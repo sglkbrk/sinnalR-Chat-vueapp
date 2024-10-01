@@ -11,78 +11,55 @@ namespace ProductManagement.Tests.Services
 {
     public class ProductServiceTests
     {
-        private ProductService _productService;
-        private ApplicationDbContext _context;
-        // public ProductServiceTests()
-        // {
-
-        //     var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-        //         .UseInMemoryDatabase(databaseName: "TestDatabase")
-        //         .Options;
-
-        //     var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-        //     .UseSqlServer("YourConnectionStringHere") // Gerçek veritabanı bağlantısı
-        //     .Options;
-
-        //     _context = new ApplicationDbContext(options);
-        //     _productService = new ProductService(_context);
-        // }
-        public void UseInMemoryDatabase()
+        private readonly ProductService _productService;
+        private readonly ApplicationDbContext _context;
+        public ProductServiceTests()
         {
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(databaseName: "TestDatabase")
-            .Options;
 
-            _context = new ApplicationDbContext(options);
-            _productService = new ProductService(_context);
-        }
-
-        public void UseMySqlDatabase()
-        {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseMySql("Server=localhost;Database=ProductManagementDb;User=root;Password=123456;",
-                    new MySqlServerVersion(new Version(8, 0, 40))) // MySQL versiyonunu uygun şekilde belirtin
+                .UseInMemoryDatabase(databaseName: "TestDatabase")
                 .Options;
 
+
             _context = new ApplicationDbContext(options);
             _productService = new ProductService(_context);
+            InitializeDatabase();
         }
-        // private void InitializeDatabase()
-        // {
-        //     _context.Products.RemoveRange(_context.Products); // Verileri temizler
-        //     _context.SaveChanges();
+        //public void UseInMemoryDatabase()
+        //{
+        //    var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+        //    .UseInMemoryDatabase(databaseName: "TestDatabase")
+        //    .Options;
 
-        //     _context.Products.AddRange(
-        //         new Product { Id = 1, Name = "Product 1", Price = 100 },
-        //         new Product { Id = 2, Name = "Product 2", Price = 200 }
-        //     );
-        //     _context.SaveChanges();
-        // }
+        //    _context = new ApplicationDbContext(options);
+        //    _productService = new ProductService(_context);
+        //}
 
-        private void SeedDatabase()
+        //public void UseMySqlDatabase()
+        //{
+        //    var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+        //        .UseMySql("Server=localhost;Database=ProductManagementDb;User=root;Password=123456;",
+        //            new MySqlServerVersion(new Version(8, 0, 40))) // MySQL versiyonunu uygun şekilde belirtin
+        //        .Options;
+
+        //    _context = new ApplicationDbContext(options);
+        //    _productService = new ProductService(_context);
+        //}
+        private void InitializeDatabase()
         {
-            if (_context.Products.Any())
-            {
-                return; // Veritabanı zaten doldurulmuş
-            }
+            _context.Products.RemoveRange(_context.Products); // Verileri temizler
+            _context.SaveChanges();
 
             _context.Products.AddRange(
-                new Product { Id = 1, Name = "Product 1" },
-                new Product { Id = 2, Name = "Product 2" }
+                new Product { Id = 1, Name = "Product 1", Price = 100 },
+                new Product { Id = 2, Name = "Product 2", Price = 200 }
             );
-
             _context.SaveChanges();
         }
-        public void Dispose()
-        {
-            _context?.Database.EnsureDeleted(); // Testlerden sonra veritabanını sil
-            _context?.Dispose();
-        }
+
         [Fact]
         public void GetAllProducts_ShouldReturnAllProducts()
         {
-            UseInMemoryDatabase();
-            SeedDatabase();
             var result = _productService.GetAllProducts();
             Assert.Equal(2, result.Count); // Beklenen ürün sayısı
             Assert.Equal("Product 1", result[0].Name); // İlk ürün kontrolü
@@ -92,8 +69,6 @@ namespace ProductManagement.Tests.Services
         [Fact]
         public void GetProductById_ShouldReturnProduct()
         {
-            UseInMemoryDatabase();
-            SeedDatabase();
             var result = _productService.GetProductById(1);
             Assert.Equal("Product 1", result.Name); // Beklenen ürün kontrolü
         }
@@ -101,7 +76,7 @@ namespace ProductManagement.Tests.Services
         [Fact]
         public void AddProduct_ShouldAddProduct()
         {
-            UseInMemoryDatabase();
+            InitializeDatabase();
             var product = new Product { Id = 3, Name = "Product 3", Price = 300 };
             _productService.AddProduct(product);
             var result = _productService.GetProductById(3);
@@ -111,7 +86,7 @@ namespace ProductManagement.Tests.Services
         [Fact]
         public void UpdateProduct_ShouldUpdateProduct()
         {
-            UseInMemoryDatabase();
+            InitializeDatabase();
             var product = new Product { Id = 1, Name = "Updated Product", Price = 500 };
             _productService.UpdateProduct(product);
             var result = _productService.GetProductById(1);
@@ -121,7 +96,6 @@ namespace ProductManagement.Tests.Services
         [Fact]
         public void DeleteProduct_ShouldDeleteProduct()
         {
-            UseInMemoryDatabase();
             _productService.DeleteProduct(1);
             var result = _productService.GetProductById(1);
             Assert.Null(result); // Silinecek ürün kontrolü
@@ -130,7 +104,6 @@ namespace ProductManagement.Tests.Services
         [Fact]
         public void GetProductById_ShouldReturnNull_WhenProductNotFound()
         {
-            UseInMemoryDatabase();
             var result = _productService.GetProductById(999); // Var olmayan bir ID
 
             // Assert
@@ -139,7 +112,6 @@ namespace ProductManagement.Tests.Services
         [Fact]
         public void GetAllProducts_ShouldReturnInLessThan1Second()
         {
-            UseInMemoryDatabase();
             // Act
             var watch = System.Diagnostics.Stopwatch.StartNew();
             var result = _productService.GetAllProducts();
@@ -153,7 +125,7 @@ namespace ProductManagement.Tests.Services
         [InlineData(5, "Product B")]
         public void AddProduct_ShouldAddProduct_WhenNameIsValid(int id, string productName)
         {
-            UseInMemoryDatabase();
+            InitializeDatabase();
             var product = new Product { Id = id, Name = productName, Price = 300 };
             _productService.AddProduct(product);
             var result = _productService.GetProductById(product.Id);

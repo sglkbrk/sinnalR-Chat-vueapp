@@ -3,13 +3,13 @@ using ProductManagement.Infrastructure.Data;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ProductManagement.Application.Services
+namespace ProductManagement.Application.Services 
 {
     public class ProductService
     {
         private readonly ApplicationDbContext _context;
 
-
+                  
 
         public ProductService(ApplicationDbContext context)
         {
@@ -34,7 +34,7 @@ namespace ProductManagement.Application.Services
 
         public void UpdateProduct(Product product)
         {
-            _context.Products.Update(product);
+             _context.Products.Update(product);
             _context.SaveChanges();
         }
 

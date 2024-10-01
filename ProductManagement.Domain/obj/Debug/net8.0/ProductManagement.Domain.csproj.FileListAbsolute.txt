@@ -11,3 +11,15 @@
 /Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/obj/Debug/net8.0/ref/ProductManagement.Domain.dll
 /Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/bin/Debug/net8.0/ProductManagement.Domain.runtimeconfig.json
 /Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/obj/Debug/net8.0/ProductManagement.Domain.genruntimeconfig.cache
+C:\Users\sglkb\Source\Repos\ProductManagement\ProductManagement.Domain\bin\Debug\net8.0\ProductManagement.Domain.deps.json
+C:\Users\sglkb\Source\Repos\ProductManagement\ProductManagement.Domain\bin\Debug\net8.0\ProductManagement.Domain.dll
+C:\Users\sglkb\Source\Repos\ProductManagement\ProductManagement.Domain\bin\Debug\net8.0\ProductManagement.Domain.pdb
+C:\Users\sglkb\Source\Repos\ProductManagement\ProductManagement.Domain\obj\Debug\net8.0\ProductManagement.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\sglkb\Source\Repos\ProductManagement\ProductManagement.Domain\obj\Debug\net8.0\ProductManagement.Domain.AssemblyInfoInputs.cache
+C:\Users\sglkb\Source\Repos\ProductManagement\ProductManagement.Domain\obj\Debug\net8.0\ProductManagement.Domain.AssemblyInfo.cs
+C:\Users\sglkb\Source\Repos\ProductManagement\ProductManagement.Domain\obj\Debug\net8.0\ProductManagement.Domain.csproj.CoreCompileInputs.cache
+C:\Users\sglkb\Source\Repos\ProductManagement\ProductManagement.Domain\obj\Debug\net8.0\ProductManagement.Domain.sourcelink.json
+C:\Users\sglkb\Source\Repos\ProductManagement\ProductManagement.Domain\obj\Debug\net8.0\ProductManagement.Domain.dll
+C:\Users\sglkb\Source\Repos\ProductManagement\ProductManagement.Domain\obj\Debug\net8.0\refint\ProductManagement.Domain.dll
+C:\Users\sglkb\Source\Repos\ProductManagement\ProductManagement.Domain\obj\Debug\net8.0\ProductManagement.Domain.pdb
+C:\Users\sglkb\Source\Repos\ProductManagement\ProductManagement.Domain\obj\Debug\net8.0\ref\ProductManagement.Domain.dll

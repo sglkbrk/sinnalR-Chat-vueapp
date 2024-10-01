@@ -3,21 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductManagement.API", "ProductManagement.API\ProductManagement.API.csproj", "{00EE35FA-AD30-4382-A4A7-C8D1F31C9DA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductManagement.API", "ProductManagement.API\ProductManagement.API.csproj", "{00EE35FA-AD30-4382-A4A7-C8D1F31C9DA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductManagement.Application", "ProductManagement.Application\ProductManagement.Application.csproj", "{63EE501B-DC8E-4270-B9E3-6AFD3E3ED56D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductManagement.Application", "ProductManagement.Application\ProductManagement.Application.csproj", "{63EE501B-DC8E-4270-B9E3-6AFD3E3ED56D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductManagement.Domain", "ProductManagement.Domain\ProductManagement.Domain.csproj", "{B726B977-F2C7-424A-8233-5034B6D860FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductManagement.Domain", "ProductManagement.Domain\ProductManagement.Domain.csproj", "{B726B977-F2C7-424A-8233-5034B6D860FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductManagement.Infrastructure", "ProductManagement.Infrastructure\ProductManagement.Infrastructure.csproj", "{34510851-6518-418B-AC30-CE391D0BC75B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductManagement.Infrastructure", "ProductManagement.Infrastructure\ProductManagement.Infrastructure.csproj", "{34510851-6518-418B-AC30-CE391D0BC75B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductManagement.Tests", "ProductManagement.Tests\ProductManagement.Tests.csproj", "{8C069D2F-6873-4438-87E3-77C2D7EBCA2C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{00EE35FA-AD30-4382-A4A7-C8D1F31C9DA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -36,5 +35,12 @@ Global
 		{34510851-6518-418B-AC30-CE391D0BC75B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34510851-6518-418B-AC30-CE391D0BC75B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34510851-6518-418B-AC30-CE391D0BC75B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C069D2F-6873-4438-87E3-77C2D7EBCA2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C069D2F-6873-4438-87E3-77C2D7EBCA2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C069D2F-6873-4438-87E3-77C2D7EBCA2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C069D2F-6873-4438-87E3-77C2D7EBCA2C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

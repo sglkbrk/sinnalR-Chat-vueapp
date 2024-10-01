@@ -1832,7 +1832,6 @@
         "dependencies": {
           "Microsoft.AspNetCore.Authentication.JwtBearer": "8.0.8",
           "Microsoft.AspNetCore.OpenApi": "8.0.8",
-          "Pomelo.EntityFrameworkCore.MySql": "8.0.2",
           "ProductManagement.Application": "1.0.0",
           "ProductManagement.Domain": "1.0.0",
           "ProductManagement.Infrastructure": "1.0.0",
@@ -4873,35 +4872,38 @@
     ]
   },
   "packageFolders": {
-    "/Users/burak/.nuget/packages/": {}
+    "C:\\Users\\sglkb\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Tests/ProductManagement.Tests.csproj",
+      "projectUniqueName": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Tests\\ProductManagement.Tests.csproj",
       "projectName": "ProductManagement.Tests",
-      "projectPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Tests/ProductManagement.Tests.csproj",
-      "packagesPath": "/Users/burak/.nuget/packages/",
-      "outputPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Tests/obj/",
+      "projectPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Tests\\ProductManagement.Tests.csproj",
+      "packagesPath": "C:\\Users\\sglkb\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/burak/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\sglkb\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/ProductManagement.API.csproj": {
-              "projectPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/ProductManagement.API.csproj"
+            "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.API\\ProductManagement.API.csproj": {
+              "projectPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.API\\ProductManagement.API.csproj"
             },
-            "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Application/ProductManagement.Application.csproj": {
-              "projectPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Application/ProductManagement.Application.csproj"
+            "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Application\\ProductManagement.Application.csproj": {
+              "projectPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Application\\ProductManagement.Application.csproj"
             }
           }
         }
@@ -4964,7 +4966,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.401/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
