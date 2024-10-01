@@ -1,0 +1,13 @@
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/bin/Debug/net8.0/ProductManagement.Domain.deps.json
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/bin/Debug/net8.0/ProductManagement.Domain.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/bin/Debug/net8.0/ProductManagement.Domain.pdb
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/obj/Debug/net8.0/ProductManagement.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/obj/Debug/net8.0/ProductManagement.Domain.AssemblyInfoInputs.cache
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/obj/Debug/net8.0/ProductManagement.Domain.AssemblyInfo.cs
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/obj/Debug/net8.0/ProductManagement.Domain.csproj.CoreCompileInputs.cache
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/obj/Debug/net8.0/ProductManagement.Domain.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/obj/Debug/net8.0/refint/ProductManagement.Domain.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/obj/Debug/net8.0/ProductManagement.Domain.pdb
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/obj/Debug/net8.0/ref/ProductManagement.Domain.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/bin/Debug/net8.0/ProductManagement.Domain.runtimeconfig.json
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/obj/Debug/net8.0/ProductManagement.Domain.genruntimeconfig.cache
