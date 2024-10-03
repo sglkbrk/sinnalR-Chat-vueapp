@@ -1,15 +1,16 @@
+using Microsoft.EntityFrameworkCore;
 using ProductManagement.Domain.Models;
 using ProductManagement.Infrastructure.Data;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ProductManagement.Application.Services 
+namespace ProductManagement.Application.Services
 {
     public class ProductService
     {
         private readonly ApplicationDbContext _context;
 
-                  
+
 
         public ProductService(ApplicationDbContext context)
         {
@@ -18,7 +19,7 @@ namespace ProductManagement.Application.Services
 
         public List<Product> GetAllProducts()
         {
-            return _context.Products.OrderBy(p => p.Id).ToList();
+            return _context.Products.Include(p => p.Category).OrderBy(p => p.Id).ToList();
         }
 
         public Product GetProductById(int id)
@@ -34,7 +35,7 @@ namespace ProductManagement.Application.Services
 
         public void UpdateProduct(Product product)
         {
-             _context.Products.Update(product);
+            _context.Products.Update(product);
             _context.SaveChanges();
         }
 
@@ -47,5 +48,6 @@ namespace ProductManagement.Application.Services
                 _context.SaveChanges();
             }
         }
+
     }
 }

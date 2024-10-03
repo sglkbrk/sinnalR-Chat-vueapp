@@ -1,28 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Domain\\ProductManagement.Domain.csproj": {}
+    "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/ProductManagement.Domain.csproj": {}
   },
   "projects": {
-    "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Domain\\ProductManagement.Domain.csproj": {
+    "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/ProductManagement.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Domain\\ProductManagement.Domain.csproj",
+        "projectUniqueName": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/ProductManagement.Domain.csproj",
         "projectName": "ProductManagement.Domain",
-        "projectPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Domain\\ProductManagement.Domain.csproj",
-        "packagesPath": "C:\\Users\\sglkb\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Domain\\obj\\",
+        "projectPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/ProductManagement.Domain.csproj",
+        "packagesPath": "/Users/burak/.nuget/packages/",
+        "outputPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\sglkb\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/burak/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -61,7 +58,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

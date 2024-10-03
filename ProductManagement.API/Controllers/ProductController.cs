@@ -39,7 +39,7 @@ namespace ProductManagement.API.Controllers
         public IActionResult Create([FromBody] Product product)
         {
             _productService.AddProduct(product);
-            return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+            return Ok(product);
         }
 
         [HttpPut("{id}")]

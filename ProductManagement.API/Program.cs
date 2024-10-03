@@ -16,9 +16,9 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql("Server=localhost;Database=ProductManagementDb;User=root;Password=123456;",
+    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
     new MySqlServerVersion(new Version(8, 0, 40))));
-
+// Server=localhost;Database=ProductManagementDb;User=root;Password=123456;
 // Servisleri ekleyin
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddControllers();

@@ -1,42 +1,39 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.API\\ProductManagement.API.csproj": {}
+    "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/ProductManagement.API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.API\\ProductManagement.API.csproj": {
+    "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/ProductManagement.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.API\\ProductManagement.API.csproj",
+        "projectUniqueName": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/ProductManagement.API.csproj",
         "projectName": "ProductManagement.API",
-        "projectPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.API\\ProductManagement.API.csproj",
-        "packagesPath": "C:\\Users\\sglkb\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.API\\obj\\",
+        "projectPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/ProductManagement.API.csproj",
+        "packagesPath": "/Users/burak/.nuget/packages/",
+        "outputPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\sglkb\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/burak/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Application\\ProductManagement.Application.csproj": {
-                "projectPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Application\\ProductManagement.Application.csproj"
+              "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Application/ProductManagement.Application.csproj": {
+                "projectPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Application/ProductManagement.Application.csproj"
               },
-              "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Domain\\ProductManagement.Domain.csproj": {
-                "projectPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Domain\\ProductManagement.Domain.csproj"
+              "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/ProductManagement.Domain.csproj": {
+                "projectPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/ProductManagement.Domain.csproj"
               },
-              "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Infrastructure\\ProductManagement.Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Infrastructure\\ProductManagement.Infrastructure.csproj"
+              "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Infrastructure/ProductManagement.Infrastructure.csproj": {
+                "projectPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Infrastructure/ProductManagement.Infrastructure.csproj"
               }
             }
           }
@@ -61,6 +58,12 @@
               "version": "[8.0.8, )"
             },
             "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
               "target": "Package",
               "version": "[8.0.8, )"
             },
@@ -96,37 +99,34 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Application\\ProductManagement.Application.csproj": {
+    "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Application/ProductManagement.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Application\\ProductManagement.Application.csproj",
+        "projectUniqueName": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Application/ProductManagement.Application.csproj",
         "projectName": "ProductManagement.Application",
-        "projectPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Application\\ProductManagement.Application.csproj",
-        "packagesPath": "C:\\Users\\sglkb\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Application\\obj\\",
+        "projectPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Application/ProductManagement.Application.csproj",
+        "packagesPath": "/Users/burak/.nuget/packages/",
+        "outputPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Application/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\sglkb\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/burak/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Infrastructure\\ProductManagement.Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Infrastructure\\ProductManagement.Infrastructure.csproj"
+              "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Infrastructure/ProductManagement.Infrastructure.csproj": {
+                "projectPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Infrastructure/ProductManagement.Infrastructure.csproj"
               }
             }
           }
@@ -161,29 +161,26 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Domain\\ProductManagement.Domain.csproj": {
+    "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/ProductManagement.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Domain\\ProductManagement.Domain.csproj",
+        "projectUniqueName": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/ProductManagement.Domain.csproj",
         "projectName": "ProductManagement.Domain",
-        "projectPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Domain\\ProductManagement.Domain.csproj",
-        "packagesPath": "C:\\Users\\sglkb\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Domain\\obj\\",
+        "projectPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/ProductManagement.Domain.csproj",
+        "packagesPath": "/Users/burak/.nuget/packages/",
+        "outputPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\sglkb\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/burak/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -222,37 +219,34 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Infrastructure\\ProductManagement.Infrastructure.csproj": {
+    "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Infrastructure/ProductManagement.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Infrastructure\\ProductManagement.Infrastructure.csproj",
+        "projectUniqueName": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Infrastructure/ProductManagement.Infrastructure.csproj",
         "projectName": "ProductManagement.Infrastructure",
-        "projectPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Infrastructure\\ProductManagement.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\sglkb\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Infrastructure\\obj\\",
+        "projectPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Infrastructure/ProductManagement.Infrastructure.csproj",
+        "packagesPath": "/Users/burak/.nuget/packages/",
+        "outputPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Infrastructure/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\sglkb\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/burak/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Domain\\ProductManagement.Domain.csproj": {
-                "projectPath": "C:\\Users\\sglkb\\source\\repos\\ProductManagement\\ProductManagement.Domain\\ProductManagement.Domain.csproj"
+              "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/ProductManagement.Domain.csproj": {
+                "projectPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/ProductManagement.Domain.csproj"
               }
             }
           }
@@ -309,7 +303,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
