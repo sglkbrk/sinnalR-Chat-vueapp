@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace ProductManagement.Domain.Models
 {
-    public class Product
+    public class Products
     {
         [Key]  // Birincil anahtar olduğunu belirtir
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

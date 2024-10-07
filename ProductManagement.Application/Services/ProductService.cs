@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProductManagement.Domain.Models;
 using ProductManagement.Infrastructure.Data;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace ProductManagement.Application.Services
 {
@@ -17,23 +15,23 @@ namespace ProductManagement.Application.Services
             _context = context;
         }
 
-        public List<Product> GetAllProducts()
+        public List<Products> GetAllProducts()
         {
             return _context.Products.Include(p => p.Category).OrderBy(p => p.Id).ToList();
         }
 
-        public Product GetProductById(int id)
+        public Products GetProductById(int id)
         {
-            return _context.Products.FirstOrDefault(p => p.Id == id);
+            return _context.Products.Include(p => p.Category).FirstOrDefault(p => p.Id == id);
         }
 
-        public void AddProduct(Product product)
+        public void AddProduct(Products product)
         {
             _context.Products.Add(product);
             _context.SaveChanges();
         }
 
-        public void UpdateProduct(Product product)
+        public void UpdateProduct(Products product)
         {
             _context.Products.Update(product);
             _context.SaveChanges();

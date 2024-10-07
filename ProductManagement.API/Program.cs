@@ -21,6 +21,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Server=localhost;Database=ProductManagementDb;User=root;Password=123456;
 // Servisleri ekleyin
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<CategoryService>();
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(c =>
 {

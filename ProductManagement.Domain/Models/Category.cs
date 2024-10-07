@@ -8,8 +8,7 @@ namespace ProductManagement.Domain.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-
-        public required int Id { get; set; }
+        public int Id { get; set; }
 
         public required string Name { get; set; }
 

@@ -10,7 +10,7 @@ namespace ProductManagement.Infrastructure.Data
         {
         }
 
-        public DbSet<Product> Products { get; set; }
+        public DbSet<Products> Products { get; set; }
         public DbSet<Category> Category { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

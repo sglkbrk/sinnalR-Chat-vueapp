@@ -36,14 +36,14 @@ namespace ProductManagement.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] Product product)
+        public IActionResult Create([FromBody] Products product)
         {
             _productService.AddProduct(product);
             return Ok(product);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Product product)
+        public IActionResult Update(int id, [FromBody] Products product)
         {
             if (id != product.Id)
                 return BadRequest();
