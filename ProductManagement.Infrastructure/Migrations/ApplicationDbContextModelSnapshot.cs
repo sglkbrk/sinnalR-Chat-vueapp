@@ -38,7 +38,7 @@ namespace ProductManagement.Infrastructure.Migrations
                     b.ToTable("Category");
                 });
 
-            modelBuilder.Entity("ProductManagement.Domain.Models.Product", b =>
+            modelBuilder.Entity("ProductManagement.Domain.Models.Products", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -50,7 +50,6 @@ namespace ProductManagement.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<decimal>("Price")
@@ -63,20 +62,15 @@ namespace ProductManagement.Infrastructure.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("ProductManagement.Domain.Models.Product", b =>
+            modelBuilder.Entity("ProductManagement.Domain.Models.Products", b =>
                 {
                     b.HasOne("ProductManagement.Domain.Models.Category", "Category")
-                        .WithMany("Products")
+                        .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("ProductManagement.Domain.Models.Category", b =>
-                {
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

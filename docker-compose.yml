@@ -4,10 +4,10 @@ services:
   db:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: your_root_password
-      MYSQL_DATABASE: your_database_name
-      MYSQL_USER: your_user
-      MYSQL_PASSWORD: your_password
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: ProductManagementDb
+      MYSQL_USER: burak
+      MYSQL_PASSWORD: 123456
     volumes:
       - db_data:/var/lib/mysql
     ports:
@@ -18,12 +18,14 @@ services:
   web:
     build: .
     ports:
-      - "5044:5044"   # HTTP portunu map ediyor
+      - "8080:8080"   # HTTP portunu map ediyor
       - "7266:7266"   # HTTPS portunu map ediyor
     depends_on:
       - db
     environment:
-      ConnectionStrings__DefaultConnection: "Server=db;Database=your_database_name;User=your_user;Password=your_password;"
+      ConnectionStrings__DefaultConnection: "Server=db;Database=ProductManagementDb;User=root;Password=123456"
+      
+
     networks:
       - app-network
 

@@ -1,0 +1,9 @@
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/bin/Release/net8.0/publish/ProductManagement.Domain.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/bin/Release/net8.0/publish/ProductManagement.Domain.deps.json
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/bin/Release/net8.0/publish/ProductManagement.Domain.pdb
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/bin/Release/net8.0/publish/Microsoft.Bcl.TimeProvider.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/bin/Release/net8.0/publish/Microsoft.IdentityModel.Abstractions.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/bin/Release/net8.0/publish/Microsoft.IdentityModel.JsonWebTokens.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/bin/Release/net8.0/publish/Microsoft.IdentityModel.Logging.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/bin/Release/net8.0/publish/Microsoft.IdentityModel.Tokens.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/bin/Release/net8.0/publish/System.IdentityModel.Tokens.Jwt.dll

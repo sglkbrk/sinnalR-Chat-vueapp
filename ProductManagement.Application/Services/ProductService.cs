@@ -20,7 +20,7 @@ namespace ProductManagement.Application.Services
             return _context.Products.Include(p => p.Category).OrderBy(p => p.Id).ToList();
         }
 
-        public Products GetProductById(int id)
+        public Products? GetProductById(int id)
         {
             return _context.Products.Include(p => p.Category).FirstOrDefault(p => p.Id == id);
         }

@@ -1,0 +1,3 @@
+/Users/burak/Desktop/Project/dotnet/ProductManagement/publish/ProductManagement.Domain.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/publish/ProductManagement.Domain.deps.json
+/Users/burak/Desktop/Project/dotnet/ProductManagement/publish/ProductManagement.Domain.pdb

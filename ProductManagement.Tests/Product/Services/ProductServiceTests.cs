@@ -46,10 +46,10 @@ namespace ProductManagement.Tests.Services
         [Fact]
         public void UpdateProduct_ShouldUpdateProduct()
         {
-            var product = new Product { Id = 2, Name = "Updated Product", Price = 500 };
+            var product = new Products { Id = 2, Name = "Updated Product", Price = 500 };
             _productService.UpdateProduct(product);
             var result = _productService.GetProductById(2);
-            Assert.Equal("Updated Product", result.Name); // Güncellenecek ürün kontrolü
+            Assert.Equal("Updated Product", result?.Name); // Güncellenecek ürün kontrolü
         }
 
         [Fact]
@@ -65,16 +65,16 @@ namespace ProductManagement.Tests.Services
         public void GetProductById_ShouldReturnProduct()
         {
             var result = _productService.GetProductById(2);
-            Assert.Equal("1", result.Name); // Beklenen ürün kontrolü
+            Assert.Equal("1", result?.Name); // Beklenen ürün kontrolü
         }
 
         [Fact]
         public void AddProduct_ShouldAddProduct()
         {
-            var product = new Product { Name = "Product 3", Price = 300 };
+            var product = new Products { Name = "Product 3", Price = 300 };
             _productService.AddProduct(product);
             var result = _productService.GetProductById(product.Id);
-            Assert.Equal("Product 3", result.Name); // Eklenecek ürün kontrolü
+            Assert.Equal("Product 3", result?.Name); // Eklenecek ürün kontrolü
         }
 
 
@@ -111,16 +111,16 @@ namespace ProductManagement.Tests.Services
         [InlineData("Product B")]
         public void AddProduct_ShouldAddProduct_WhenNameIsValid(string productName)
         {
-            var product = new Product { Name = productName, Price = 300 };
+            var product = new Products { Name = productName, Price = 300 };
             _productService.AddProduct(product);
             var result = _productService.GetProductById(product.Id);
-            Assert.Equal(productName, result.Name); // Eklenecek ürün kontrolü
+            Assert.Equal(productName, result?.Name); // Eklenecek ürün kontrolü
         }
 
-        public void Dispose()
-        {
-            _transaction.Dispose();
-        }
+        // public void Dispose()
+        // {
+        //     _transaction.Dispose();
+        // }
     }
 
 

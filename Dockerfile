@@ -1,7 +1,7 @@
 # Base image olarak ASP.NET runtime kullanılıyor
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 5044
+EXPOSE 8080
 EXPOSE 7266
 
 # SDK image for building the app

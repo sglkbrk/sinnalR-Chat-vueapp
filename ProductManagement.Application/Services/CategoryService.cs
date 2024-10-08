@@ -17,7 +17,7 @@ namespace ProductManagement.Application.Services
             return _context.Category.ToList();
         }
 
-        public Category GetCategoryById(int id)
+        public Category? GetCategoryById(int id)
         {
             return _context.Category.FirstOrDefault(c => c.Id == id);
         }
