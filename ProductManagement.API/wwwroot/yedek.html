@@ -279,7 +279,7 @@
         function updateConnectionStatus(status) {
             const statusDiv = document.getElementById('connectionStatus');
             statusDiv.textContent = status;
-            setTimeout(() => statusDiv.textContent = '', 15000);
+            setTimeout(() => statusDiv.textContent = '', 10000);
         }
         async function loadUsers() {
             const response = await fetch('/api/UserAuth/users', {
