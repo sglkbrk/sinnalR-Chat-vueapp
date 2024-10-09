@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using Serilog;
+using ProductManagement.API.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File("logs/myapp.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
+builder.Services.AddSignalR();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
     new MySqlServerVersion(new Version(8, 0, 40))));
@@ -49,6 +51,18 @@ builder.Services.AddSwaggerGen(c =>
         });
 
 });
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials()
+              .SetIsOriginAllowed(origin => true); // Geliştirme ortamında herhangi bir origin'e izin verebilirsiniz.
+    });
+});
+
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "";
 var key = Encoding.UTF8.GetBytes(jwtKey);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -71,6 +85,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
+app.MapHub<ChatHub>("/chatHub");
+app.UseCors();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseRouting();
 app.MapControllers();

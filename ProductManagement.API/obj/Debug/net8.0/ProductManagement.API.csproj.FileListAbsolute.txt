@@ -246,3 +246,5 @@ C:/Users/sglkb/Source/Repos/ProductManagement/ProductManagement.API/obj/Debug/ne
 /Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/obj/Debug/net8.0/ProductManagement.API.pdb
 /Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/obj/Debug/net8.0/ProductManagement.API.genruntimeconfig.cache
 /Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/obj/Debug/net8.0/ref/ProductManagement.API.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/bin/Debug/net8.0/Newtonsoft.Json.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/bin/Debug/net8.0/System.Net.WebSockets.WebSocketProtocol.dll
