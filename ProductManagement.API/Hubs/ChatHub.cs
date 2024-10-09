@@ -1,34 +1,3 @@
-// using Microsoft.AspNetCore.SignalR;
-// using ProductManagement.Domain.Models;
-// using ProductManagement.Application.Services;
-// using System.Security.Claims;
-
-// namespace ProductManagement.API.Hubs
-// {
-//     public class ChatHub : Hub
-//     {
-//         private readonly MessageService _messageService;
-//         public ChatHub(MessageService messageService)
-//         {
-//             _messageService = messageService;
-//         }
-
-//         public override Task OnConnectedAsync()
-//         {
-//             return base.OnConnectedAsync();
-//         }
-
-//         public async Task SendMessage(Message message)
-//         {
-//             var senderId = Context.UserIdentifier;
-//             _messageService.AddMessage(message);
-//             // await Clients.All.SendAsync("ReceiveMessage", message.Content);
-//             await Clients.User(message.ReceiverId.ToString()).SendAsync("ReceiveMessage", message.SenderId, message);
-//         }
-//     }
-// }
-
-// Hubs/ChatHub.cs
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
@@ -55,12 +24,14 @@ public class ChatHub : Hub
     public async Task SendMessage(Message message)
     {
         var senderId = Context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var name = Context.User.FindFirstValue(ClaimTypes.Name);
         // Mesajı veritabanına kaydet
         message.SenderId = int.Parse(senderId);
         _messageService.AddMessage(message);
         // Alıcıya mesajı gönder
         await Clients.User(message.ReceiverId.ToString()).SendAsync("ReceiveMessage", new
         {
+            Name = name,
             SenderId = senderId,
             Content = message,
             Timestamp = message.Timestamp
