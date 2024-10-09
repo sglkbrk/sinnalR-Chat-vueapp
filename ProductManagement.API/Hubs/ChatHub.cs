@@ -66,4 +66,12 @@ public class ChatHub : Hub
             Timestamp = message.Timestamp
         });
     }
+
+    public async Task SendWrite(string ReceiverId)
+    {
+        var senderId = Context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        // Mesajı veritabanına kaydet
+        // Alıcıya mesajı gönder
+        await Clients.User(ReceiverId).SendAsync("ReceiveWrites", senderId);
+    }
 }

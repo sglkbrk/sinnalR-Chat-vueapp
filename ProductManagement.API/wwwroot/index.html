@@ -7,36 +7,57 @@
 </head>
 <body>
     <h1>WhatsApp Clone</h1>
+
+    <!-- Login Bölümü -->
     <div id="login">
         <h2>Login</h2>
+        <!-- <input type="text" id="username" value="asd@asd.com" placeholder="Username" />
+        <input type="password" id="password" value="123456" placeholder="Password" /> -->
         <input type="text" id="username"  placeholder="Username" />
         <input type="password" id="password"  placeholder="Password" />
         <button onclick="login()">Login</button>
     </div>
 
+    <!-- Register Bölümü -->
+    <div id="register" >
+        <h2>Register</h2>
+        <input type="text" id="reg-username" placeholder="Username" />
+        <input type="email" id="reg-email" placeholder="Email" />
+        <input type="password" id="reg-password" placeholder="Password" />
+        <button onclick="register()">Register</button>
+        
+    </div>
+    <div id="register-message"></div>
+    <!-- Chat Bölümü -->
     <div id="chat" style="display:none;">
         <h2>Chat</h2>
         <label for="users">Select User:</label>
         <select onchange="selectasd()" id="users"></select>
-        
-
+        <div id="connectionStatus"></div>
+        <div id="ReceiveWrites" style="display:none;" >yazıyor</div>
         <div id="messages" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll;">
             <!-- Mesajlar buraya eklenecek -->
         </div>
-        <input style="width:100%;" type="text" id="message" placeholder="Type a message" />
+        <input style="width:100%;" type="text" id="message" oninput="onChangeMsg()" placeholder="Type a message" />
         <button onclick="sendMessage()">Send</button>
     </div>
 
     <script>
+        // Giriş işlemi için tuş dinleyicisi
         document.getElementById("message").addEventListener("keydown", function(event) {
             if (event.key === "Enter") {
                 sendMessage(); // Enter tuşuna basıldığında mesajı gönder
                 event.preventDefault(); // Formun submit edilmesini engelle
             }
         });
+
         let token = '';
-        userId = 0
+        userId = 0;
         let connection = null;
+        let reconnectAttempts = 0; // Yeniden bağlanma denemeleri sayacı
+        const maxReconnectAttempts = 5; // Maksimum yeniden bağlanma denemesi
+        const reconnectInterval = 5000; 
+        let writeTime=0
 
         async function login() {
             const username = document.getElementById('username').value;
@@ -51,9 +72,10 @@
             if (response.ok) {
                 const data = await response.json();
                 token = data.token;
-                var asd = parseJwt(token)
-                userId = asd.sub
+                var asd = parseJwt(token);
+                userId = asd.sub;
                 document.getElementById('login').style.display = 'none';
+                document.getElementById('register').style.display = 'none'; // Kayıt bölümünü gizle
                 document.getElementById('chat').style.display = 'block';
                 startConnection();
                 loadUsers();
@@ -62,6 +84,30 @@
                 alert('Login failed: ' + (error.message || 'Unknown error'));
             }
         }
+
+        async function register() {
+            const regUsername = document.getElementById('reg-username').value;
+            const regEmail = document.getElementById('reg-email').value;
+            const regPassword = document.getElementById('reg-password').value;
+
+            const response = await fetch('/api/UserAuth/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ Username: regUsername, Email: regEmail, Password: regPassword })
+            });
+
+            if (response.ok) {
+                document.getElementById('register-message').textContent = "Kayıt başarılı! Lütfen giriş yapın.";
+                document.getElementById('reg-username').value = '';
+                document.getElementById('reg-email').value = '';
+                document.getElementById('reg-password').value = '';
+                document.getElementById('register').style.display = 'none'; 
+            } else {
+                const error = await response.json();
+                document.getElementById('register-message').textContent = 'Kayıt başarısız: ' + (error.errors || 'Lüfen Bilgileri doğrı girin ');
+            }
+        }
+
         function parseJwt(token) {
             // Token'ı parçala
             const base64Url = token.split('.')[1]; // Payload kısmı
@@ -78,19 +124,65 @@
 
             connection.on('ReceiveMessage', (message) => {
                 const receiverId = document.getElementById('users').value;
-                if(message.senderId == receiverId) {
+                if (message.senderId == receiverId) {
                     const msgDiv = document.getElementById('messages');
-                    msgDiv.innerHTML += `<p style="text-align:left" > <em style="color:blue" >${new Date(message.timestamp).toLocaleTimeString()}</em>  ${message.content.content} </p>`;
+                    msgDiv.innerHTML += `<p style="text-align:left"><em style="color:blue">${new Date(message.timestamp).toLocaleTimeString()}</em> ${message.content.content}</p>`;
                     msgDiv.scrollTop = msgDiv.scrollHeight; // Otomatik olarak en son mesaja kaydır
                 }
-                
             });
 
+            connection.on('ReceiveWrites', (senderId) => {
+                const receiverId = document.getElementById('users').value;
+                if (senderId == receiverId) {
+                    document.getElementById('ReceiveWrites').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('ReceiveWrites').style.display = 'none';
+                    },3000)
+                }
+            });
+            
+            connection.onclose(() => {
+                updateConnectionStatus('Bağlantı kesildi. Yeniden bağlanma denemeleri başlatılıyor...');
+                attemptReconnect();
+            });
+
+            connection.onreconnecting(() => {
+                updateConnectionStatus('Bağlantı yeniden bağlanıyor...');
+            });
+
+            connection.onreconnected(() => {
+                updateConnectionStatus('Bağlantı başarıyla yeniden kuruldu.');
+            });
             connection.start()
                 .then(() => console.log('SignalR connected'))
                 .catch(err => console.error('SignalR connection error: ', err));
         }
+        async function attemptReconnect() {
+            while (reconnectAttempts < maxReconnectAttempts) {
+                await new Promise(resolve => setTimeout(resolve, reconnectInterval)); // Belirli bir süre bekle
 
+                reconnectAttempts++;
+                console.log(`Yeniden bağlanma denemesi ${reconnectAttempts}...`);
+
+                try {
+                    await connection.start(); // Yeniden bağlanmayı dene
+                    console.log('Bağlantı başarıyla yeniden kuruldu.');
+                    updateConnectionStatus('Bağlantı başarıyla yeniden kuruldu.');
+                    reconnectAttempts = 0; // Başarılı olduğunda deneme sayacını sıfırla
+                    return; // Yeniden bağlantı başarılıysa döngüden çık
+                } catch (err) {
+                    console.error('Yeniden bağlanma hatası: ', err);
+                }
+            }
+
+            // Maksimum deneme sayısına ulaşıldıysa kullanıcıya bildirim gönder
+            updateConnectionStatus('Maksimum yeniden bağlanma denemesi aşıldı. Lütfen internet bağlantınızı kontrol edin.');
+        }
+        function updateConnectionStatus(status) {
+            const statusDiv = document.getElementById('connectionStatus');
+            statusDiv.textContent = status;
+            setTimeout(() => statusDiv.textContent = '', 10000);
+        }
         async function loadUsers() {
             const response = await fetch('/api/UserAuth/users', {
                 method: 'GET',
@@ -111,16 +203,18 @@
                     option.text = user.username; // veya user.email
                     usersSelect.add(option);
                 });
-                loadMessages(userId,users[0].id)
+                loadMessages(userId, users[0].id);
             } else {
                 const error = await response.json();
                 alert('Failed to load users: ' + (error.message || 'Unknown error'));
             }
         }
+
         async function selectasd() {
             const receiverId = document.getElementById('users').value;
-            loadMessages(userId,receiverId)
+            loadMessages(userId, receiverId);
         }
+
         async function loadMessages(senderId, receiverId) {
             const response = await fetch('/api/message/GetMyMessages/' + senderId + '/' + receiverId, {
                 method: 'GET',
@@ -135,10 +229,10 @@
                 const msgDiv = document.getElementById('messages');
                 msgDiv.innerHTML = "";
                 users.forEach(msg => {
-                    if(msg.senderId == userId )
-                        msgDiv.innerHTML += `<p style="text-align:right" > ${msg.content} <em  style="color:blue">${new Date(msg.timestamp).toLocaleTimeString()}</em></p>`;
+                    if (msg.senderId == userId)
+                        msgDiv.innerHTML += `<p style="text-align:right">${msg.content}<em style="color:blue">${new Date(msg.timestamp).toLocaleTimeString()}</em></p>`;
                     else
-                        msgDiv.innerHTML += `<p style="text-align:left" > <em  style="color:blue" >${new Date(msg.timestamp).toLocaleTimeString()}</em> ${msg.content} </p>`;
+                        msgDiv.innerHTML += `<p style="text-align:left"><em style="color:blue">${new Date(msg.timestamp).toLocaleTimeString()}</em> ${msg.content}</p>`;
                     msgDiv.scrollTop = msgDiv.scrollHeight; // Otomatik olarak en son mesaja kaydır
                 });
             } else {
@@ -146,7 +240,17 @@
                 alert('Failed to load users: ' + (error.message || 'Unknown error'));
             }
         }
-
+        async function onChangeMsg (params) {
+            if(writeTime  == 0 ){
+                const receiverId = document.getElementById('users').value;
+                await connection.invoke('SendWrite', receiverId);
+                writeTime = 3000
+                setTimeout(() => {
+                    writeTime = 0
+                },writeTime)
+            }
+           
+        }
         async function sendMessage() {
             const receiverId = document.getElementById('users').value;
             const message = document.getElementById('message').value.trim();
@@ -154,14 +258,14 @@
             if (connection && message !== '') {
                 try {
                     var asd = {
-                        SenderId:parseInt(userId),
-                        ReceiverId:parseInt(receiverId) ,
-                        Content:message,
-                        Timestamp:new Date()
+                        SenderId: parseInt(userId),
+                        ReceiverId: parseInt(receiverId),
+                        Content: message,
+                        Timestamp: new Date()
                     }
                     await connection.invoke('SendMessage', asd);
                     const msgDiv = document.getElementById('messages');
-                    msgDiv.innerHTML += `<p style="text-align:right" > ${message} <em  style="color:blue;" >${new Date().toLocaleTimeString()}</em></p>`;
+                    msgDiv.innerHTML += `<p style="text-align:right">${message}<em style="color:blue;">${new Date().toLocaleTimeString()}</em></p>`;
                     msgDiv.scrollTop = msgDiv.scrollHeight; // Otomatik olarak en son mesaja kaydır
                     document.getElementById('message').value = '';
                 } catch (err) {
