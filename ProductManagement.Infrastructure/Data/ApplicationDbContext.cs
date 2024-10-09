@@ -12,14 +12,28 @@ namespace ProductManagement.Infrastructure.Data
 
         public DbSet<Products> Products { get; set; }
         public DbSet<Category> Category { get; set; }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            // modelBuilder.Entity<Product>()
-            //     .HasOne(p => p.Category)
-            //     .WithMany(c => c.Products)
-            //     .HasForeignKey(p => p.CategoryId);
+        public DbSet<Message> Message { get; set; }
+        public DbSet<Users> Users { get; set; }
+        public DbSet<ChatRoom> ChatRoom { get; set; }
 
-            // Diğer yapılandırmaları burada ekleyebilirsiniz.
+
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            // Mesajların ilişkilerini tanımla
+            builder.Entity<Message>()
+                .HasOne(m => m.Sender)
+                .WithMany()
+                .HasForeignKey(m => m.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Message>()
+                .HasOne(m => m.Receiver)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

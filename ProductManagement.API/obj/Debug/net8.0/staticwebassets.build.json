@@ -1,11 +1,39 @@
 {
   "Version": 1,
-  "Hash": "1gu1NQ1tJumqN4LcHhjkdtPtQV9FIwPCKXG89NcK4y4=",
+  "Hash": "Erwhk1J01tOTCt/sogzGYqGcpI2OvgN44BAWl+ntJtE=",
   "Source": "ProductManagement.API",
   "BasePath": "_content/ProductManagement.API",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
+  "DiscoveryPatterns": [
+    {
+      "Name": "ProductManagement.API/wwwroot",
+      "Source": "ProductManagement.API",
+      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
+      "BasePath": "_content/ProductManagement.API",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/index.html",
+      "SourceId": "ProductManagement.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
+      "BasePath": "_content/ProductManagement.API",
+      "RelativePath": "index.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/index.html"
+    }
+  ]
 }

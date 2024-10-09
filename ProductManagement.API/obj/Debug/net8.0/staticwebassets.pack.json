@@ -1,0 +1,25 @@
+{
+  "Files": [
+    {
+      "Id": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/index.html",
+      "PackagePath": "staticwebassets/index.html"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.ProductManagement.API.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.ProductManagement.API.props",
+      "PackagePath": "build\\ProductManagement.API.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.ProductManagement.API.props",
+      "PackagePath": "buildMultiTargeting\\ProductManagement.API.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.ProductManagement.API.props",
+      "PackagePath": "buildTransitive\\ProductManagement.API.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

@@ -344,3 +344,5 @@ C:/Users/sglkb/source/repos/ProductManagement/ProductManagement.Tests/obj/Debug/
 /Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Tests/obj/Debug/net8.0/ProductManagement.Tests.pdb
 /Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Tests/obj/Debug/net8.0/ProductManagement.Tests.genruntimeconfig.cache
 /Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Tests/obj/Debug/net8.0/ref/ProductManagement.Tests.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Tests/bin/Debug/net8.0/ProductManagement.API.staticwebassets.runtime.json
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Tests/bin/Debug/net8.0/System.Net.WebSockets.WebSocketProtocol.dll
