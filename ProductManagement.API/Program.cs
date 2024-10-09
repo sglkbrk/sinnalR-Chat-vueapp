@@ -86,7 +86,6 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
-
 app.UseCors();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseRouting();
@@ -106,7 +105,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapGet("/", async context =>
     {
         context.Response.ContentType = "text/html";
-        await context.Response.WriteAsync(System.IO.File.ReadAllText("../wwwroot/index.html"));
+        await context.Response.WriteAsync(System.IO.File.ReadAllText("wwwroot/index.html"));
     });
     endpoints.MapHub<ChatHub>("/chatHub");
 });
