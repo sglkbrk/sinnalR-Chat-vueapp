@@ -26,5 +26,6 @@ RUN dotnet publish "ProductManagement.API.csproj" -c Release -o /app/publish
 # Son olarak uygulamayı çalıştırmak için base image'e geçiş yapıyoruz
 FROM base AS final
 WORKDIR /app
+COPY --from=build /src/ProductManagement.API/wwwroot ./wwwroot
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "ProductManagement.API.dll"]
