@@ -25,6 +25,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddControllers();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
@@ -85,7 +86,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
-app.MapHub<ChatHub>("/chatHub");
+
 app.UseCors();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseRouting();
@@ -100,6 +101,15 @@ app.UseSwaggerUI(c =>
 });
 
 // Hata ayıklama sayfasını sadece geliştirme modunda gösterin
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGet("/", async context =>
+    {
+        context.Response.ContentType = "text/html";
+        await context.Response.WriteAsync(System.IO.File.ReadAllText("../wwwroot/index.html"));
+    });
+    endpoints.MapHub<ChatHub>("/chatHub");
+});
 
 try
 {

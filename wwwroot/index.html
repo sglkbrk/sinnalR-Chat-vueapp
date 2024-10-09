@@ -1,9 +1,5 @@
-@{
-    ViewData["Title"] = "Chat";
-}
-
 <h2>Gerçek Zamanlı Chat</h2>
-
+<html lang="tr"> <!-- Dil kodunu 'tr' olarak ayarlayın -->
 <div>
     <input type="text" id="userInput" placeholder="Kullanıcı Adı" />
     <input type="text" id="messageInput" placeholder="Mesajınız" />
@@ -17,7 +13,7 @@
     <script type="text/javascript">
         // SignalR bağlantısı oluştur
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("http://localhost:5044/chathub")
+            .withUrl("/chathub")
             .build();
 
         // Mesaj alındığında çağrılacak fonksiyon
