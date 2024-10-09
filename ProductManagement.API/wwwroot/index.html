@@ -15,6 +15,7 @@
         <input type="password" id="password" value="123456" placeholder="Password" /> -->
         <input type="text" id="username"  placeholder="Username" />
         <input type="password" id="password"  placeholder="Password" />
+        <input type="checkbox" id="rememberMe">Remember me</checkbox>
         <button onclick="login()">Login</button>
     </div>
 
@@ -43,6 +44,7 @@
     </div>
 
     <script>
+        
         // Giriş işlemi için tuş dinleyicisi
         document.getElementById("message").addEventListener("keydown", function(event) {
             if (event.key === "Enter") {
@@ -58,11 +60,28 @@
         const maxReconnectAttempts = 5; // Maksimum yeniden bağlanma denemesi
         const reconnectInterval = 5000; 
         let writeTime=0
+        onload = () => {
+            token = localStorage.getItem('token');
+            if (token) {
+                var asd = parseJwt(token);
+                userId = asd.sub;
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('register').style.display = 'none';
+                document.getElementById('chat').style.display = 'block';
+                startConnection();
+                loadUsers();
+            }else{
+                document.getElementById('username').value = localStorage.getItem('username');
+                document.getElementById('password').value = localStorage.getItem('password');
+                document.getElementById('rememberMe').checked = localStorage.getItem('rememberMe');
+            }
+        }
 
         async function login() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
             const response = await fetch('/api/UserAuth/login', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -72,11 +91,17 @@
             if (response.ok) {
                 const data = await response.json();
                 token = data.token;
+                localStorage.setItem('token', token);
                 var asd = parseJwt(token);
                 userId = asd.sub;
                 document.getElementById('login').style.display = 'none';
                 document.getElementById('register').style.display = 'none'; // Kayıt bölümünü gizle
                 document.getElementById('chat').style.display = 'block';
+                if(rememberMe){
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('password', password);
+                    localStorage.setItem('rememberMe', rememberMe);
+                }
                 startConnection();
                 loadUsers();
             } else {

@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Security.Cryptography;
 using ProductManagement.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 
 
 [Route("api/[controller]")]
@@ -44,7 +45,9 @@ public class UserAuthController : ControllerBase
         return Ok(new { token });
     }
 
+    [Authorize]
     [HttpGet("users")]
+
     public async Task<IActionResult> GetUsers()
     {
         // Mevcut kullanıcının ID'sini al
