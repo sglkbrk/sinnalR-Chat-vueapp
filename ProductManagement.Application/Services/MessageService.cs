@@ -20,14 +20,14 @@ namespace ProductManagement.Application.Services
 
         public List<Message> GetMyMessages(int senderId, int receiverId, int page = 1, int pageSize = 50)
         {
-            return _context.Message.
+            var messages = _context.Message.
             Where(m => (m.SenderId == senderId && m.ReceiverId == receiverId) || (m.SenderId == receiverId && m.ReceiverId == senderId))
             .Include(m => m.Sender)
             .Include(m => m.Receiver)
-            .OrderBy(m => m.Timestamp)
+            .OrderByDescending(m => m.Timestamp)
             .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
+            .Take(pageSize);
+            return messages.Reverse().ToList();
         }
 
         public Message? GetMessageById(int id)
