@@ -8,7 +8,11 @@
 <body>
     <div class="header">
         <h1>Bnet Clone</h1>
-        <button id="logout" onclick="logout()">Çıkış</button>
+        <div style="display: flex;flex-direction: row;align-items: center">
+            <label id="myuser" style="color: brown; font-size: large;"></label>
+            <button id="logout" onclick="logout()">Çıkış</button>
+        </div>
+       
     </div>
     
     <!-- Login Bölümü -->
@@ -36,10 +40,6 @@
     <!-- Chat Bölümü -->
     <div id="chat" style="display:none;flex-direction: column;">
         <div style="flex:1;" >
-            <div style="display: flex;flex-direction: row;">
-                <label for="users" style="color:brown; font-size: large;">Giriş Yapan Kullanıcı:</label>
-                <label id="myuser" style="color: brown; font-size: large;"></label>
-            </div>
             <div style="display: flex; align-items: center;">
                 <label for="users">Konuşmak istediğiniz kullanıcı:</label>
                 <select id="users" style="width: 150px; margin-left: 10px; margin-right: 10px;" onchange="selectasd()"></select>
@@ -88,6 +88,10 @@
         let writeTime=0
         var onlineUsers_data = [];
         var users = [];
+        let page = 1;
+        const pageSize = 50;
+        const msgDiv = document.getElementById('messages');
+        let stop = false;
         onload = () => {
             token = localStorage.getItem('token');
             if (token) {
@@ -190,7 +194,7 @@
             connection.on('ReceiveMessage', (message) => {
                 const receiverId = document.getElementById('users').value;
                 if (message.senderId == receiverId) {
-                    const msgDiv = document.getElementById('messages');
+                    // const msgDiv = document.getElementById('messages');
                     msgDiv.innerHTML += `<p style="text-align:left"><em style="color:blue;font-size:10px">${new Date(message.timestamp).toLocaleTimeString()}</em > ${message.content.content}</p>`;
                     msgDiv.scrollTop = msgDiv.scrollHeight; // Otomatik olarak en son mesaja kaydır
                 }
@@ -311,11 +315,14 @@
 
         async function selectasd() {
             const receiverId = document.getElementById('users').value;
+            msgDiv.innerHTML = "";
             loadMessages(userId, receiverId);
+            stop = false
         }
 
         async function loadMessages(senderId, receiverId) {
-            const response = await fetch('/api/message/GetMyMessages/' + senderId + '/' + receiverId, {
+            if(stop) return
+            const response = await fetch('/api/message/GetMyMessages/' + senderId + '/' + receiverId + '/'+ page +'/' + pageSize, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -324,21 +331,35 @@
             });
 
             if (response.ok) {
-                const users = await response.json();
-                const msgDiv = document.getElementById('messages');
-                msgDiv.innerHTML = "";
-                users.forEach(msg => {
+                const messages = await response.json();
+                let currentScrollHeight = msgDiv.scrollHeight;
+                let htmlContent = "";
+                if(messages.length == 0 && page == 1) htmlContent = `<p style="text-align:center">Herhangi bir mesaj yok.</p>`
+                else if(messages.length == 0 && page > 1) {
+                    htmlContent = `<p style="text-align:center">Başka Mesaj Yok</p>`
+                    stop = true
+                } 
+                messages.forEach(msg => {
                     if (msg.senderId == userId)
-                        msgDiv.innerHTML += `<p style="text-align:right">${msg.content} <em style="color:blue;font-size:10px"> ${new Date(msg.timestamp).toLocaleTimeString()}</em></p>`;
+                        htmlContent += `<p style="text-align:right">${msg.content} <em style="color:blue;font-size:10px"> ${new Date(msg.timestamp).toLocaleTimeString()}</em></p>`;
                     else
-                        msgDiv.innerHTML += `<p style="text-align:left"><em style="color:blue;font-size:10px">${new Date(msg.timestamp).toLocaleTimeString()}</em> ${msg.content}</p>`;
-                    msgDiv.scrollTop = msgDiv.scrollHeight; // Otomatik olarak en son mesaja kaydır
+                        htmlContent += `<p style="text-align:left"><em style="color:blue;font-size:10px">${new Date(msg.timestamp).toLocaleTimeString()}</em> ${msg.content}</p>`;
                 });
+                msgDiv.innerHTML = htmlContent + msgDiv.innerHTML; 
+                msgDiv.scrollTop = msgDiv.scrollHeight - currentScrollHeight;
+                if(page ==1)msgDiv.scrollTop = msgDiv.scrollHeight; 
+                page++;
             } else {
                 const error = await response.json();
                 alert('Failed to load users: ' + (error.message || 'Unknown error'));
             }
         }
+        msgDiv.addEventListener('scroll', () => {
+            if (msgDiv.scrollTop === 0) {
+                const receiverId = document.getElementById('users').value;
+                loadMessages(userId, receiverId);
+            }
+        });
         async function onChangeMsg (params) {
             if(writeTime  == 0 ){
                 const receiverId = document.getElementById('users').value;
@@ -363,7 +384,7 @@
                         Timestamp: new Date()
                     }
                     await connection.invoke('SendMessage', asd);
-                    const msgDiv = document.getElementById('messages');
+                    // const msgDiv = document.getElementById('messages');
                     msgDiv.innerHTML += `<p style="text-align:right">${message} <em style="color:blue;font-size:10px;"> ${new Date().toLocaleTimeString()}</em></p>`;
                     msgDiv.scrollTop = msgDiv.scrollHeight; // Otomatik olarak en son mesaja kaydır
                     document.getElementById('message').value = '';

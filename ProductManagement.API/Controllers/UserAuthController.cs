@@ -1,23 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using System.Security.Cryptography;
 using ProductManagement.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
+using ProductManagement.Application.Services;
 
 
 [Route("api/[controller]")]
 [ApiController]
 public class UserAuthController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
-    private readonly IConfiguration _configuration;
-    public UserAuthController(IConfiguration configuration, ApplicationDbContext context)
+    private readonly UserAuthService _userAuthService;
+    public UserAuthController(UserAuthService userAuthService)
     {
-        _configuration = configuration;
-        _context = context;
+        _userAuthService = userAuthService;
     }
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] Users model)
@@ -26,81 +20,51 @@ public class UserAuthController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        // Eğer model geçerliyse, parolayı hash'leyip kaydetme işlemi yapar
-        model.Password = HashPasswordMD5(model.Password);
-        _context.Users.Add(model);
-        await _context.SaveChangesAsync();
-
+        _userAuthService.Register(model);
         return Ok();
     }
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
-        var user = _context.Users.SingleOrDefault(x => x.Username == model.Username || x.Email == model.Username);
-        if (user == null)
-            return NotFound("User not found.");
-        if (user.Password != HashPasswordMD5(model.Password))
-            return Unauthorized("Invalid password.");
-        var token = GenerateJwtToken(user);
-        return Ok(new { token });
+        try
+        {
+            var token = await _userAuthService.Login(model);
+            return Ok(new { token });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(ex.Message);
+        }
+        catch
+        {
+            // Genel hata yönetimi
+            return StatusCode(500, "Internal server error.");
+        }
     }
 
     [Authorize]
     [HttpGet("users")]
-
     public async Task<IActionResult> GetUsers()
     {
         // Mevcut kullanıcının ID'sini al
         var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-        // Tüm kullanıcıları al, mevcut kullanıcıyı hariç tut
-        var users = _context.Users
-            .Where(u => u.id.ToString() != currentUserId).ToList();
-
+        var users = _userAuthService.GetUsers(currentUserId);
         return Ok(users);
     }
-    private string GenerateJwtToken(Users user)
+
+
+    [Authorize]
+    public async Task<IActionResult> GetUsersAsync()
     {
-        var claims = new[]
-       {
-            new Claim(JwtRegisteredClaimNames.Sub, user.id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim("name", user.Username)
-        };
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var token = new JwtSecurityToken(
-               issuer: _configuration["Jwt:Issuer"],
-               audience: _configuration["Jwt:Audience"],
-               claims: claims,
-               expires: DateTime.Now.AddDays(1),
-               signingCredentials: creds);
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        // Mevcut kullanıcının ID'sini al
+        var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var users = _userAuthService.GetUsersAsync();
+        return Ok(users);
     }
-    public static string HashPasswordMD5(string password)
-    {
 
-        if (password == null)
-        {
-            throw new ArgumentNullException("Password cannot be null");
-        }
-        using (var md5 = MD5.Create())
-        {
-            var inputBytes = Encoding.UTF8.GetBytes(password);
-            var hashBytes = md5.ComputeHash(inputBytes);
-
-            // Hash'i hex formatında geri döndürmek için StringBuilder kullanıyoruz
-            var sb = new StringBuilder();
-            for (int i = 0; i < hashBytes.Length; i++)
-            {
-                sb.Append(hashBytes[i].ToString("X2")); // Hex formatında temsil
-            }
-
-            return sb.ToString();
-        }
-    }
 }
 

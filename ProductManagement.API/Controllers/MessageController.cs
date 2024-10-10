@@ -56,10 +56,10 @@ namespace ProductManagement.API.Controllers
         }
 
         [HttpGet]
-        [Route("GetMyMessages/{senderId}/{receiverId}")]
-        public async Task<IActionResult> GetMyMessages(int senderId, int receiverId)
+        [Route("GetMyMessages/{senderId}/{receiverId}/{page}/{pageSize}")]
+        public async Task<IActionResult> GetMyMessages(int senderId, int receiverId, int page = 1, int pageSize = 50)
         {
-            var result = _messageService.GetMyMessages(senderId, receiverId);
+            var result = _messageService.GetMyMessages(senderId, receiverId, page, pageSize);
             return Ok(result);
         }
 

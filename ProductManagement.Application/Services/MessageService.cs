@@ -18,11 +18,15 @@ namespace ProductManagement.Application.Services
             return _context.Message.ToList();
         }
 
-        public List<Message> GetMyMessages(int senderId, int receiverId)
+        public List<Message> GetMyMessages(int senderId, int receiverId, int page = 1, int pageSize = 50)
         {
             return _context.Message.
-            Where(m => (m.SenderId == senderId && m.ReceiverId == receiverId) || (m.SenderId == receiverId && m.ReceiverId == senderId)).Include(m => m.Sender).Include(m => m.Receiver)
+            Where(m => (m.SenderId == senderId && m.ReceiverId == receiverId) || (m.SenderId == receiverId && m.ReceiverId == senderId))
+            .Include(m => m.Sender)
+            .Include(m => m.Receiver)
             .OrderBy(m => m.Timestamp)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToList();
         }
 

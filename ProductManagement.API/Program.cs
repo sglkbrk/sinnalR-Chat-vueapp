@@ -24,6 +24,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<MessageService>();
+builder.Services.AddScoped<UserAuthService>();
 builder.Services.AddControllers();
 
 builder.Services.AddSwaggerGen(c =>
