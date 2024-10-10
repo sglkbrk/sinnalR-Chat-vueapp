@@ -8,7 +8,9 @@
 <body>
     <div class="header">
         <h1>Bnet Clone</h1>
+        <div id="connectionStatus"></div>
         <div style="display: flex;flex-direction: row;align-items: center">
+   
             <label id="myuser" style="color: brown; font-size: large;"></label>
             <button id="logout" onclick="logout()">Çıkış</button>
         </div>
@@ -38,25 +40,25 @@
     <div id="register-message"></div>
     
     <!-- Chat Bölümü -->
-    <div id="chat" style="display:none;flex-direction: column;">
-        <div style="flex:1;" >
+    <div id="chat">
+        <div >
             <div style="display: flex; align-items: center;">
                 <label for="users">Konuşmak istediğiniz kullanıcı:</label>
                 <select id="users" style="width: 150px; margin-left: 10px; margin-right: 10px;" onchange="selectasd()"></select>
                 <p id="user_online" style="display: none;">online</p>
             </div>
         
-            <div id="connectionStatus"></div>
+          
             
-            <p style="color: orange;">Mesajlar uçtan uca şifresizdir. Bende dahil olmak üzere bu sohbetin dışında bulunan herkes mesajları okuyabilir.</p>
+            <p>Mesajlar uçtan uca şifresizdir. Bende dahil olmak üzere bu sohbetin dışında bulunan herkes mesajları okuyabilir.</p>
             <div id="ReceiveWrites" style="display:none;">yazıyor</div>
         </div>
         <div style="flex: 1;">
             <div id="messages"></div>
         </div>
         
-        <div id="send-message" style="flex:1; display: flex;flex-direction: row;">
-            <input id="message" type="text" style="flex-grow: 1;" oninput="onChangeMsg()" placeholder="Mesaj" />
+        <div id="send-message">
+            <input id="message" type="text" placeholder="Mesaj" />
             <button onclick="sendMessage()">Gönder</button>
         </div>
     </div>
@@ -405,197 +407,223 @@
 </html>
 
 <style>
-        /* CSS Sıfırlama */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        /* Genel stiller */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            display: flex;
-            flex:1;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-           
-        }
+/* Genel stiller */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-height: 80vh;
+}
 
-        /* Başlık ve çıkış düğmesi */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            padding: 10px;
-            background-color: #333;
-            color: white;
-        }
+/* Başlık ve çıkış düğmesi */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+}
 
-        h1 {
-            font-size: 24px;
-        }
+h1 {
+    font-size: 24px;
+}
 
-        #logout {
-            margin-left: 20px;
-            display: none;
-            padding: 8px 16px;
-            background-color: #ff4d4d;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            color: white;
-        }
+#logout {
+    padding: 8px 16px;
+    background-color: #ff4d4d;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    display: none;
+}
 
-        #logout:hover {
-            background-color: #ff1a1a;
-        }
+#logout:hover {
+    background-color: #ff1a1a;
+}
 
-        /* Form Bölümleri */
-        #login, #register {
-            width: 100%;
-            padding: 20px;
-            background-color: white;
-            margin-top: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        #login h2, #register h2 {
-            margin-bottom: 15px;
-            color: #333;
-        }
+/* Form Bölümleri */
+#login, #register {
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    background-color: white;
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 
-        #login input, #register input, #register button {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
+#login h2, #register h2 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 1.5rem;
+}
 
-        #login button, #register button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
+#login input, #register input, #register button {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
 
-        #login button:hover, #register button:hover {
-            background-color: #0056b3;
-        }
+#login button, #register button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
 
-        /* Chat Bölümü */
-        #chat {
-            width: 100%;
-            padding: 20px;
-            background-color: white;
-            margin-top: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: none;
-        
-        }
-        #chat > .middle-section {
-            flex: 1 1 auto;
-            border: 1px solid #ccc;
-            padding: 10px;
-            overflow-y: auto;
-            background-color: #fafafa;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
+#login button:hover, #register button:hover {
+    background-color: #0056b3;
+}
 
-        #chat label {
-            display: flex;
-           
-            color: #333;
-            font-size: large;
-        }
+/* Chat Bölümü */
+#chat {
+    width: 90%;
+    max-width: 800px;
+    padding: 20px;
+    background-color: white;
+    /* margin-top: 20px; */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: none;
+    flex-direction: column;
+}
 
-        #chat select, #chat input[type="text"] {
-            width: 100%;
-            padding: 10px;
-        }
+#chat > div {
+    /* margin-bottom: 15px; */
+}
 
-        #messages {
-            border: 1px solid #ccc;
-            padding: 10px;
-            overflow-y: auto;
-            margin-bottom: 10px; 
-            background-color: #fafafa;
-            max-height: 50vh;
-        }
-        #send-message{
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            flex: 1;
-            flex-grow: 1;
-        }
-        #ReceiveWrites {
-            display: none;
-            color: green;
-            margin-bottom: 10px;
-        }
+#chat label {
+    display: flex;
+    align-items: center;
+    color: #333;
+    font-size: 1.1rem;
+}
 
-        #chat button {
-            padding: 12px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 15%;
-            margin-left: 10px;
-          
-        }
+#chat select, #chat input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    font-size: 1rem;
+    margin-left: 10px;
+    margin-right: 10px;
+}
 
-        #chat button:hover {
-            background-color: #218838;
-        }
+#messages {
+    flex: 1;
+    border: 1px solid #ccc;
+    padding: 10px;
+    overflow-y: auto;
+    margin-bottom: 10px; 
+    background-color: #fafafa;
+    border-radius: 4px;
+    max-height: 70vh;
+}
 
-        /* Checkbox ve Metin Düzenlemeleri */
-        #login input[type="checkbox"] {
-            margin-right: 5px;
-        }
+#send-message {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
 
-        p {
-            color: orange;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
+#send-message input {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
 
-        /* Mobil cihazlar için medya sorgusu */
-        @media (max-width: 768px) {
-            .header, #login, #register, #chat {
-                max-width: 100%;
-                padding: 15px;
-            }
+#send-message button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
 
-            h1 {
-                font-size: 20px;
-            }
+#send-message button:hover {
+    background-color: #218838;
+}
 
-            #logout {
-                margin-left: 0;
-                margin-top: 10px;
-                width: 100%;
-            }
+/* Uyarılar ve Durum Mesajları */
+p {
+    color: orange;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
 
-            #messages {
-                height: 350px;
-            }
+#ReceiveWrites {
+    display: none;
+    color: green;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
 
-            #ReceiveWrites {
-                font-size: 14px;
-            }
+/* Mobil cihazlar için medya sorgusu */
+@media (max-width: 768px) {
+    .header, #login, #register, #chat {
+        width: 95%;
+        padding: 15px;
+    }
 
-            p {
-                font-size: 14px;
-            }
-        }
-    </style>
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    #logout {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    #login h2, #register h2 {
+        font-size: 1.3rem;
+    }
+
+    #login input, #register input, #register button,
+    #chat select, #chat input[type="text"], #send-message button {
+        font-size: 1rem;
+    }
+
+    #messages {
+        max-height: 35vh;
+    }
+
+    p, #ReceiveWrites {
+        font-size: 0.85rem;
+    }
+
+    #send-message {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #send-message input {
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    #send-message button {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+</style>
