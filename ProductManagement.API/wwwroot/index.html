@@ -216,13 +216,17 @@
             connection.on('UserStatusUpdated', (onlineUsers) => {
                 onlineUsers_data = onlineUsers;
                 const usersSelect = document.getElementById('users');
-                usersSelect.innerHTML = ''; // Önceki seçenekleri temizle
-                users.forEach(user => {
-                    const option = document.createElement('option');
-                    option.value = user.id;
-                    option.text = user.username + ' - ' +( onlineUsers_data.includes(user.id.toString()) ? 'Online' : 'Offline');
-                    usersSelect.add(option);
-                });
+                for (let i = 0; i < users.length; i++) {
+                    usersSelect.options[i].innerHTML = users[i].username + ' - ' +( onlineUsers_data.includes(users[i].id.toString()) ? 'Online' : 'Offline');
+                    
+                }
+                // usersSelect.op
+                // users.forEach(user => {
+                //     const option = document.createElement('option');
+                //     option.value = user.id;
+                //     option.text = user.username + ' - ' +( onlineUsers_data.includes(user.id.toString()) ? 'Online' : 'Offline');
+                //     usersSelect.add(option);
+                // });
             });
             connection.onclose(() => {
                 updateConnectionStatus('Bağlantı kesildi. Yeniden bağlanma denemeleri başlatılıyor...');
@@ -316,8 +320,11 @@
         async function selectasd() {
             const receiverId = document.getElementById('users').value;
             msgDiv.innerHTML = "";
-            loadMessages(userId, receiverId);
+            page = 1
             stop = false
+            loadMessages(userId, receiverId);
+           
+        
         }
 
         async function loadMessages(senderId, receiverId) {
