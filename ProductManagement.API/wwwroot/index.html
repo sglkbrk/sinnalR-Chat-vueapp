@@ -6,59 +6,60 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 </head>
 <body>
-    <div style="display: flex;align-items: center;" >
-    <h1>Bnet Clone    </h1>
-    <button id="logout" style="display: none;margin-left: 20px;" onclick="logout()" >Çıkış</button>
+    <div class="header">
+        <h1>Bnet Clone</h1>
+        <button id="logout" onclick="logout()">Çıkış</button>
     </div>
-  
+    
     <!-- Login Bölümü -->
     <div id="login">
         <h2>Login</h2>
-        <!-- <input type="text" id="username" value="asd@asd.com" placeholder="Username" />
-        <input type="password" id="password" value="123456" placeholder="Password" /> -->
-        <input type="text" id="username"  placeholder="Username" />
-        <input type="password" id="password"  placeholder="Password" />
-        <input type="checkbox" id="rememberMe">Remember me</checkbox>
+        <input type="text" id="username" placeholder="Username" />
+        <input type="password" id="password" placeholder="Password" />
+        <input type="checkbox" id="rememberMe"> Remember me
         <button onclick="login()">Login</button>
     </div>
-
+    
     <!-- Register Bölümü -->
-    <div id="register" >
+    <div id="register">
         <h2>Register</h2>
         <input type="text" id="reg-username" placeholder="Username" />
         <input type="email" id="reg-email" placeholder="Email" />
-        <input type="password" id="reg-password" placeholder="Password" />
+        <input type="password" id="reg-password" placeholder="Password (6 Karekter)" />
         <button onclick="register()">Register</button>
-        
     </div>
+    
     <div id="register-message"></div>
+    
     <!-- Chat Bölümü -->
-    <div id="chat" style="display:none;">
-        <label style="color:brown;font-size: large;"  for="users">Giriş Yapan Kullanıcı: </label>
-        <label style="color: brown;font-size: large;" id="myuser"  for="users"></label>
-        <div style="display: flex;align-items: center;">
-            <label for="users">Konusmak istediğiniz kullanıcı:</label>
-            <select style="width: 150px;margin-left: 10px;margin-right: 10px;" onchange="selectasd()" id="users"></select>
-            <p  style="display: none;" id="user_online">online</p>
+    <div id="chat" style="display:none;flex-direction: column;">
+        <div style="flex:1;" >
+            <div style="display: flex;flex-direction: row;">
+                <label for="users" style="color:brown; font-size: large;">Giriş Yapan Kullanıcı:</label>
+                <label id="myuser" style="color: brown; font-size: large;"></label>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <label for="users">Konuşmak istediğiniz kullanıcı:</label>
+                <select id="users" style="width: 150px; margin-left: 10px; margin-right: 10px;" onchange="selectasd()"></select>
+                <p id="user_online" style="display: none;">online</p>
+            </div>
+        
+            <div id="connectionStatus"></div>
+            
+            <p style="color: orange;">Mesajlar uçtan uca şifresizdir. Bende dahil olmak üzere bu sohbetin dışında bulunan herkes mesajları okuyabilir.</p>
+            <div id="ReceiveWrites" style="display:none;">yazıyor</div>
         </div>
-       
-        <div id="connectionStatus"></div>
-        <div id="ReceiveWrites" style="display:none;" >yazıyor</div>
-        <p style="color: orange;">Mesajlar uçdan uca şifresizdir Bende Dahil olmak üzere bu sohbetin dışında bulunan herkes mesajları okuyabilir</p>
-        <div id="messages" style="border: 1px solid #ccc; padding: 10px; height: 350px; overflow-y: scroll;">
-            <!-- Mesajlar buraya eklenecek -->
+        <div style="flex: 1;">
+            <div id="messages"></div>
         </div>
-        <div style="display: flex;" >
-            <input style="width:100%;" type="text" id="message" oninput="onChangeMsg()" placeholder="Mesaj" />
+        
+        <div id="send-message" style="flex:1; display: flex;flex-direction: row;">
+            <input id="message" type="text" style="flex-grow: 1;" oninput="onChangeMsg()" placeholder="Mesaj" />
             <button onclick="sendMessage()">Gönder</button>
         </div>
-        
     </div>
 
     <script>
-        
-        // Giriş işlemi için tuş dinleyicisi
-
         if ("Notification" in window) {
             if (Notification.permission === "granted") {
                 // İzin zaten verilmiş
@@ -76,7 +77,6 @@
                 event.preventDefault(); // Formun submit edilmesini engelle
             }
         });
-
         let token = '';
         userId = 0;
         let connection = null;
@@ -94,7 +94,7 @@
                 document.getElementById('myuser').innerHTML=asd.name.toUpperCase();
                 document.getElementById('login').style.display = 'none';
                 document.getElementById('register').style.display = 'none';
-                document.getElementById('chat').style.display = 'block';
+                document.getElementById('chat').style.display = 'flex';
                 startConnection();
                 loadUsers();
             }else{
@@ -121,7 +121,6 @@
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ username, password })
             });
-
             if (response.ok) {
                 const data = await response.json();
                 token = data.token;
@@ -131,7 +130,7 @@
                 document.getElementById('myuser').innerHTML=asd.name
                 document.getElementById('login').style.display = 'none';
                 document.getElementById('register').style.display = 'none'; // Kayıt bölümünü gizle
-                document.getElementById('chat').style.display = 'block';
+                document.getElementById('chat').style.display = 'flex';
                 document.getElementById('register-message').textContent = '';
                 if(rememberMe){
                     localStorage.setItem('username', username);
@@ -145,18 +144,19 @@
                 alert('Login failed: ' + (error.message || 'Unknown error'));
             }
         }
-
         async function register() {
             const regUsername = document.getElementById('reg-username').value;
             const regEmail = document.getElementById('reg-email').value;
             const regPassword = document.getElementById('reg-password').value;
-
+            if (regUsername === '' || regEmail === '' || regPassword === '') {
+                alert('Lütfen bilgileri eksiksiz doldurun');
+                return;
+            }
             const response = await fetch('/api/UserAuth/register', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ Username: regUsername, Email: regEmail, Password: regPassword })
             });
-
             if (response.ok) {
                 document.getElementById('register-message').textContent = "Kayıt başarılı! Lütfen giriş yapın.";
                 setTimeout(() => {
@@ -173,16 +173,14 @@
         }
 
         function parseJwt(token) {
-            // Token'ı parçala
             const base64Url = token.split('.')[1]; // Payload kısmı
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // Base64 URL kodlamasını düzelt
-
             const jsonPayload = decodeURIComponent(escape(atob(base64))); // Base64'ten JSON'a dönüştür
             return JSON.parse(jsonPayload); // JSON'ı objeye dönüştür
         }
 
         function startConnection() {
-            document.getElementById('logout').style.display = 'block';
+            document.getElementById('logout').style.display = 'flex';
             connection = new signalR.HubConnectionBuilder()
                 .withUrl('/chathub', { accessTokenFactory: () => token })
                 .build();
@@ -191,7 +189,7 @@
                 const receiverId = document.getElementById('users').value;
                 if (message.senderId == receiverId) {
                     const msgDiv = document.getElementById('messages');
-                    msgDiv.innerHTML += `<p style="text-align:left"><em style="color:blue">${new Date(message.timestamp).toLocaleTimeString()}</em> ${message.content.content}</p>`;
+                    msgDiv.innerHTML += `<p style="text-align:left"><em style="color:blue;font-size:10px">${new Date(message.timestamp).toLocaleTimeString()}</em > ${message.content.content}</p>`;
                     msgDiv.scrollTop = msgDiv.scrollHeight; // Otomatik olarak en son mesaja kaydır
                 }
                 if(!isPageVisible()){
@@ -202,7 +200,7 @@
             connection.on('ReceiveWrites', (senderId) => {
                 const receiverId = document.getElementById('users').value;
                 if (senderId == receiverId) {
-                    document.getElementById('ReceiveWrites').style.display = 'block';
+                    document.getElementById('ReceiveWrites').style.display = 'flex';
                     setTimeout(() => {
                         document.getElementById('ReceiveWrites').style.display = 'none';
                     },3000)
@@ -233,7 +231,10 @@
                 updateConnectionStatus('Bağlantı başarıyla yeniden kuruldu.');
             });
             connection.start()
-                .then(() => console.log('SignalR connected'))
+                .then(() => {
+                    updateConnectionStatus('Bağlantı başarıyla kuruldu.',3000);
+                    console.log('SignalR connected')
+                })
                 .catch(err => console.error('SignalR connection error: ', err));
         }
         function showNotification(message,senderId,name) {
@@ -272,14 +273,12 @@
                     console.error('Yeniden bağlanma hatası: ', err);
                 }
             }
-
-            // Maksimum deneme sayısına ulaşıldıysa kullanıcıya bildirim gönder
-            updateConnectionStatus('Maksimum yeniden bağlanma denemesi aşıldı. Lütfen internet bağlantınızı kontrol edin.');
+            updateConnectionStatus('Maksimum yeniden bağlanma denemesi aşıldı. Lütfen internet bağlantınızı kontrol edin.',10000);
         }
-        function updateConnectionStatus(status) {
+        function updateConnectionStatus(status,time) {
             const statusDiv = document.getElementById('connectionStatus');
             statusDiv.textContent = status;
-            setTimeout(() => statusDiv.textContent = '', 15000);
+            setTimeout(() => statusDiv.textContent = '', time ? time: 5000);
         }
         async function loadUsers() {
             const response = await fetch('/api/UserAuth/users', {
@@ -328,9 +327,9 @@
                 msgDiv.innerHTML = "";
                 users.forEach(msg => {
                     if (msg.senderId == userId)
-                        msgDiv.innerHTML += `<p style="text-align:right">${msg.content} <em style="color:blue"> ${new Date(msg.timestamp).toLocaleTimeString()}</em></p>`;
+                        msgDiv.innerHTML += `<p style="text-align:right">${msg.content} <em style="color:blue;font-size:10px"> ${new Date(msg.timestamp).toLocaleTimeString()}</em></p>`;
                     else
-                        msgDiv.innerHTML += `<p style="text-align:left"><em style="color:blue">${new Date(msg.timestamp).toLocaleTimeString()}</em> ${msg.content}</p>`;
+                        msgDiv.innerHTML += `<p style="text-align:left"><em style="color:blue;font-size:10px">${new Date(msg.timestamp).toLocaleTimeString()}</em> ${msg.content}</p>`;
                     msgDiv.scrollTop = msgDiv.scrollHeight; // Otomatik olarak en son mesaja kaydır
                 });
             } else {
@@ -363,7 +362,7 @@
                     }
                     await connection.invoke('SendMessage', asd);
                     const msgDiv = document.getElementById('messages');
-                    msgDiv.innerHTML += `<p style="text-align:right">${message} <em style="color:blue;"> ${new Date().toLocaleTimeString()}</em></p>`;
+                    msgDiv.innerHTML += `<p style="text-align:right">${message} <em style="color:blue;font-size:10px;"> ${new Date().toLocaleTimeString()}</em></p>`;
                     msgDiv.scrollTop = msgDiv.scrollHeight; // Otomatik olarak en son mesaja kaydır
                     document.getElementById('message').value = '';
                 } catch (err) {
@@ -374,3 +373,199 @@
     </script>
 </body>
 </html>
+
+<style>
+        /* CSS Sıfırlama */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Genel stiller */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            flex:1;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+           
+        }
+
+        /* Başlık ve çıkış düğmesi */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        #logout {
+            margin-left: 20px;
+            display: none;
+            padding: 8px 16px;
+            background-color: #ff4d4d;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+        }
+
+        #logout:hover {
+            background-color: #ff1a1a;
+        }
+
+        /* Form Bölümleri */
+        #login, #register {
+            width: 100%;
+            padding: 20px;
+            background-color: white;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        #login h2, #register h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        #login input, #register input, #register button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #login button, #register button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #login button:hover, #register button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Chat Bölümü */
+        #chat {
+            width: 100%;
+            padding: 20px;
+            background-color: white;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        
+        }
+        #chat > .middle-section {
+            flex: 1 1 auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: auto;
+            background-color: #fafafa;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        #chat label {
+            display: flex;
+           
+            color: #333;
+            font-size: large;
+        }
+
+        #chat select, #chat input[type="text"] {
+            width: 100%;
+            padding: 10px;
+        }
+
+        #messages {
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: auto;
+            margin-bottom: 10px; 
+            background-color: #fafafa;
+            max-height: 70vh;
+        }
+        #send-message{
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            flex-grow: 1;
+        }
+        #ReceiveWrites {
+            display: none;
+            color: green;
+            margin-bottom: 10px;
+        }
+
+        #chat button {
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 15%;
+            margin-left: 10px;
+          
+        }
+
+        #chat button:hover {
+            background-color: #218838;
+        }
+
+        /* Checkbox ve Metin Düzenlemeleri */
+        #login input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        p {
+            color: orange;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        /* Mobil cihazlar için medya sorgusu */
+        @media (max-width: 768px) {
+            .header, #login, #register, #chat {
+                max-width: 100%;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            #logout {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+            }
+
+            #messages {
+                height: 350px;
+            }
+
+            #ReceiveWrites {
+                font-size: 14px;
+            }
+
+            p {
+                font-size: 14px;
+            }
+        }
+    </style>

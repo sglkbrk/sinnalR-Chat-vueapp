@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Erwhk1J01tOTCt/sogzGYqGcpI2OvgN44BAWl+ntJtE=",
+  "Hash": "H6s+du6NiJRv1FPYJfhc1jbqHfZKNUPOk29ff9gh1ks=",
   "Source": "ProductManagement.API",
   "BasePath": "_content/ProductManagement.API",
   "Mode": "Default",
@@ -34,6 +34,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/index.html"
+    },
+    {
+      "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/yedek.html",
+      "SourceId": "ProductManagement.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
+      "BasePath": "_content/ProductManagement.API",
+      "RelativePath": "yedek.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/yedek.html"
     }
   ]
 }
