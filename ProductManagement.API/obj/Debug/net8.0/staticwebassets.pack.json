@@ -9,10 +9,6 @@
       "PackagePath": "staticwebassets/script.js"
     },
     {
-      "Id": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/stlye.css",
-      "PackagePath": "staticwebassets/stlye.css"
-    },
-    {
       "Id": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/style.css",
       "PackagePath": "staticwebassets/style.css"
     },

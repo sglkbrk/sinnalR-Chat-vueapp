@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "+vnWpOa2HxfrEFmhJ9J2xoYl+P8YqiPUCgv+1/a7R2U=",
+  "Hash": "W4DQ3tUWL6nrivVo+SIqrHwWnkJ3P/dLECqg51JoRAU=",
   "Source": "ProductManagement.API",
   "BasePath": "_content/ProductManagement.API",
   "Mode": "Default",
@@ -53,25 +53,6 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/script.js"
-    },
-    {
-      "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/stlye.css",
-      "SourceId": "ProductManagement.API",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
-      "BasePath": "_content/ProductManagement.API",
-      "RelativePath": "stlye.css",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/stlye.css"
     },
     {
       "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/style.css",

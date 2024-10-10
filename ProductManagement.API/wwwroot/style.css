@@ -750,6 +750,10 @@ html {
   font-weight: 500;
 }
 
+.conversation-area.open {
+  display: block !important;
+}
+
 @media (max-width: 1120px) {
   .detail-area {
     display: none;
@@ -757,7 +761,7 @@ html {
 }
 @media (max-width: 780px) {
   .conversation-area {
-    display: none;
+  display: none;
   }
 
   .search-bar {
@@ -767,4 +771,33 @@ html {
   .search-bar input {
     padding-right: 10px;
   }
+}
+
+@media (min-width: 780px) {
+  .usersToggleBtn {
+    display: none;
+  }
+
+}
+
+.toogleUserSvg {
+  width: 30px;
+  height: 30px;
+}
+
+.dark-mode .toogleUserSvg svg {
+  fill: white;
+  stroke: white;
+}
+
+#logout {
+  /* display: none; */
+  /* background-color: #007BFF;
+  color: red;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 15px;
+  padding: 12px;
+  width: 100%; */
 }

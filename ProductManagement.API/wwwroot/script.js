@@ -13,6 +13,7 @@ let page = 1;
 const pageSize = 50;
 const msgDiv = document.getElementById('messages');
 const chat = document.getElementById('chat');
+const conversationArea = document.querySelector('.conversation-area');
 let stop = false;
 selectedUserId = 0;
 let isScrollingEnabled = true; 
@@ -75,7 +76,6 @@ function logout(){
     localStorage.removeItem('username');
     localStorage.removeItem('password');
     localStorage.removeItem('rememberMe');
-    document.getElementById('logout').style.display = 'none';
     location.reload();  
 }
 async function login() {
@@ -148,7 +148,6 @@ function parseJwt(token) {
 }
 
 function startConnection() {
-    // document.getElementById('logout').style.display = 'flex';
     connection = new signalR.HubConnectionBuilder()
         .withUrl('/chathub', { accessTokenFactory: () => token })
         .build();
@@ -300,6 +299,7 @@ async function selectUser(receiverId,name) {
     document.getElementById("chat-area-footer").style.display = ""
     isScrollingEnabled = false;
     loadMessages(userId, receiverId);
+    conversationArea.classList.remove('open');
 }
 
 async function loadMessages(senderId, receiverId) {
@@ -391,4 +391,8 @@ async function sendMessage() {
             console.error('SendMessage error: ', err);
         }
     }
+}
+
+function toggleConversationArea() {
+    conversationArea.classList.toggle('open');
 }
