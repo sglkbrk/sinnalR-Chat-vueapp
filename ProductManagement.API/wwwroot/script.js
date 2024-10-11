@@ -169,6 +169,7 @@ function startConnection() {
         if(!isPageVisible()){
                 showNotification(message.content.content,message.senderId,message.name);
         }
+        setLastMessage(message.senderId, message.content.content);
     });
 
     connection.on('ReceiveWrites', (senderId) => {
@@ -251,7 +252,7 @@ function updateConnectionStatus(status,time) {
     setTimeout(() => statusDiv.textContent = '', time ? time: 5000);
 }
 async function loadUsers() {
-    const response = await fetch('/api/UserAuth/users', {
+    const response = await fetch('/api/UserAuth', {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -265,13 +266,13 @@ async function loadUsers() {
         let asd = ""
         users.forEach(user => {
             asd += 
-          ` <div id="${user.id}-user" onclick="selectUser('${user.id}','${user.username}')" class="msg ${onlineUsers_data.includes(user.id.toString()) ? 'online' : ''}">
+          ` <div id="${user.id}-user" onclick="selectUser('${user.id}','${user.userName}')" class="msg ${onlineUsers_data.includes(user.id.toString()) ? 'online' : ''}">
             <img class="msg-profile" src="https://randomuser.me/api/portraits/men/${user.id}.jpg"  alt="" />
             <div class="msg-detail">
-            <div class="msg-username">${user.username}</div>
+            <div class="msg-username">${user.userName}</div>
             <div class="msg-content">
-              <span class="msg-message">Son Konuşma</span>
-              <span class="msg-date">20m</span>
+              <span class="msg-message">${user.lastMessage ? user.lastMessage.content.slice(0, 20) : ''}</span>
+              <span class="msg-date">${user.lastMessage ? timeAgo(user.lastMessage.timestamp) : ''}</span>
             </div>
             </div>
           </div>`;
@@ -282,7 +283,31 @@ async function loadUsers() {
         alert('Failed to load users: ' + (error.message || 'Unknown error'));
     }
 }
+function timeAgo(timestamp) {
+    const now = new Date();
+    const timeElapsed = now - new Date(timestamp);
+    
+    const seconds = Math.floor(timeElapsed / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const months = Math.floor(days / 30);
+    const years = Math.floor(days / 365);
 
+    if (seconds < 60) {
+        return "Şimdi";
+    } else if (minutes < 60) {
+        return `${minutes} dk önce`;
+    } else if (hours < 24) {
+        return `${hours} saat önce`;
+    } else if (days < 30) {
+        return `${days} gün önce`;
+    } else if (months < 12) {
+        return `${months} ay önce`;
+    } else {
+        return `${years} yıl önce`;
+    }
+}
 async function selectUser(receiverId,name) {
     page = 1
     stop = false
@@ -361,6 +386,12 @@ async function onChangeMsg (params) {
     }
    
 }
+
+function setLastMessage(id, lastMessage) {
+    var asd = document.getElementById(id + '-user');
+    asd.getElementsByClassName("msg-message")[0].innerHTML = lastMessage
+    asd.getElementsByClassName("msg-date")[0].innerHTML = timeAgo(new Date());
+}
 async function sendMessage() {
     const receiverId = selectedUserId
     const message = document.getElementById('message').value.trim();
@@ -387,6 +418,7 @@ async function sendMessage() {
             </div>`;
             chat.scrollTop = chat.scrollHeight; // Otomatik olarak en son mesaja kaydır
             document.getElementById('message').value = '';
+            setLastMessage(receiverId, msg.Content);
         } catch (err) {
             console.error('SendMessage error: ', err);
         }

@@ -45,15 +45,21 @@ namespace ProductManagement.Application.Services
 
         }
 
-        public async Task<List<UserDto>> GetUsersAsync()
+        public List<UserDto> GetUsersAsync(string currentUserId)
         {
-            var users = await _context.Users
-                .Select(u => new UserDto
-                {
-                    Id = u.id,
-                    UserName = u.Username,
-                    Email = u.Email
-                }).ToListAsync();
+            var users = _context.Users
+            .Where(u => u.id.ToString() != currentUserId)
+            .Select(u => new UserDto
+            {
+                Id = u.id,
+                UserName = u.Username,
+                Email = u.Email,
+                LastMessage = _context.Message
+                    .Where(m => (m.SenderId == u.id && m.ReceiverId.ToString() == currentUserId) ||
+                                (m.ReceiverId == u.id && m.SenderId.ToString() == currentUserId))
+                    .OrderByDescending(m => m.Timestamp)
+                    .FirstOrDefault()
+            }).ToList();
 
             return users;
         }

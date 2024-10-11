@@ -62,7 +62,7 @@ public class UserAuthController : ControllerBase
     {
         // Mevcut kullanıcının ID'sini al
         var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        var users = _userAuthService.GetUsersAsync();
+        var users = _userAuthService.GetUsersAsync(currentUserId);
         return Ok(users);
     }
 
