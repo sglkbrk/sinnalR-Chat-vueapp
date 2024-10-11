@@ -121,11 +121,13 @@ body {
   background-color: var(--body-bg-color);
   font-family: var(--body-font);
   color: var(--body-color);
+  overflow-x: hidden;
 }
 
 html {
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 .app {
@@ -771,6 +773,9 @@ html {
   .search-bar input {
     padding-right: 10px;
   }
+  .app {
+    height: 95vh;
+  }
 }
 
 @media (min-width: 780px) {
@@ -780,9 +785,9 @@ html {
 
 }
 
-.toogleUserSvg {
-  width: 30px;
-  height: 30px;
+.toogleUserSvg svg {
+  width: 25px;
+  height: 25px;
 }
 
 .dark-mode .toogleUserSvg svg {
