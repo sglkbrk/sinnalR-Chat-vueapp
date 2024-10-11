@@ -122,6 +122,7 @@ body {
   font-family: var(--body-font);
   color: var(--body-color);
   overflow-x: hidden;
+  
 }
 
 html {
@@ -775,6 +776,7 @@ html {
   }
   .app {
     height: 95vh;
+    padding: 10px;
   }
 }
 
@@ -793,6 +795,14 @@ html {
 .dark-mode .toogleUserSvg svg {
   fill: white;
   stroke: white;
+}
+
+@media (max-width: 480px) {
+  /* Daha küçük ekranlar için özel stil */
+  .app {
+      padding: 10px;
+      font-size: 14px;
+  }
 }
 
 #logout {
