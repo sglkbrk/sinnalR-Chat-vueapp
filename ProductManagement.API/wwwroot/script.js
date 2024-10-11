@@ -164,7 +164,7 @@ function startConnection() {
                 <div class="chat-msg-text">${message.content.content}</div>
               </div>
             </div>`;
-            chat.scrollTop = chat.scrollHeight; // Otomatik olarak en son mesaja kaydır
+            msgDiv.scrollTop = msgDiv.scrollHeight; // Otomatik olarak en son mesaja kaydır
         }
         if(!isPageVisible()){
                 showNotification(message.content.content,message.senderId,message.name);
@@ -361,9 +361,10 @@ async function loadMessages(senderId, receiverId) {
             </div>
           </div>`;
         });
+        var asd = msgDiv.scrollHeight;
         msgDiv.innerHTML = htmlContent + msgDiv.innerHTML; 
-        if(page ==1) chat.scrollTop = chat.scrollHeight; 
-        else  chat.scrollTop = chat.scrollHeight - chat.scrollHeight;
+        if(page ==1) msgDiv.scrollTop = msgDiv.scrollHeight; 
+        else  msgDiv.scrollTop = msgDiv.scrollHeight - asd;
         isScrollingEnabled = true;
         page++;
     } else {
@@ -371,8 +372,8 @@ async function loadMessages(senderId, receiverId) {
         alert('Failed to load users: ' + (error.message || 'Unknown error'));
     }
 }
-chat.addEventListener('scroll', () => {
-    if (chat.scrollTop === 0 && isScrollingEnabled )  {
+msgDiv.addEventListener('scroll', () => {
+    if (msgDiv.scrollTop === 0 && isScrollingEnabled )  {
         loadMessages(userId, selectedUserId);
     }
 });
@@ -416,7 +417,7 @@ async function sendMessage() {
                 <div class="chat-msg-text">${msg.Content}</div>
               </div>
             </div>`;
-            chat.scrollTop = chat.scrollHeight; // Otomatik olarak en son mesaja kaydır
+            msgDiv.scrollTop = msgDiv.scrollHeight; // Otomatik olarak en son mesaja kaydır
             document.getElementById('message').value = '';
             setLastMessage(receiverId, msg.Content);
         } catch (err) {

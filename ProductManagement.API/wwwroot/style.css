@@ -121,14 +121,12 @@ body {
   background-color: var(--body-bg-color);
   font-family: var(--body-font);
   color: var(--body-color);
-  overflow-x: hidden;
-  
 }
 
 html {
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .app {
@@ -390,6 +388,9 @@ html {
 }
 .chat-area-main {
   flex-grow: 1;
+  overflow: auto;
+  overflow-x: hidden;
+
 }
 
 .chat-msg-img {
@@ -774,10 +775,6 @@ html {
   .search-bar input {
     padding-right: 10px;
   }
-  .app {
-    height: 95vh;
-    padding: 10px;
-  }
 }
 
 @media (min-width: 780px) {
@@ -787,24 +784,20 @@ html {
 
 }
 
-.toogleUserSvg svg {
-  width: 25px;
-  height: 25px;
+.toogleUserSvg {
+  width: 30px;
+  height: 30px;
 }
 
 .dark-mode .toogleUserSvg svg {
   fill: white;
-  stroke: white;
+  stroke: #ffce45;
 }
 
-@media (max-width: 480px) {
-  /* Daha küçük ekranlar için özel stil */
-  .app {
-      padding: 10px;
-      font-size: 14px;
-  }
+.toogleUserSvg svg {
+  width: 25px;
+  height: 25px;
 }
-
 #logout {
   /* display: none; */
   /* background-color: #007BFF;
