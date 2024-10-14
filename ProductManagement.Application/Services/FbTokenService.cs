@@ -78,7 +78,7 @@ namespace ProductManagement.Application.Services
                 },
                 Data = new Dictionary<string, string>()
                 {
-                    { "url", "http://localhost:5044/" },
+                    { "url", "https://buraksaglik.com/" },
                     { "senderId", senderId },
                 },
             };
