@@ -16,6 +16,14 @@ namespace ProductManagement.Domain.Models
         public Users Receiver { get; set; }
         public string Content { get; set; }
         public DateTime Timestamp { get; set; }
+        public messageStatus Status { get; set; }
     }
 
+    public enum messageStatus
+    {
+        Sent,
+        forwarded,
+        Seen
+    }
 }
+

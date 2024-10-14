@@ -37,6 +37,7 @@ createApp({
                     }
                 });
             }
+        
         }
         if(this.$refs.msgDiv){
             this.$refs.msgDiv.addEventListener('scroll', () => {
@@ -45,6 +46,11 @@ createApp({
                 }
             });
         }  
+        document.addEventListener('keydown', this.handleKeydown);
+        document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    },
+    beforeDestroy() {
+        document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     },
     computed: {
         sortedUsers() {
@@ -58,6 +64,17 @@ createApp({
         changeColor(color){
             localStorage.setItem('theme', color);
             document.body.setAttribute('data-theme', color);
+        },
+        handleVisibilityChange: function () {
+            if(this.selectedUserId)this.sendSeen(this.selectedUserId,2);
+        },
+        handleKeydown: function (event) {
+            if (event.key === 'Escape') {
+                // ESC tuşuna basıldığında yapılacak işlemler
+                console.log('ESC tuşuna basıldı');
+                // Örneğin, bir modal kapatma işlemi
+                // this.closeModal();
+              }
         },
         async  login() {
             var json = {
@@ -154,13 +171,15 @@ createApp({
                         "timestamp": message.timestamp
                     }
                     this.messages.push(item);
+                    this.sendSeen(item.senderId,2);
                     setTimeout(() => {
                         this.$refs.msgDiv.scrollTop = this.$refs.msgDiv.scrollHeight;
                     }, );
-                }
-                if(!this.isPageVisible())
-                    this.showNotification(message.content.content,message.senderId,message.name,"message");
-                
+                }else {
+                    if(!this.isPageVisible())
+                        this.showNotification(message.content.content,message.senderId,message.name,"message");
+                    this.sendSeen(message.senderId,1);
+                }   
                 this.setLastMessage(message.senderId, message.content.content);
             });
         
@@ -174,6 +193,15 @@ createApp({
             });
             this.connection.on('UserStatusUpdated', (onlineUsers) => {
                 this.onlineUsers_data = onlineUsers;
+            });
+            this.connection.on('ReceiveSeen', (userid,messageStatus) => {
+                if(this.selectedUserId == userid) {
+                    this.messages.forEach(message => {
+                        if (message.status != 2 && message.senderId == this.myuser.sub) {
+                            message.status = messageStatus;
+                        }
+                    });    
+                }
             });
             this.connection.on('ReceiveNotification', (data) => {
                 if(data.type == "refreshFriendRequests")  this.loadFriendRequests();
@@ -268,21 +296,23 @@ createApp({
                         SenderId: parseInt(this.myuser.sub),
                         ReceiverId: parseInt(this.selectedUserId),
                         Content: this.messageText,
-                        Timestamp: new Date()
+                        Timestamp: new Date(),
+                        Status: 0
                     }
                     await this.connection.invoke('SendMessage', msg);
                     var item  =  {
                         "senderId": msg.SenderId,
                         "receiverId": msg.ReceiverId,
                         "content": msg.Content,
-                        "timestamp": msg.Timestamp
+                        "timestamp": msg.Timestamp,
+                        "status": msg.Status
                     }
                     this.messages.push(item);
+                    this.messageText = '';
+                    this.setLastMessage(this.selectedUserId, msg.Content);
                     setTimeout(() => {
                         this.$refs.msgDiv.scrollTop = this.$refs.msgDiv.scrollHeight; 
                     });
-                    this.messageText = '';
-                    this.setLastMessage(this.selectedUserId, msg.Content);
                 } catch (err) {
                     console.error('SendMessage error: ', err);
                 }
@@ -435,6 +465,7 @@ createApp({
             this.settingsBoxVis = !this.settingsBoxVis
         },
         selectUser(receiverId,name) {
+            if(receiverId == this.selectedUserId ) return
             page = 1
             this.endMessageVariable = false
             this.messages = []
@@ -444,6 +475,7 @@ createApp({
             isScrollingEnabled = false;
             this.loadMessages(this.myuser.sub, receiverId);
             this.$refs.conversationArea.classList.remove('open');
+            this.sendSeen(receiverId,2);
         },
         async  loadUsers() {
             const response = await fetch('/api/Friend/GetChatFriends', {
@@ -455,6 +487,9 @@ createApp({
             });
             if (response.ok) {
                 this.users  = this.sortUsersByLastMessage( await response.json());
+                this.users.forEach(user => {
+                    if(user.notSeenMessagesCount > 0)this.sendSeen(user.id,1);
+                })
             } else {
                 if(response.status == 401) {
                     logout();
@@ -502,6 +537,10 @@ createApp({
                 },writeTime)
             }
            
+        },
+        async  sendSeen (userId,messageStatus) {
+            if(!this.isPageVisible()) messageStatus = 1
+            await this.connection.invoke('SendSeen', userId.toString(), messageStatus);
         },
         async  loadFriendRequests() {
             const response = await fetch('/api/FriendRequest/GetFriendRequestByReceiverId/' + this.myuser.sub, {

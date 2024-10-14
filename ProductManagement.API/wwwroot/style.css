@@ -415,6 +415,7 @@ html {
 }
 
 .chat-msg-date {
+  flex-direction: row;
   position: absolute;
   left: calc(100% + 12px);
   bottom: 0;

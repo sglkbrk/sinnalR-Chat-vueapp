@@ -37,7 +37,8 @@ namespace ProductManagement.Application.Services
                    .Where(m => (m.SenderId == u.FriendUser.id && m.ReceiverId == userId) ||
                                (m.ReceiverId == u.FriendUser.id && m.SenderId == userId))
                    .OrderByDescending(m => m.Timestamp)
-                   .FirstOrDefault()
+                   .FirstOrDefault(),
+               NotSeenMessagesCount = _context.Message.Where(m => m.ReceiverId == userId && m.SenderId == u.FriendUser.id && m.Status != messageStatus.Seen).Count(),
            }).ToList();
 
             return users;

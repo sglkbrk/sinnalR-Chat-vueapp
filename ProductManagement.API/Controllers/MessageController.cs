@@ -35,7 +35,7 @@ namespace ProductManagement.API.Controllers
         [Route("AddMessage")]
         public async Task<IActionResult> AddMessage([FromBody] Message message)
         {
-            _messageService.AddMessage(message);
+            await _messageService.AddMessageAsync(message);
             return Ok(message);
         }
 

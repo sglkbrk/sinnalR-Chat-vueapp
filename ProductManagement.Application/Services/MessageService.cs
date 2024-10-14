@@ -35,11 +35,12 @@ namespace ProductManagement.Application.Services
             return _context.Message.FirstOrDefault(c => c.Id == id);
         }
 
-        public void AddMessage(Message message)
+        public async Task AddMessageAsync(Message message)
         {
             _context.Message.Add(message);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
+
 
         public void UpdateMessage(Message message)
         {
@@ -55,6 +56,31 @@ namespace ProductManagement.Application.Services
                 _context.Message.Remove(message);
                 _context.SaveChanges();
             }
+        }
+
+        public async Task setSeen(int senderId, int receiverId, messageStatus messageStatus)
+        {
+            IQueryable<Message> query = _context.Message
+        .Where(m => m.SenderId == senderId && m.ReceiverId == receiverId);
+
+            if (messageStatus == messageStatus.Seen)
+            {
+                query = query.Where(m => m.Status != messageStatus.Seen);
+            }
+
+            else if (messageStatus == messageStatus.forwarded)
+            {
+                query = query.Where(m => m.Status == messageStatus.Sent);
+            }
+            var messages = await query.ToListAsync();
+            foreach (var message in messages)
+            {
+                message.Status = messageStatus;
+            }
+
+            // Veritabanına değişiklikleri kaydediyoruz
+            await _context.SaveChangesAsync();
+
         }
     }
 }

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
 using System.Security.Claims;
 using ProductManagement.Domain.Models;
 using ProductManagement.Application.Services;
@@ -43,11 +42,8 @@ public class ChatHub : Hub
     {
         var senderId = Context.User.FindFirstValue(ClaimTypes.NameIdentifier);
         var name = Context.User.FindFirstValue(ClaimTypes.Name);
-        // Mesajı veritabanına kaydet
         message.SenderId = int.Parse(senderId);
-        _messageService.AddMessage(message);
-
-        // Alıcıya mesajı gönder
+        await _messageService.AddMessageAsync(message);
         await Clients.User(message.ReceiverId.ToString()).SendAsync("ReceiveMessage", new
         {
             Name = name,
@@ -55,27 +51,28 @@ public class ChatHub : Hub
             Content = message,
             Timestamp = message.Timestamp
         });
-        sendNotification(message);
+        await sendNotification(message);
     }
 
     public async Task SendWrite(string ReceiverId)
     {
         var senderId = Context.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        // Mesajı veritabanına kaydet
-        // Alıcıya mesajı gönder
         await Clients.User(ReceiverId).SendAsync("ReceiveWrites", senderId);
     }
 
-
-
+    public async Task SendSeen(string ReceiverId, messageStatus messageStatus)
+    {
+        var senderId = Context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        await Clients.User(ReceiverId).SendAsync("ReceiveSeen", senderId, messageStatus);
+        await _messageService.setSeen(int.Parse(ReceiverId), int.Parse(senderId), messageStatus);
+    }
 
     private async Task sendNotification(Message message)
     {
-
         bool isOnline = _onlineUsers.Values.Contains(message.ReceiverId.ToString());
         if (isOnline) return;
         var token = _fbTokenService.GetTokenByUserId(int.Parse(message.ReceiverId.ToString()));
         if (token == null) return;
-        _fbTokenService.SendNotificationAsync(message.Content, message.SenderId.ToString(), token.Token, message.SenderId.ToString());
+        await _fbTokenService.SendNotificationAsync(message.Content, message.SenderId.ToString(), token.Token, message.SenderId.ToString());
     }
 }

@@ -7,5 +7,7 @@ public class Friends
     public string Email { get; set; }
 
     public Message LastMessage { get; set; }
+
+    public int NotSeenMessagesCount { get; set; }
     // Password alanı burada yer almaz.
 }
