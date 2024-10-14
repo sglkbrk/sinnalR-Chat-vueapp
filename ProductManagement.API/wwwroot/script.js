@@ -253,8 +253,12 @@ createApp({
         },
         sortUsersByLastMessage(updatedUsers) {
             updatedUsers.sort((a, b) => {
-                return new Date(b.lastMessage.timestamp) - new Date(a.lastMessage.timestamp);
+                const aTimestamp = a.lastMessage ? new Date(a.lastMessage.timestamp) : new Date(0); // Varsayılan olarak 0 (1 Ocak 1970)
+                const bTimestamp = b.lastMessage ? new Date(b.lastMessage.timestamp) : new Date(0); // Varsayılan olarak 0 (1 Ocak 1970)
+            
+                return bTimestamp - aTimestamp;
             });
+            
             return updatedUsers;
         },
         async sendMessage() {
