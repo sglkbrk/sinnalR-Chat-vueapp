@@ -20,7 +20,6 @@ createApp({
             this.myuser.picture =  `https://randomuser.me/api/portraits/men/${this.myuser.sub}.jpg`;
             localStorage.setItem('userId',this.myuser.sub );
             this.startConnection();
-            this.loadUsers();
             sendTokenToServer();
             this.loadFriendRequests();
         }else{
@@ -105,7 +104,6 @@ createApp({
                     localStorage.removeItem('rememberMe');
                 }
                 this.startConnection();
-                this.loadUsers();
                 sendTokenToServer();
             } else {
                 const error = await response.json();
@@ -223,6 +221,7 @@ createApp({
             this.connection.start()
                 .then(() => {
                     this.updateConnectionStatus('Bağlantı başarıyla kuruldu.',3000);
+                    this.loadUsers();
                     console.log('SignalR connected')
                 })
                 .catch(err => console.error('SignalR connection error: ', err));
@@ -539,8 +538,10 @@ createApp({
            
         },
         async  sendSeen (userId,messageStatus) {
-            if(!this.isPageVisible()) messageStatus = 1
-            await this.connection.invoke('SendSeen', userId.toString(), messageStatus);
+            if(this.connection){
+                if(!this.isPageVisible()) messageStatus = 1
+                await this.connection.invoke('SendSeen', userId.toString(), messageStatus);
+            }
         },
         async  loadFriendRequests() {
             const response = await fetch('/api/FriendRequest/GetFriendRequestByReceiverId/' + this.myuser.sub, {
