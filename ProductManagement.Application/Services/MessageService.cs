@@ -23,7 +23,6 @@ namespace ProductManagement.Application.Services
             var messages = _context.Message.
             Where(m => (m.SenderId == senderId && m.ReceiverId == receiverId) || (m.SenderId == receiverId && m.ReceiverId == senderId))
             .Include(m => m.Sender)
-            .Include(m => m.Receiver)
             .OrderByDescending(m => m.Timestamp)
             .Skip((page - 1) * pageSize)
             .Take(pageSize);

@@ -22,7 +22,7 @@ namespace ProductManagement.API.Controllers
         public IActionResult GetChatFriends()
         {
             var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            return Ok(_friendService.GetChatFriends(int.Parse(currentUserId)));
+            return Ok(_friendService.GetChatFriends(int.Parse(currentUserId ?? "0")));
         }
 
 

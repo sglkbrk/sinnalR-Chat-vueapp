@@ -19,10 +19,10 @@ const messaging = firebase.messaging();
 // Arka planda gelen mesajları ele al
 messaging.onBackgroundMessage(function(payload) {
     console.log('[firebase-messaging-sw.js] Gelen arka plan mesajı:', payload);
-    const notificationTitle = payload.notification.title;
+    const notificationTitle = payload.data.name;
     const notificationOptions = {
-        body: payload.notification.body,
-        icon: payload.notification.image, // İsteğe bağlı ikon
+        body: payload.data.body,
+        icon: payload.data.image, // İsteğe bağlı ikon
         data: {
             url: payload.data.url || '/', // Varsayılan bir URL ekleyin
             senderId: payload.data.senderId // Ek veri

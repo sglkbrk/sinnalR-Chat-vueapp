@@ -3,12 +3,39 @@ const maxReconnectAttempts = 10; // Maksimum yeniden bağlanma denemesi
 const reconnectInterval = 5000; 
 let writeTime=0
 let page = 1;
-const pageSize = 50;
+const pageSize = 30;
 let isScrollingEnabled = true; 
-
 const { createApp } = Vue
 
 createApp({
+    data() {
+        return {
+          users: [],
+          onlineUsers_data: [],
+          selectedUserId: null,
+          messages: [],
+          cachesMessages: {},
+          myuser: {},
+          messageText: '',
+          token: '',
+          connection: null,
+          friendRequests: [],
+          endMessageVariable: false,
+          loginItem:{
+            username: '',
+            password: '',
+            rememberMe: false,
+          },       
+          statusText: '',
+          registerItem:{
+              username: '',
+              email: '',
+              password: ''
+          },
+          registerMessage: '',
+          settingsBoxVis: false,
+        }
+    },
     setup() {
 
     },
@@ -16,16 +43,16 @@ createApp({
         localStorage.getItem('theme') && document.body.setAttribute('data-theme', localStorage.getItem('theme'));
         this.token = localStorage.getItem('token');
         if (this.token) {
-            this.myuser = parseJwt( this.token)
+            this.myuser = this.parseJwt( this.token)
             this.myuser.picture =  `https://randomuser.me/api/portraits/men/${this.myuser.sub}.jpg`;
             localStorage.setItem('userId',this.myuser.sub );
             this.startConnection();
             sendTokenToServer();
             this.loadFriendRequests();
         }else{
-            this.username = localStorage.getItem('username');
-            this.password = localStorage.getItem('password');
-            this.rememberMe = localStorage.getItem('rememberMe');
+            this.loginItem.username = localStorage.getItem('username');
+            this.loginItem.password = localStorage.getItem('password');
+            this.loginItem.rememberMe = localStorage.getItem('rememberMe');
         }
         if ("Notification" in window) {
             if (Notification.permission === "granted") {
@@ -50,6 +77,16 @@ createApp({
     },
     beforeDestroy() {
         document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    },
+    watch: {
+        messages: {
+          handler(newMessages) {
+            if(newMessages && newMessages.length)
+            this.cachesMessages[newMessages[0].receiverId] = newMessages
+            // Yeni mesaj eklendiğinde veya mevcut mesajlar güncellendiğinde yapılacak işlemler
+          },
+          deep: true // Dizi içindeki nesneleri dinlemek için gerekli
+        }
     },
     computed: {
         sortedUsers() {
@@ -77,8 +114,8 @@ createApp({
         },
         async  login() {
             var json = {
-                username:this.username,
-                password:this.password
+                username:this.loginItem.username,
+                password:this.loginItem.password
             }
             
             const response = await fetch('/api/UserAuth/login', {
@@ -90,13 +127,13 @@ createApp({
                 const data = await response.json();
                 this.token = data.token;
                 localStorage.setItem('token',  this.token);
-                this.myuser = parseJwt( this.token);
+                this.myuser = this.parseJwt( this.token);
                 this.myuser.picture =  `https://randomuser.me/api/portraits/men/${this.myuser.sub}.jpg`;
                 this.registerMessage = '';
-                if(this.rememberMe){
-                    localStorage.setItem('username', this.username);
-                    localStorage.setItem('password', this.password);
-                    localStorage.setItem('rememberMe', this.rememberMe);
+                if(this.loginItem.rememberMe){
+                    localStorage.setItem('username', this.loginItem.username);
+                    localStorage.setItem('password', this.loginItem.password);
+                    localStorage.setItem('rememberMe', this.loginItem.rememberMe);
                     localStorage.setItem('userId', this.myuser.sub );
                 }else{
                     localStorage.removeItem('username');
@@ -109,6 +146,12 @@ createApp({
                 const error = await response.json();
                 alert('Login failed: ' + (error.message || 'Unknown error'));
             }
+        },
+        parseJwt(token) {
+            const base64Url = token.split('.')[1]; // Payload kısmı
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // Base64 URL kodlamasını düzelt
+            const jsonPayload = decodeURIComponent(escape(atob(base64))); // Base64'ten JSON'a dönüştür
+            return JSON.parse(jsonPayload); // JSON'ı objeye dönüştür
         },
         async  register() {
             if (this.register.username === '' || this.register.email === '' || this.register.password === '') {
@@ -507,25 +550,25 @@ createApp({
                 }
             });
             if (response.ok) {
-                const msgDiv2 = this.$refs.msgDiv;
-                var sy = msgDiv2.scrollHeight;
-                var messages = await response.json();
-                if(messages.length == 0 && page > 1) {
-                    this.endMessageVariable = true
-                } 
-                this.messages  =  messages.concat(this.messages) 
-                setTimeout(() => {
-                    if(page ==1) msgDiv2.scrollTop = msgDiv2.scrollHeight; 
-                    else  msgDiv2.scrollTop = msgDiv2.scrollHeight - sy;
-                    isScrollingEnabled = true;
-                    page++;
-                }, 100);
-                
-               
+                this.renderMessage(await response.json(),receiverId);
             } else {
                 const error = await response.json();
                 alert('Failed to load users: ' + (error.message || 'Unknown error'));
             }
+        },
+        renderMessage(messages,receiverId) {
+            const msgDiv2 = this.$refs.msgDiv;
+            var sy = msgDiv2.scrollHeight;
+            if(messages.length == 0 && page > 1) {
+                this.endMessageVariable = true
+            } 
+            this.messages  =  messages.concat(this.messages) 
+            setTimeout(() => {
+                if(page ==1) msgDiv2.scrollTop = msgDiv2.scrollHeight; 
+                else  msgDiv2.scrollTop = msgDiv2.scrollHeight - sy;
+                isScrollingEnabled = true;
+                page++;
+            }, 100);
         },
         async  onChangeMsg () {
             if(writeTime  == 0 ){
@@ -586,31 +629,5 @@ createApp({
                 return `${years} yıl önce`;
             }
         }
-    },
-    data() {
-      return {
-        message: 'Hello Vue!',
-        users: [],
-        onlineUsers_data: [],
-        selectedUserId: null,
-        messages: [],
-        myuser: {},
-        messageText: '',
-        token: '',
-        connection: null,
-        friendRequests: [],
-        endMessageVariable: false,
-        username: '',
-        password: '',
-        rememberMe: false,
-        statusText: '',
-        registerItem:{
-            username: '',
-            email: '',
-            password: ''
-        },
-        registerMessage: '',
-        settingsBoxVis: false,
-      }
     }
 }).mount('#deneme')

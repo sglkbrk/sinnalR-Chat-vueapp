@@ -25,7 +25,6 @@ namespace ProductManagement.Application.Services
 
         public List<Friends> GetChatFriends(int userId)
         {
-            // return _context.Friend.Select(c => new Friends { UserId = c.UserId, FriendUserId = c.FriendUserId }).Where(c => c.UserId == userId).ToList();
             var users = _context.Friend
            .Where(u => u.UserId == userId)
            .Select(u => new Friends

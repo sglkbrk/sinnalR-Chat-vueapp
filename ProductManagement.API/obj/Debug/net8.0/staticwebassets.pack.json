@@ -5,10 +5,6 @@
       "PackagePath": "staticwebassets/app.js"
     },
     {
-      "Id": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/common.js",
-      "PackagePath": "staticwebassets/common.js"
-    },
-    {
       "Id": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/firebase-messaging-sw.js",
       "PackagePath": "staticwebassets/firebase-messaging-sw.js"
     },

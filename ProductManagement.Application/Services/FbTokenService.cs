@@ -64,22 +64,18 @@ namespace ProductManagement.Application.Services
             }
         }
 
-        public async Task SendNotificationAsync(string title, string body, string token, string senderId)
+        public async Task SendNotificationAsync(string body, string name, string token, string senderId)
         {
             var message = new FirebaseAdmin.Messaging.Message()
             {
                 Token = token,
-                Notification = new Notification
-                {
-                    Title = title,
-                    Body = body,
-                    ImageUrl = "https://randomuser.me/api/portraits/men/" + senderId + ".jpg"
-
-                },
                 Data = new Dictionary<string, string>()
                 {
                     { "url", "https://buraksaglik.com/" },
                     { "senderId", senderId },
+                    { "name", name },
+                    { "body", body },
+                    { "image", "https://randomuser.me/api/portraits/men/" + senderId + ".jpg" }
                 },
             };
 

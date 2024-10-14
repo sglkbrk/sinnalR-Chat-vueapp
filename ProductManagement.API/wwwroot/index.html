@@ -20,9 +20,9 @@
 
 <div  v-if="token ? false : true"  ref="login"   @keydown="handleKeydown" >
     <h2>Login</h2>
-    <input type="text" v-model="username" placeholder="Username" />
-    <input type="password" v-model="password"  placeholder="Password" />
-    <input type="checkbox" v-model="rememberMe" > 
+    <input type="text" v-model="loginItem.username" placeholder="Username" />
+    <input type="password" v-model="loginItem.password"  placeholder="Password" />
+    <input type="checkbox" v-model="loginItem.rememberMe" > 
     Remember me
     </input>
     <button @click="login()">Login</button>
@@ -174,7 +174,6 @@
 
 </html>
 
-<script src="common.js"></script>
 <script src="app.js"></script>
 <script  src="./script.js"></script>
 

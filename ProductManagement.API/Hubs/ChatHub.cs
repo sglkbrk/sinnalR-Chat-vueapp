@@ -69,10 +69,11 @@ public class ChatHub : Hub
 
     private async Task sendNotification(Message message)
     {
+        var name = Context.User.FindFirstValue(ClaimTypes.Name);
         bool isOnline = _onlineUsers.Values.Contains(message.ReceiverId.ToString());
         if (isOnline) return;
         var token = _fbTokenService.GetTokenByUserId(int.Parse(message.ReceiverId.ToString()));
         if (token == null) return;
-        await _fbTokenService.SendNotificationAsync(message.Content, message.SenderId.ToString(), token.Token, message.SenderId.ToString());
+        await _fbTokenService.SendNotificationAsync(message.Content, name, token.Token, message.SenderId.ToString());
     }
 }
