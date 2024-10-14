@@ -1,6 +1,18 @@
 {
   "Files": [
     {
+      "Id": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/app.js",
+      "PackagePath": "staticwebassets/app.js"
+    },
+    {
+      "Id": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/common.js",
+      "PackagePath": "staticwebassets/common.js"
+    },
+    {
+      "Id": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/firebase-messaging-sw.js",
+      "PackagePath": "staticwebassets/firebase-messaging-sw.js"
+    },
+    {
       "Id": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/index.html",
       "PackagePath": "staticwebassets/index.html"
     },
@@ -15,6 +27,10 @@
     {
       "Id": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/yedek.html",
       "PackagePath": "staticwebassets/yedek.html"
+    },
+    {
+      "Id": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/yedek2.js",
+      "PackagePath": "staticwebassets/yedek2.js"
     },
     {
       "Id": "obj/Debug/net8.0/staticwebassets/msbuild.ProductManagement.API.Microsoft.AspNetCore.StaticWebAssets.props",

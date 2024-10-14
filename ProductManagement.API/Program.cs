@@ -6,8 +6,19 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using Serilog;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+if (FirebaseApp.DefaultInstance == null)
+{
+    FirebaseApp.Create(new AppOptions()
+    {
+        Credential = GoogleCredential.FromFile("serviceAccountKey.json"), // Servis hesabı anahtar dosyanızın yolu
+    });
+}
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -25,6 +36,9 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<MessageService>();
 builder.Services.AddScoped<UserAuthService>();
+builder.Services.AddScoped<FbTokenService>();
+builder.Services.AddScoped<FriendService>();
+builder.Services.AddScoped<FriendRequestService>();
 builder.Services.AddControllers();
 
 builder.Services.AddSwaggerGen(c =>
@@ -52,6 +66,12 @@ builder.Services.AddSwaggerGen(c =>
             }
         });
 
+});
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5044); // Tüm IP adreslerinden dinle
+    // Veya belirli bir IP adresini dinle
+    // options.Listen(IPAddress.Parse("192.168.1.100"), 5000);
 });
 
 builder.Services.AddCors(options =>

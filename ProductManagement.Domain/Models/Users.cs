@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+
+
 public class Users
 {
     [Key]  // Birincil anahtar olduğunu belirtir
@@ -14,5 +16,6 @@ public class Users
     [Required(ErrorMessage = "Şifre gereklidir.")]
     [MinLength(6, ErrorMessage = "Şifre en az 6 karakter olmalıdır.")]
     public required string Password { get; set; }
+
 
 }

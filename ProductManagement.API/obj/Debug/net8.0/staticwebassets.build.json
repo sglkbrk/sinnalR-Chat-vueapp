@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "W4DQ3tUWL6nrivVo+SIqrHwWnkJ3P/dLECqg51JoRAU=",
+  "Hash": "R+C2aimienGE4LWATofidY15giMGcA7gBt7goHShcrQ=",
   "Source": "ProductManagement.API",
   "BasePath": "_content/ProductManagement.API",
   "Mode": "Default",
@@ -16,6 +16,63 @@
     }
   ],
   "Assets": [
+    {
+      "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/app.js",
+      "SourceId": "ProductManagement.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
+      "BasePath": "_content/ProductManagement.API",
+      "RelativePath": "app.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/app.js"
+    },
+    {
+      "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/common.js",
+      "SourceId": "ProductManagement.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
+      "BasePath": "_content/ProductManagement.API",
+      "RelativePath": "common.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/common.js"
+    },
+    {
+      "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/firebase-messaging-sw.js",
+      "SourceId": "ProductManagement.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
+      "BasePath": "_content/ProductManagement.API",
+      "RelativePath": "firebase-messaging-sw.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/firebase-messaging-sw.js"
+    },
     {
       "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/index.html",
       "SourceId": "ProductManagement.API",
@@ -91,6 +148,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/yedek.html"
+    },
+    {
+      "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/yedek2.js",
+      "SourceId": "ProductManagement.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
+      "BasePath": "_content/ProductManagement.API",
+      "RelativePath": "yedek2.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/yedek2.js"
     }
   ]
 }

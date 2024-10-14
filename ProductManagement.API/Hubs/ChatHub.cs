@@ -12,9 +12,11 @@ public class ChatHub : Hub
     // Kullanıcıların online durumlarını tutmak için bir ConcurrentDictionary kullanıyoruz
     private static ConcurrentDictionary<string, string> _onlineUsers = new ConcurrentDictionary<string, string>();
     private readonly MessageService _messageService;
-    public ChatHub(MessageService messageService)
+    private readonly FbTokenService _fbTokenService;
+    public ChatHub(MessageService messageService, FbTokenService fbTokenService)
     {
         _messageService = messageService;
+        _fbTokenService = fbTokenService;
     }
 
     public override async Task OnConnectedAsync()
@@ -44,6 +46,7 @@ public class ChatHub : Hub
         // Mesajı veritabanına kaydet
         message.SenderId = int.Parse(senderId);
         _messageService.AddMessage(message);
+
         // Alıcıya mesajı gönder
         await Clients.User(message.ReceiverId.ToString()).SendAsync("ReceiveMessage", new
         {
@@ -52,6 +55,7 @@ public class ChatHub : Hub
             Content = message,
             Timestamp = message.Timestamp
         });
+        sendNotification(message);
     }
 
     public async Task SendWrite(string ReceiverId)
@@ -60,5 +64,18 @@ public class ChatHub : Hub
         // Mesajı veritabanına kaydet
         // Alıcıya mesajı gönder
         await Clients.User(ReceiverId).SendAsync("ReceiveWrites", senderId);
+    }
+
+
+
+
+    private async Task sendNotification(Message message)
+    {
+
+        bool isOnline = _onlineUsers.Values.Contains(message.ReceiverId.ToString());
+        if (isOnline) return;
+        var token = _fbTokenService.GetTokenByUserId(int.Parse(message.ReceiverId.ToString()));
+        if (token == null) return;
+        _fbTokenService.SendNotificationAsync(message.Content, message.SenderId.ToString(), token.Token, message.SenderId.ToString());
     }
 }
