@@ -220,9 +220,10 @@ createApp({
                     if(!this.isPageVisible())
                         this.showNotification(message.content.content,message.senderId,message.name,"message");
                     this.sendSeen(message.senderId,1);
+                    this.setNotMessageCount(message.senderId, true);
                 }   
                 this.setLastMessage(message.senderId, message.content.content);
-                this.setNotMessageCount(message.senderId, true);
+               
             });
         
             this.connection.on('ReceiveWrites', (senderId) => {
