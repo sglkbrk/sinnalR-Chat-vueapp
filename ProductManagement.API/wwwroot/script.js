@@ -371,6 +371,8 @@ createApp({
                 } catch (err) {
                     console.error('SendMessage error: ', err);
                 }
+            }else {
+                this.updateConnectionStatus('Bağlantı kurulmadı. Lütfen internet bağlantınızı kontrol edin.',10000);
             }
         },
         toggleConversationArea() {
@@ -589,6 +591,7 @@ createApp({
                 page++;
             }, 100);
         },
+
         async  onChangeMsg () {
             if(writeTime  == 0 ){
                 await this.connection.invoke('SendWrite', this.selectedUserId.toString());
