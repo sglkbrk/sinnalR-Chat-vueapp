@@ -1,5 +1,5 @@
 let reconnectAttempts = 0; // Yeniden bağlanma denemeleri sayacı
-const maxReconnectAttempts = 10; // Maksimum yeniden bağlanma denemesi
+const maxReconnectAttempts = 20; // Maksimum yeniden bağlanma denemesi
 const reconnectInterval = 5000; 
 let writeTime=0
 let page = 1;
@@ -352,7 +352,7 @@ createApp({
                         Timestamp: new Date(),
                         Status: 0
                     }
-                    await this.connection.invoke('SendMessage', msg);
+                   
                     var item  =  {
                         "senderId": msg.SenderId,
                         "receiverId": msg.ReceiverId,
@@ -363,6 +363,7 @@ createApp({
                     this.messages.push(item);
                     this.messageText = '';
                     this.setLastMessage(this.selectedUserId, msg.Content);
+                    await this.connection.invoke('SendMessage', msg);
                     setTimeout(() => {
                         this.$refs.msgDiv.scrollTop = this.$refs.msgDiv.scrollHeight; 
                     });
