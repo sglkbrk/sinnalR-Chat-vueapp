@@ -47,6 +47,7 @@ createApp({
             this.myuser.picture =  `https://randomuser.me/api/portraits/men/${this.myuser.sub}.jpg`;
             localStorage.setItem('userId',this.myuser.sub );
             this.startConnection();
+            this.loadUsers();
             sendTokenToServer();
             this.loadFriendRequests();
         }else{
@@ -142,6 +143,7 @@ createApp({
                 }
                 this.startConnection();
                 sendTokenToServer();
+                this.loadUsers();
             } else {
                 const error = await response.json();
                 alert('Login failed: ' + (error.message || 'Unknown error'));
@@ -266,7 +268,6 @@ createApp({
             this.connection.start()
                 .then(() => {
                     this.updateConnectionStatus('Bağlantı başarıyla kuruldu.',3000);
-                    this.loadUsers();
                     console.log('SignalR connected')
                 })
                 .catch(err => console.error('SignalR connection error: ', err));
