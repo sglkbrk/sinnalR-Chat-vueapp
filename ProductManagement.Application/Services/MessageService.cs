@@ -20,9 +20,8 @@ namespace ProductManagement.Application.Services
 
         public List<Message> GetMyMessages(int senderId, int receiverId, int page = 1, int pageSize = 50)
         {
-            var messages = _context.Message.
+            var messages = _context.Message.AsNoTracking().
             Where(m => (m.SenderId == senderId && m.ReceiverId == receiverId) || (m.SenderId == receiverId && m.ReceiverId == senderId))
-            .Include(m => m.Sender)
             .OrderByDescending(m => m.Timestamp)
             .Skip((page - 1) * pageSize)
             .Take(pageSize);
