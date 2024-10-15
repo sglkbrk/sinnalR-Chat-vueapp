@@ -317,11 +317,13 @@ html {
 
 .msg-content {
   font-weight: 500;
-  font-size: 13px;
+  font-size: 12px;
   display: flex;
+  justify-content: center;
 }
 
 .msg-message {
+  max-width: 130px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -329,12 +331,12 @@ html {
 }
 
 .msg-date {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--msg-date);
   margin-left: 3px;
 }
 .msg-date:before {
-  content: "•";
+  /* content: "•"; */
   margin-right: 2px;
 }
 
@@ -887,4 +889,18 @@ html {
   font-size: 10px;
   left: 0;
   margin-bottom: 15px;
+}
+
+.notSeenMessages{
+  display: flex;
+  position: absolute;
+  right: 0;
+  margin-right: 15px;
+  font-size: 12px;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  background-color:  var(--theme-color);
+  align-items: center;
+  justify-content: center;
 }

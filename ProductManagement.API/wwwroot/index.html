@@ -16,7 +16,7 @@
 
 </head>
 
-<body  id="deneme"  >
+<body  id="projetApp"  >
 
 <div  v-if="token ? false : true"  ref="login"   @keydown="handleKeydown" >
     <h2>Login</h2>
@@ -102,9 +102,12 @@
         <div class="msg-detail">
             <div class="msg-username">{{user.userName}}</div>
             <div class="msg-content">
-            <span class="msg-message">{{user.lastMessage ? user.lastMessage.content.slice(0, 20) : ''}}</span>
-            <span class="msg-date">{{user.lastMessage ? this.timeAgo(user.lastMessage.timestamp) : ''}}</span>
+              <span class="msg-message">{{user.lastMessage ? user.lastMessage.content.slice(0, 20) : ''}}</span>
+              <span class="msg-date">{{user.lastMessage ? this.timeAgo(user.lastMessage.timestamp) : ''}}</span>
             </div>
+        </div>
+        <div v-if="user.notSeenMessagesCount" class="notSeenMessages">
+            <strong>{{user.notSeenMessagesCount}}</strong>
         </div>
     </div>
    <button @click="sendFriendRequestBtn()" class="add"></button>

@@ -79,14 +79,14 @@ createApp({
         document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     },
     watch: {
-        messages: {
-          handler(newMessages) {
-            if(newMessages && newMessages.length)
-            this.cachesMessages[newMessages[0].receiverId] = newMessages
-            // Yeni mesaj eklendiğinde veya mevcut mesajlar güncellendiğinde yapılacak işlemler
-          },
-          deep: true // Dizi içindeki nesneleri dinlemek için gerekli
-        }
+        // messages: {
+        //   handler(newMessages) {
+        //     if(newMessages && newMessages.length)
+        //     this.cachesMessages[newMessages[0].receiverId] = newMessages
+        //     // Yeni mesaj eklendiğinde veya mevcut mesajlar güncellendiğinde yapılacak işlemler
+        //   },
+        //   deep: true // Dizi içindeki nesneleri dinlemek için gerekli
+        // }
     },
     computed: {
         sortedUsers() {
@@ -222,6 +222,7 @@ createApp({
                     this.sendSeen(message.senderId,1);
                 }   
                 this.setLastMessage(message.senderId, message.content.content);
+                this.setNotMessageCount(message.senderId, true);
             });
         
             this.connection.on('ReceiveWrites', (senderId) => {
@@ -318,6 +319,15 @@ createApp({
                 timestamp: new Date(),
                 content: lastMessage
                 }
+            };
+            this.users = this.sortUsersByLastMessage(updatedUsers);
+        },
+        setNotMessageCount(id, add) {
+            const index = this.users.findIndex(user => user.id.toString() === id.toString());
+            const updatedUsers = [...this.users]; // Derin kopya oluşturuyoruz
+            updatedUsers[index] = {
+                ...updatedUsers[index],
+                notSeenMessagesCount: add ? updatedUsers[index].notSeenMessagesCount + 1 : 0
             };
             this.users = this.sortUsersByLastMessage(updatedUsers);
         },
@@ -518,6 +528,7 @@ createApp({
             this.loadMessages(this.myuser.sub, receiverId);
             this.$refs.conversationArea.classList.remove('open');
             this.sendSeen(receiverId,2);
+            this.setNotMessageCount(receiverId, false);
         },
         async  loadUsers() {
             const response = await fetch('/api/Friend/GetChatFriends', {
@@ -541,6 +552,10 @@ createApp({
             }
         },
         async  loadMessages(senderId, receiverId) {
+            // if(this.cachesMessages[receiverId]) {
+            //     this.renderMessage(this.cachesMessages[receiverId],receiverId);
+            //     return
+            // }
             if(this.endMessageVariable) return
             const response = await fetch('/api/message/GetMyMessages/' + senderId + '/' + receiverId + '/'+ page +'/' + pageSize, {
                 method: 'GET',
@@ -562,7 +577,8 @@ createApp({
             if(messages.length == 0 && page > 1) {
                 this.endMessageVariable = true
             } 
-            this.messages  =  messages.concat(this.messages) 
+            this.messages  =  messages.concat(this.messages)
+            this.cachesMessages[receiverId] = this.messages;
             setTimeout(() => {
                 if(page ==1) msgDiv2.scrollTop = msgDiv2.scrollHeight; 
                 else  msgDiv2.scrollTop = msgDiv2.scrollHeight - sy;
@@ -604,30 +620,39 @@ createApp({
                 alert('Failed to load users: ' + (error.message || 'Unknown error'));
             }
         },
-        timeAgo(timestamp) {
-            const now = new Date();
-            const timeElapsed = now - new Date(timestamp);
-            
-            const seconds = Math.floor(timeElapsed / 1000);
-            const minutes = Math.floor(seconds / 60);
-            const hours = Math.floor(minutes / 60);
-            const days = Math.floor(hours / 24);
-            const months = Math.floor(days / 30);
-            const years = Math.floor(days / 365);
+        timeAgo(isoDateString) {
+            const turkishMonths = [
+                'Oca', // Ocak
+                'Şub', // Şubat
+                'Mar', // Mart
+                'Nis', // Nisan
+                'May', // Mayıs
+                'Haz', // Haziran
+                'Tem', // Temmuz
+                'Ağu', // Ağustos
+                'Eyl', // Eylül
+                'Eki', // Ekim
+                'Kas', // Kasım
+                'Ara'  // Aralık
+            ];
         
-            if (seconds < 60) {
-                return "Şimdi";
-            } else if (minutes < 60) {
-                return `${minutes} dk önce`;
-            } else if (hours < 24) {
-                return `${hours} saat önce`;
-            } else if (days < 30) {
-                return `${days} gün önce`;
-            } else if (months < 12) {
-                return `${months} ay önce`;
-            } else {
-                return `${years} yıl önce`;
-            }
+            // ISO 8601 tarih string'ini Date objesine dönüştürme
+            const date = new Date(isoDateString);
+        
+            // Gün bilgisini alma
+            const day = date.getDate();
+        
+            // Ay bilgisini Türkçe kısaltmalarla alma
+            const month = turkishMonths[date.getMonth()];
+        
+            // Saat bilgisini alma ve iki haneli yapma
+            const hours = date.getHours().toString().padStart(2, '0');
+        
+            // Dakika bilgisini alma ve iki haneli yapma
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+        
+            // İstenen formatta birleştirme
+            return `${day} ${month} ${hours}:${minutes}`;
         }
     }
-}).mount('#deneme')
+}).mount('#projetApp')
