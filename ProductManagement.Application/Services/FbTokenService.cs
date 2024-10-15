@@ -78,9 +78,19 @@ namespace ProductManagement.Application.Services
                     { "image", "https://randomuser.me/api/portraits/men/" + senderId + ".jpg" }
                 },
             };
+            try
+            {
+                string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                Console.WriteLine("Successfully sent message: " + response);
+            }
+            catch (FirebaseMessagingException ex)
+            {
+                Console.WriteLine($"FirebaseMessagingException: {ex.Message}");
+            }
 
-            string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
-            Console.WriteLine("Bildirim gönderildi: " + response);
+
+            // string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+            // Console.WriteLine("Bildirim gönderildi: " + response);
         }
     }
 }
