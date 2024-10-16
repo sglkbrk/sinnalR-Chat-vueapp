@@ -32,8 +32,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     new MySqlServerVersion(new Version(8, 0, 40))));
 // Server=localhost;Database=ProductManagementDb;User=root;Password=123456;
 // Servisleri ekleyin
-builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<MessageService>();
 builder.Services.AddScoped<UserAuthService>();
 builder.Services.AddScoped<FbTokenService>();

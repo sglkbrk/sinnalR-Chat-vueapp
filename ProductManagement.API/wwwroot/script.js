@@ -37,6 +37,7 @@ createApp({
           showEmojiPicker: false,
           darkMode: false,
           acceptType: 'image/*',
+          selectedUserName: null,
         }
     },
     setup() {
@@ -227,7 +228,15 @@ createApp({
                         "type": message.content.type,
                         "fileUrl": message.content.fileUrl
                     }
-                    this.messages.push(item);
+                    // this.messages.push(item);
+                    if(this.messages[this.messages.length - 1].senderId == item.senderId) {
+                        this.messages[this.messages.length - 1].messages.push(item);
+                    }else{
+                        this.messages.push({
+                            senderId: item.senderId,
+                            messages:[item]
+                        })
+                    }
                     this.sendSeen(item.senderId,2);
                     setTimeout(() => {
                         this.$refs.msgDiv.scrollTop = this.$refs.msgDiv.scrollHeight;
@@ -255,10 +264,13 @@ createApp({
             });
             this.connection.on('ReceiveSeen', (userid,messageStatus) => {
                 if(this.selectedUserId == userid) {
-                    this.messages.forEach(message => {
-                        if (message.status != 2 && message.senderId == this.myuser.sub) {
-                            message.status = messageStatus;
-                        }
+                    this.messages.forEach(msg => {
+                        if(message.senderId != this.myuser.sub)
+                        msg.messages.forEach(message => {
+                            if (message.status != 2) {
+                                message.status = messageStatus;
+                            }
+                        })
                     });    
                 }
             });
@@ -383,7 +395,14 @@ createApp({
                         "type": msg.Type,
                         "fileUrl": msg.FileUrl
                     }
-                    this.messages.push(item);
+                    if(this.messages[this.messages.length - 1].senderId == msg.SenderId) {
+                        this.messages[this.messages.length - 1].messages.push(item);
+                    }else{
+                        this.messages.push({
+                            senderId: msg.SenderId,
+                            messages:[item]
+                        })
+                    }
                     this.setLastMessage(this.selectedUserId, msg.Content);
                     await this.connection.invoke('SendMessage', msg);
                     setTimeout(() => {
@@ -555,8 +574,7 @@ createApp({
             this.endMessageVariable = false
             this.messages = []
             this.selectedUserId = receiverId
-            let chatAreaTitle = document.getElementById('chat-area-title');
-            chatAreaTitle.innerHTML = name
+            this.selectedUserName = name
             isScrollingEnabled = false;
             this.loadMessages(this.myuser.sub, receiverId);
             this.$refs.conversationArea.classList.remove('open');
@@ -598,7 +616,19 @@ createApp({
                 }
             });
             if (response.ok) {
-                this.renderMessage(await response.json(),receiverId);
+                var messages = await response.json()
+                var arr = [];
+                messages.forEach(msg => {
+                    if(msg.senderId != arr[arr.length - 1]?.senderId) {
+                        arr.push({
+                            senderId: msg.senderId,
+                            messages:[msg]
+                        })
+                    }else {
+                        arr[arr.length - 1].messages.push(msg)
+                    }
+                })
+                this.renderMessage(arr,receiverId);
             } else {
                 const error = await response.json();
                 alert('Failed to load users: ' + (error.message || 'Unknown error'));
@@ -693,11 +723,16 @@ createApp({
         },
         triggerFileSelect() {
             this.acceptType = '*';
-            this.$refs.fileInput.click();
+            setTimeout(() => {
+                this.$refs.fileInput.click();
+            }, 100);
+            
         },
         triggerImageSelect() {
             this.acceptType = 'image/*'; 
-            this.$refs.fileInput.click();
+            setTimeout(() => {
+                this.$refs.fileInput.click();
+            }, 100);
         },
         handlePaste(event) {
             // Yapıştırılan içerikleri al

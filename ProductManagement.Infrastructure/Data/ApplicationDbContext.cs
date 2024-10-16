@@ -10,8 +10,6 @@ namespace ProductManagement.Infrastructure.Data
         {
         }
 
-        public DbSet<Products> Products { get; set; }
-        public DbSet<Category> Category { get; set; }
         public DbSet<Message> Message { get; set; }
         public DbSet<Users> Users { get; set; }
         public DbSet<ChatRoom> ChatRoom { get; set; }
