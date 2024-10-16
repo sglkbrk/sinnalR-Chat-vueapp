@@ -26,9 +26,18 @@ namespace ProductManagement.Application.Services
         {
 
             // Eğer model geçerliyse, parolayı hash'leyip kaydetme işlemi yapar
-            model.Password = HashPasswordMD5(model.Password);
-            _context.Users.Add(model);
-            _context.SaveChanges();
+            Users users = _context.Users.FirstOrDefault(x => x.Email == model.Email || x.Username == model.Username);
+            if (users != null)
+            {
+                throw new Exception("Bu kullanıcı zaten kayıtlı");
+            }
+            else
+            {
+                model.Password = HashPasswordMD5(model.Password);
+                _context.Users.Add(model);
+                _context.SaveChanges();
+            }
+
 
 
         }
