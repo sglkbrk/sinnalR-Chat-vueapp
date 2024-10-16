@@ -225,6 +225,7 @@ createApp({
                         "timestamp": message.timestamp,
                         "status": message.content.status,
                         "type": message.content.type,
+                        "fileUrl": message.content.fileUrl
                     }
                     this.messages.push(item);
                     this.sendSeen(item.senderId,2);
