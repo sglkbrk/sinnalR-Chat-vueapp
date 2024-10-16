@@ -39,6 +39,7 @@ builder.Services.AddScoped<UserAuthService>();
 builder.Services.AddScoped<FbTokenService>();
 builder.Services.AddScoped<FriendService>();
 builder.Services.AddScoped<FriendRequestService>();
+builder.Services.AddSingleton<MinioFileService>();
 builder.Services.AddControllers();
 
 builder.Services.AddSwaggerGen(c =>

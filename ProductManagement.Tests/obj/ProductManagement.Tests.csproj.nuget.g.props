@@ -23,5 +23,7 @@
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <Pkgxunit_analyzers Condition=" '$(Pkgxunit_analyzers)' == '' ">/Users/burak/.nuget/packages/xunit.analyzers/1.16.0</Pkgxunit_analyzers>
     <PkgMicrosoft_Extensions_ApiDescription_Server Condition=" '$(PkgMicrosoft_Extensions_ApiDescription_Server)' == '' ">/Users/burak/.nuget/packages/microsoft.extensions.apidescription.server/6.0.5</PkgMicrosoft_Extensions_ApiDescription_Server>
+    <PkgAWSSDK_Core Condition=" '$(PkgAWSSDK_Core)' == '' ">/Users/burak/.nuget/packages/awssdk.core/3.7.400.35</PkgAWSSDK_Core>
+    <PkgAWSSDK_S3 Condition=" '$(PkgAWSSDK_S3)' == '' ">/Users/burak/.nuget/packages/awssdk.s3/3.7.404.7</PkgAWSSDK_S3>
   </PropertyGroup>
 </Project>

@@ -34,6 +34,9 @@ createApp({
           },
           registerMessage: '',
           settingsBoxVis: false,
+          showEmojiPicker: false,
+          darkMode: false,
+          acceptType: 'image/*',
         }
     },
     setup() {
@@ -73,8 +76,15 @@ createApp({
                 }
             });
         }  
-        document.addEventListener('keydown', this.handleKeydown);
         document.addEventListener('visibilitychange', this.handleVisibilityChange);
+        document.addEventListener('click', (event) => {
+            if (this.showEmojiPicker && !this.$refs.emojiPicker.contains(event.target) && event.target !== this.$refs.emojiIcon) {
+                this.showEmojiPicker = false;
+            }
+        });
+        this.$refs.emojiPicker.addEventListener('emoji-click', event => {
+            this.messageText += event.detail.unicode;
+        });
     },
     beforeDestroy() {
         document.removeEventListener('visibilitychange', this.handleVisibilityChange);
@@ -96,6 +106,7 @@ createApp({
     },
     methods: {
         changeTheme(){
+            this.darkMode = !this.darkMode
             document.body.classList.toggle('dark-mode');
         },
         changeColor(color){
@@ -177,7 +188,7 @@ createApp({
                 }
             } else {
                 const error = await response.json();
-                this.registerMessage = 'Kayıt başarısız: ' + (error.errors || 'Lüfen Bilgileri doğrı girin ');
+                this.registerMessage = 'Kayıt başarısız: ' + (error.message || 'Lüfen Bilgileri doğrı girin ');
             }
         },
         logout(){
@@ -344,25 +355,32 @@ createApp({
             return updatedUsers;
         },
         async sendMessage() {
-            if (this.connection && this.messageText !== '') {
+            this.addMessage(this.messageText);
+            this.messageText = '';
+        },
+        async addMessage(messageText,type = 0,fileUrl) {
+            if (this.connection && messageText) {
+                messageText = this.escapeHTML(messageText);
                 try {
                     var msg = {
                         SenderId: parseInt(this.myuser.sub),
                         ReceiverId: parseInt(this.selectedUserId),
-                        Content: this.messageText,
+                        Content: messageText,
                         Timestamp: new Date(),
-                        Status: 0
+                        Status: 0,
+                        Type: type,
+                        FileUrl: fileUrl ? fileUrl : null
                     }
-                   
                     var item  =  {
                         "senderId": msg.SenderId,
                         "receiverId": msg.ReceiverId,
                         "content": msg.Content,
                         "timestamp": msg.Timestamp,
-                        "status": msg.Status
+                        "status": msg.Status,
+                        "type": msg.Type,
+                        "fileUrl": msg.FileUrl
                     }
                     this.messages.push(item);
-                    this.messageText = '';
                     this.setLastMessage(this.selectedUserId, msg.Content);
                     await this.connection.invoke('SendMessage', msg);
                     setTimeout(() => {
@@ -374,6 +392,13 @@ createApp({
             }else {
                 this.updateConnectionStatus('Bağlantı kurulmadı. Lütfen internet bağlantınızı kontrol edin.',10000);
             }
+        },
+        escapeHTML(text) {
+            const map = {
+              '<': '&lt;',
+              '>': '&gt;',
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         },
         toggleConversationArea() {
             this.$refs.conversationArea.classList.toggle('open');
@@ -659,6 +684,73 @@ createApp({
         
             // İstenen formatta birleştirme
             return `${day} ${month} ${hours}:${minutes}`;
+        },
+        toogleEmojiBox() {
+            this.showEmojiPicker = !this.showEmojiPicker
+        },
+        triggerFileSelect() {
+            this.acceptType = '*';
+            this.$refs.fileInput.click();
+        },
+        triggerImageSelect() {
+            this.acceptType = 'image/*'; 
+            this.$refs.fileInput.click();
+        },
+        handlePaste(event) {
+            // Yapıştırılan içerikleri al
+            const items = event.clipboardData.items;
+            for (let i = 0; i < items.length; i++) {
+              const item = items[i];
+              // Eğer yapıştırılan bir resim dosyasıysa
+              if (item.kind === 'file' && item.type.startsWith('image/')) {
+                const file = item.getAsFile();
+                // Dosyayı doğrudan handleFileChange'e gönder
+                this.handleFileChange({ target: { files: [file] } });
+              }
+            }
+        },
+        onImageLoad() {
+            this.$refs.msgDiv.scrollTop = this.$refs.msgDiv.scrollHeight; 
+        },
+        downloadFile(fileUrl) {
+            const link = document.createElement('a');
+            link.href = '/api/MinioFile/download/' + fileUrl;
+            link.download = fileUrl.split('/').pop();
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
+        async handleFileChange(event) {
+            const file = event.target.files[0];
+            if(file.size > 1024 * 1024 * 5) {
+                alert('Dosya boyutu 5MB den uzun olamaz!');
+                return
+            }
+            const formData = new FormData();
+            formData.append('file', file);
+            fetch('/api/MinioFile/upload', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                },
+                body: formData,
+            })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Dosya yükleme başarısız!');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                var type = this.acceptType == 'image/*' ? 1 : 2;
+                this.addMessage(file.name, type, data.key);
+                console.log('Dosya başarıyla yüklendi:', data);
+            })
+            .catch((error) => {
+
+                console.error('Hata:', error);
+            });
         }
+
     }
 }).mount('#projetApp')

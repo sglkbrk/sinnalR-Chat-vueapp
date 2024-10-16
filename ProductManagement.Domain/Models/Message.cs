@@ -17,6 +17,8 @@ namespace ProductManagement.Domain.Models
         public string Content { get; set; }
         public DateTime Timestamp { get; set; }
         public messageStatus Status { get; set; }
+        public messageType Type { get; set; }
+        public string? FileUrl { get; set; }
     }
 
     public enum messageStatus
@@ -24,6 +26,16 @@ namespace ProductManagement.Domain.Models
         Sent,
         forwarded,
         Seen
+    }
+
+    public enum messageType
+    {
+        Text,
+        Image,
+        File,
+        Audio,
+        Video
+
     }
 }
 
