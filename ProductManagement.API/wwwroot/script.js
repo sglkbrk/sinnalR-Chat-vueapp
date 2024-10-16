@@ -222,7 +222,9 @@ createApp({
                         "senderId": message.senderId,
                         "receiverId": message.content.receiverId,
                         "content": message.content.content,
-                        "timestamp": message.timestamp
+                        "timestamp": message.timestamp,
+                        "status": message.content.status,
+                        "type": message.content.type,
                     }
                     this.messages.push(item);
                     this.sendSeen(item.senderId,2);
