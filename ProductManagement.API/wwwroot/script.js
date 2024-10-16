@@ -710,7 +710,7 @@ createApp({
             }
         },
         onImageLoad() {
-            this.$refs.msgDiv.scrollTop = this.$refs.msgDiv.scrollHeight; 
+            // this.$refs.msgDiv.scrollTop = this.$refs.msgDiv.scrollHeight; 
         },
         downloadFile(fileUrl) {
             const link = document.createElement('a');

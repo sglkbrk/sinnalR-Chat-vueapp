@@ -154,8 +154,8 @@
                   </svg>
               </div>
             </div>
-            <div v-if="msg.type == 1" class="chat-msg-text">
-              <img @load="onImageLoad()" :src="'/api/MinioFile/download/' + msg.fileUrl" />
+            <div v-if="msg.type == 1"  style="width: 220px;height: 230px; display: flex;justify-content: center; align-items: center"  class="chat-msg-text">
+              <img  @load="onImageLoad()" style="max-width:200px;max-height:200px;" :src="'/api/MinioFile/download/' + msg.fileUrl" />
             </div>
             <div v-if="msg.type == 0"  class="chat-msg-text">{{msg.content}}</div>
         </div>
