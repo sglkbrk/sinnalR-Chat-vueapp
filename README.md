@@ -1,7 +1,7 @@
 # sinnalR-Chat-vueapp
 
 Demo App
-https://buraksaglik.com/
+https://chat.buraksaglik.com/
 
 Frontend tarafında Vue.js, backend tarafında .NET kullanılarak inşa edilmiş bu proje, gerçek zamanlı iletişim için SignalR, dosya depolama için MinIO ve veri yönetimi için MySQL ile entegre edilmiştir. Tüm bu bileşenler Docker ve Docker Compose kullanılarak kolayca kurulabilir ve yönetilebilir.
 
@@ -12,6 +12,15 @@ Frontend tarafında Vue.js, backend tarafında .NET kullanılarak inşa edilmiş
 - **Gerçek Zamanlı İletişim:** SignalR entegrasyonu
 - **Dosya Depolama:** MinIO
 - **Veritabanı:** MySQL
+- **Okundum ve İletidi Bilgileri:**
+- **Yazıyor ve son görülme:**
+- **Anlık Mesaj Silme:**
+- **Dosya ve Resim Gönderme:**
+- **Arkadaş Ekleme Sistemi Ve anlık bildirimler:**
+- **FireBase Push Notification:** Uygulama Kapalı olsa Bile Bildirim Almaya Devam eder
+- **Local Push Notification:**
+- **Dark Mode:**
+- **Teme Reklerini değiştirebilme:**
 
 ## Teknolojiler
 
