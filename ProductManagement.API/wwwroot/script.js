@@ -39,6 +39,7 @@ createApp({
           darkMode: false,
           acceptType: 'image/*',
           selectedUserName: null,
+          showLogin: true
         }
     },
     setup() {
@@ -126,6 +127,9 @@ createApp({
                 // this.closeModal();
               }
         },
+        toggleForm() {
+            this.showLogin = !this.showLogin; // Toggle form between login and register
+          },
         async  login() {
             var json = {
                 username:this.loginItem.username,
@@ -188,6 +192,7 @@ createApp({
                     email: '',
                     password: ''
                 }
+                this.showLogin = true;
             } else {
                 const error = await response.json();
                 this.registerMessage = 'Kayıt başarısız: ' + (error.message || 'Lüfen Bilgileri doğrı girin ');

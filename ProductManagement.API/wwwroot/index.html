@@ -22,25 +22,65 @@
 
 <body  id="projetApp"  >
 
-<div  v-if="token ? false : true"  ref="login"   @keydown="handleKeydown" >
-    <h2>Login</h2>
-    <input type="text" v-model="loginItem.username" placeholder="Username" />
-    <input type="password" v-model="loginItem.password"  placeholder="Password" />
-    <input type="checkbox" v-model="loginItem.rememberMe" > 
-    Remember me
-    </input>
-    <button @click="login()">Login</button>
-</div>
+  <div>
+    <!-- Conditional Render for Login/Register Form -->
+    <div v-if="!token" class="auth-container">
+      
+      <!-- Login Section -->
+        <div v-if="showLogin" ref="login" class="auth-form">
+          <h2>Login</h2>
+          <input
+            type="text"
+            v-model="loginItem.username"
+            placeholder="Username"
+            class="input-field"
+          />
+          <input
+            type="password"
+            v-model="loginItem.password"
+            placeholder="Password"
+            class="input-field"
+          />
+          <div class="remember-me">
+            <input type="checkbox" v-model="loginItem.rememberMe" />
+            <span>Remember me</span>
+          </div>
+          <button @click="login" class="btn btn-primary">Login</button>
+          <p class="toggle-text">
+            Don't have an account? <a href="#" @click="toggleForm">Register</a>
+          </p>
+        </div>
 
-<!-- Register Bölümü -->
-<div v-if="token ? false : true" ref="register">
-    <h2>Register</h2>
-    <input type="text" v-model="register.username" placeholder="Username" />
-    <input type="email" v-model="register.email" placeholder="Email" />
-    <input type="password" v-model="register.password"   placeholder="Password (6 Karekter)" />
-    <button @click="register()">Register</button>
-    <div>{{registerMessage}}</div>
-</div>
+        <!-- Register Section -->
+        <div v-if="!showLogin" ref="register" class="auth-form">
+          <h2>Register</h2>
+          <input
+            type="text"
+            v-model="register.username"
+            placeholder="Username"
+            class="input-field"
+          />
+          <input
+            type="email"
+            v-model="register.email"
+            placeholder="Email"
+            class="input-field"
+          />
+          <input
+            type="password"
+            v-model="register.password"
+            placeholder="Password (min 6 characters)"
+            class="input-field"
+          />
+          <button @click="register" class="btn btn-primary">Register</button>
+          <p class="toggle-text">
+            Already have an account? <a href="#" @click="toggleForm">Login</a>
+          </p>
+          <div>{{ registerMessage }}</div>
+        </div>
+
+      </div>
+  </div>
 
 <div   v-show="token ? true : false"  id="app"   class="app">
  <div class="header">
