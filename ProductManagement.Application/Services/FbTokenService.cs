@@ -71,7 +71,7 @@ namespace ProductManagement.Application.Services
                 Token = token,
                 Data = new Dictionary<string, string>()
                 {
-                    { "url", "https://buraksaglik.com/" },
+                    { "url", "https://chat.buraksaglik.com/" },
                     { "senderId", senderId },
                     { "name", name },
                     { "body", body },

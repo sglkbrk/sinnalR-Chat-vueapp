@@ -3,3 +3,6 @@
 /ProductManagement.API/serviceAccountKey.json
 /ProductManagement.API/bin/Debug/net8.0/serviceAccountKey.json
 ProductManagement.API/bin/Debug/net8.0/serviceAccountKey.json
+/ProductManagement.Tests/bin/Debug/net8.0/serviceAccountKey.json
+ProductManagement.Tests/bin/Debug/net8.0/serviceAccountKey.json
+*/serviceAccountKey.json

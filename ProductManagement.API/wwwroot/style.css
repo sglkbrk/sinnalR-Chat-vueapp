@@ -462,6 +462,12 @@ html {
   color: var(--chat-text-color);
 }
 
+.delete-msg{
+  background-color: var(--detail-font-color) !important;
+  color: #000 !important;
+  align-items: center;
+}
+
 .owner {
   flex-direction: row-reverse;
 }
@@ -911,4 +917,34 @@ html {
   background-color:  var(--theme-color);
   align-items: center;
   justify-content: center;
+}
+
+
+.msgIcons{
+  background-color: var(--settings-icon-color);
+  width: 30px;
+  height: 30px;
+  border-radius: 100%;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  margin: 3px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+
+.msgIcons.visible {
+  opacity: 1;
+}
+
+
+.msg-left {
+  order: -1; /* Pushes msgIcons to the left side */
+  margin-right: 10px;
+}
+
+.msg-right {
+  order: 1; /* Keeps msgIcons on the right side */
+  margin-left: 10px;
 }

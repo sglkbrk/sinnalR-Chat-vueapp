@@ -10,6 +10,7 @@ const { createApp } = Vue
 createApp({
     data() {
         return {
+            items: [{ src: 'https://via.placeholder.com/600', w: 600, h: 400 }],
           users: [],
           onlineUsers_data: [],
           selectedUserId: null,
@@ -220,6 +221,7 @@ createApp({
             this.connection.on('ReceiveMessage', (message) => {
                 if (message.senderId == this.selectedUserId) {
                     var item  =  {
+                        "id":message.id,
                         "senderId": message.senderId,
                         "receiverId": message.content.receiverId,
                         "content": message.content.content,
@@ -279,6 +281,16 @@ createApp({
                 else if(data.type == "refreshUsers"){
                     this.showNotification("Arkadaş İsteğin kabul Etti",data.id,data.name,"message");
                     this.loadUsers();
+                }
+            });
+            this.connection.on('ReceiveDeleteMessage', (userId,msgid) => {
+                if(userId == this.selectedUserId){
+                    this.messages.forEach(msg => {
+                        msg.messages.filter(x => { if(x.id == msgid){
+                           x.isDeleted = true
+                           x.content = "Bu Mesaj Silindi" 
+                        } } )
+                   });
                 }
             });
             this.connection.onclose(() => {
@@ -596,7 +608,7 @@ createApp({
                 })
             } else {
                 if(response.status == 401) {
-                    logout();
+                    this.logout();
                 }
                 const error = await response.json();
                 alert('Failed to load users: ' + (error.message || 'Unknown error'));
@@ -788,6 +800,19 @@ createApp({
 
                 console.error('Hata:', error);
             });
+        },
+        async deleteMessage(receiverId,id){
+            if(this.connection){
+                await this.connection.invoke('DeleteMessage', receiverId.toString(), id);
+                if(receiverId == this.selectedUserId){
+                    this.messages.forEach(msg => {
+                         msg.messages.filter(x => { if(x.id == id){
+                            x.isDeleted = true
+                            x.content = "Bu Mesaj Silindi" 
+                         } } )
+                    });
+                }
+            }
         }
 
     }

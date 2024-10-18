@@ -19,6 +19,8 @@ namespace ProductManagement.Domain.Models
         public messageStatus Status { get; set; }
         public messageType Type { get; set; }
         public string? FileUrl { get; set; }
+        public bool IsDeleted { get; set; } = false;
+
     }
 
     public enum messageStatus

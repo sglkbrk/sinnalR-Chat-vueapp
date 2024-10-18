@@ -40,19 +40,19 @@ namespace ProductManagement.Application.Services
         }
 
 
-        public void UpdateMessage(Message message)
+        public async Task UpdateMessage(Message message)
         {
             _context.Message.Update(message);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void DeleteMessage(int id)
+        public async Task DeleteMessage(int id)
         {
             var message = GetMessageById(id);
             if (message != null)
             {
                 _context.Message.Remove(message);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
 

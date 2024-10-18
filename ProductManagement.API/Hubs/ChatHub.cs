@@ -67,6 +67,19 @@ public class ChatHub : Hub
         await _messageService.setSeen(int.Parse(ReceiverId), int.Parse(senderId), messageStatus);
     }
 
+    public async Task DeleteMessage(string ReceiverId, int id)
+    {
+        var senderId = Context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        await Clients.User(ReceiverId).SendAsync("ReceiveDeleteMessage", senderId, id);
+        Message message = _messageService.GetMessageById(id);
+        if (message != null)
+        {
+            message.Content = "Bu Mesaj Silindi";
+            message.IsDeleted = true;
+            await _messageService.UpdateMessage(message);
+        }
+    }
+
     private async Task sendNotification(Message message)
     {
         var name = Context.User.FindFirstValue(ClaimTypes.Name);
