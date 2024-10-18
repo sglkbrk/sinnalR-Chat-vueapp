@@ -15,7 +15,7 @@ Frontend tarafında Vue.js, backend tarafında .NET kullanılarak inşa edilmiş
 - **FireBase Push Notification:** Uygulama Kapalı olsa Bile Bildirim Almaya Devam eder
 - **Local Push Notification:**
 - **Dark Mode:**
-- **Teme Reklerini değiştirebilme:**
+- **Tema Reklerini değiştirebilme:**
 
 ## Teknolojiler
 
