@@ -407,7 +407,7 @@ createApp({
                         "type": msg.Type,
                         "fileUrl": msg.FileUrl
                     }
-                    if(this.messages[this.messages.length - 1].senderId == msg.SenderId) {
+                    if(this.messages && this.messages.length && this.messages[this.messages.length - 1].senderId == msg.SenderId) {
                         this.messages[this.messages.length - 1].messages.push(item);
                     }else{
                         this.messages.push({

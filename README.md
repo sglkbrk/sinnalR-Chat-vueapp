@@ -7,11 +7,6 @@ Frontend tarafında Vue.js, backend tarafında .NET kullanılarak inşa edilmiş
 
 ## Özellikler
 
-- **Frontend:** Vue.js
-- **Backend:** .NET
-- **Gerçek Zamanlı İletişim:** SignalR entegrasyonu
-- **Dosya Depolama:** MinIO
-- **Veritabanı:** MySQL
 - **Okundum ve İletidi Bilgileri:**
 - **Yazıyor ve son görülme:**
 - **Anlık Mesaj Silme:**
@@ -20,7 +15,7 @@ Frontend tarafında Vue.js, backend tarafında .NET kullanılarak inşa edilmiş
 - **FireBase Push Notification:** Uygulama Kapalı olsa Bile Bildirim Almaya Devam eder
 - **Local Push Notification:**
 - **Dark Mode:**
-- **Teme Reklerini değiştirebilme:**
+- **Tema Reklerini değiştirebilme:**
 
 ## Teknolojiler
 
@@ -39,7 +34,7 @@ Frontend tarafında Vue.js, backend tarafında .NET kullanılarak inşa edilmiş
 
 ## Kurulum
 
-git clone
-docker-compose up --build -d
-dotnet ef migrations add InitialCreate --project ProductManagement.Infrastructure --startup-project ProductManagement.API
-dotnet ef database update --project ProductManagement.Infrastructure --startup-project ProductManagement.API
+- git clone
+- docker-compose up --build -d
+- dotnet ef migrations add InitialCreate --project ProductManagement.Infrastructure --startup-project ProductManagement.API
+- dotnet ef database update --project ProductManagement.Infrastructure --startup-project ProductManagement.API
