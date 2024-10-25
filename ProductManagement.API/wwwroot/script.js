@@ -158,8 +158,8 @@ createApp({
                 sendTokenToServer();
                 this.loadUsers();
             } else {
-                const error = await response.json();
-                alert('Login failed: ' + (error.message || 'Unknown error'));
+                const error = response;
+                alert('Login failed: ' + (error.statusText || 'Unknown error'));
             }
         },
         parseJwt(token) {
