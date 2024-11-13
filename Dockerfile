@@ -1,8 +1,7 @@
 # Base image olarak ASP.NET runtime kullanılıyor
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 7266
+EXPOSE 5044
 
 # SDK image for building the app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
@@ -22,6 +21,8 @@ RUN dotnet build "ProductManagement.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
 RUN dotnet publish "ProductManagement.API.csproj" -c Release -o /app/publish
+
+COPY ProductManagement.API/serviceAccountKey.json /app/serviceAccountKey.json
 
 # Son olarak uygulamayı çalıştırmak için base image'e geçiş yapıyoruz
 FROM base AS final
