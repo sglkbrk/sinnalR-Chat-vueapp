@@ -26,25 +26,37 @@ namespace ProductManagement.Application.Services
 
         public void AddToken(FbToken token)
         {
-            FbToken tokess = GetTokenByUserId(token.UserId);
-            if (tokess == null)
+            FbToken userToken = GetTokenByUserId(token.UserId);
+            if (userToken == null)
             {
-                FbToken token1 = _context.FbToken.FirstOrDefault(c => c.Token == token.Token);
-                if (token1 == null)
-                {
-                    _context.FbToken.Add(token);
-                    _context.SaveChanges();
-                }
-                else
-                {
-                    UpdateToken(tokess);
-                }
-
+                _context.FbToken.Add(userToken);
             }
             else
             {
-                UpdateToken(tokess);
+                userToken.Token = token.Token;
+                _context.FbToken.Update(userToken);
+
             }
+            _context.SaveChanges();
+            // FbToken tokess = GetTokenByUserId(token.UserId);
+            // if (tokess == null)
+            // {
+            //     FbToken token1 = _context.FbToken.FirstOrDefault(c => c.Token == token.Token);
+            //     if (token1 == null)
+            //     {
+            //         _context.FbToken.Add(token);
+            //         _context.SaveChanges();
+            //     }
+            //     else
+            //     {
+            //         UpdateToken(tokess);
+            //     }
+
+            // }
+            // else
+            // {
+            //     UpdateToken(tokess);
+            // }
 
         }
 
@@ -54,9 +66,18 @@ namespace ProductManagement.Application.Services
             _context.SaveChanges();
         }
 
-        public void DeleteCategory(int userId)
+        public void DeleteToken(int userId)
         {
             var fbToken = GetTokenByUserId(userId);
+            if (fbToken != null)
+            {
+                _context.FbToken.Remove(fbToken);
+                _context.SaveChanges();
+            }
+        }
+        public void DeleteToken(string token)
+        {
+            var fbToken = _context.FbToken.FirstOrDefault(c => c.Token == token);
             if (fbToken != null)
             {
                 _context.FbToken.Remove(fbToken);

@@ -53,9 +53,9 @@ namespace ProductManagement.API.Controllers
         }
 
         [HttpDelete("{userId}")]
-        public IActionResult DeleteCategory(int userId)
+        public IActionResult DeleteToken(int userId)
         {
-            _fbTokenService.DeleteCategory(userId);
+            _fbTokenService.DeleteToken(userId);
             return NoContent();
         }
 
