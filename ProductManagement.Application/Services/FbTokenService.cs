@@ -29,7 +29,7 @@ namespace ProductManagement.Application.Services
             FbToken userToken = GetTokenByUserId(token.UserId);
             if (userToken == null)
             {
-                _context.FbToken.Add(userToken);
+                _context.FbToken.Add(token);
             }
             else
             {
