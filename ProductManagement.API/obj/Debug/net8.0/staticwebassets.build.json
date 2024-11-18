@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "PElE6NmK642Sv9ihYHLEN0atpM8G0uAEnQKsRE7z1SM=",
+  "Hash": "CMaKdSF2PCTdi8G0tAVtjyNS8xHpChm/1h9uNSqrc9w=",
   "Source": "ProductManagement.API",
   "BasePath": "_content/ProductManagement.API",
   "Mode": "Default",
@@ -94,8 +94,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "vaxl815u3a",
-      "Integrity": "Kej2QVw1vR2yHo78nmAqfpOEKFho4+cLp8lER2J9R3w=",
+      "Fingerprint": "7hmjwerdbl",
+      "Integrity": "df+J5D7IkjPcsrU9Qnq5cFuw32ZcNdyAaK5Kl2lU530=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/script.js"
@@ -412,6 +412,51 @@
       ]
     },
     {
+      "Route": "script.7hmjwerdbl.js",
+      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/script.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "34835"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"df+J5D7IkjPcsrU9Qnq5cFuw32ZcNdyAaK5Kl2lU530=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 18 Nov 2024 10:45:38 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "7hmjwerdbl"
+        },
+        {
+          "Name": "label",
+          "Value": "script.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-df+J5D7IkjPcsrU9Qnq5cFuw32ZcNdyAaK5Kl2lU530="
+        }
+      ]
+    },
+    {
       "Route": "script.js",
       "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/script.js",
       "Selectors": [],
@@ -422,7 +467,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "34677"
+          "Value": "34835"
         },
         {
           "Name": "Content-Type",
@@ -430,11 +475,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"Kej2QVw1vR2yHo78nmAqfpOEKFho4+cLp8lER2J9R3w=\""
+          "Value": "\"df+J5D7IkjPcsrU9Qnq5cFuw32ZcNdyAaK5Kl2lU530=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 18 Nov 2024 09:04:51 GMT"
+          "Value": "Mon, 18 Nov 2024 10:45:38 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -444,52 +489,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-Kej2QVw1vR2yHo78nmAqfpOEKFho4+cLp8lER2J9R3w="
-        }
-      ]
-    },
-    {
-      "Route": "script.vaxl815u3a.js",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/script.js",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "34677"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/javascript"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"Kej2QVw1vR2yHo78nmAqfpOEKFho4+cLp8lER2J9R3w=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Mon, 18 Nov 2024 09:04:51 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "vaxl815u3a"
-        },
-        {
-          "Name": "label",
-          "Value": "script.js"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-Kej2QVw1vR2yHo78nmAqfpOEKFho4+cLp8lER2J9R3w="
+          "Value": "sha256-df+J5D7IkjPcsrU9Qnq5cFuw32ZcNdyAaK5Kl2lU530="
         }
       ]
     },

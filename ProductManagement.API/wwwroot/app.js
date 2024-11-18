@@ -4,6 +4,11 @@
 
 
 function sendTokenToServer(currentToken) {
+    if ('serviceWorker' in navigator) {
+    }else {
+      
+        return
+    }
     const firebaseConfig = {
         apiKey: "AIzaSyA_QoXR5jBgGN_5BiVF0J-LUVo9NO7p-84",
         authDomain: "bnetclone.firebaseapp.com",
@@ -14,8 +19,10 @@ function sendTokenToServer(currentToken) {
     };
     
     // Firebase'i başlat
-    const app = firebase.initializeApp(firebaseConfig);
-    const messaging = firebase.messaging(app);
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging(app);
+
     
     // Service Worker'ı kayıt et
     if ('serviceWorker' in navigator) {

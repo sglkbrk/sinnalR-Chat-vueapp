@@ -159,6 +159,7 @@ createApp({
                     localStorage.removeItem('rememberMe');
                 }
                 this.startConnection();
+                
                 sendTokenToServer();
                 this.loadUsers();
             } else {
