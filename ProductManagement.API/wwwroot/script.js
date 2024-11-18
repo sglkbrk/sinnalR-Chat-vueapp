@@ -625,7 +625,7 @@ createApp({
             //     return
             // }
             if(this.endMessageVariable) return
-            const response = await fetch('/api/message/GetMyMessages/' + senderId + '/' + receiverId + '/'+ page +'/' + pageSize, {
+            const response = await fetch('/api/message/GetMyMessages/' + receiverId + '/'+ page +'/' + pageSize, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${this.token}`,

@@ -56,10 +56,12 @@ namespace ProductManagement.API.Controllers
         }
 
         [HttpGet]
-        [Route("GetMyMessages/{senderId}/{receiverId}/{page}/{pageSize}")]
-        public async Task<IActionResult> GetMyMessages(int senderId, int receiverId, int page = 1, int pageSize = 50)
+        [Route("GetMyMessages/{receiverId}/{page}/{pageSize}")]
+        public async Task<IActionResult> GetMyMessages(int receiverId, int page = 1, int pageSize = 50)
         {
-            var result = _messageService.GetMyMessages(senderId, receiverId, page, pageSize);
+            var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId == null) return BadRequest();
+            var result = _messageService.GetMyMessages(int.Parse(currentUserId ?? "0"), receiverId, page, pageSize);
             return Ok(result);
         }
 

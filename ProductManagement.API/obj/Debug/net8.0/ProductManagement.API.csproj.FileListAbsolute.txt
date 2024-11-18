@@ -262,3 +262,6 @@ C:/Users/sglkb/Source/Repos/ProductManagement/ProductManagement.API/obj/Debug/ne
 /Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/bin/Debug/net8.0/AWSSDK.S3.dll
 /Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/bin/Debug/net8.0/Microsoft.Extensions.Configuration.FileExtensions.dll
 /Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/bin/Debug/net8.0/Microsoft.Extensions.Configuration.Json.dll
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/bin/Debug/net8.0/ProductManagement.API.staticwebassets.endpoints.json
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/obj/Debug/net8.0/staticwebassets.build.endpoints.json
+/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/obj/Debug/net8.0/staticwebassets/msbuild.ProductManagement.API.Microsoft.AspNetCore.StaticWebAssetEndpoints.props

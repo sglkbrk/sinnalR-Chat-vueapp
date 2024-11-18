@@ -1,178 +1,19 @@
 {
   "Version": 1,
-  "Hash": "PElE6NmK642Sv9ihYHLEN0atpM8G0uAEnQKsRE7z1SM=",
-  "Source": "ProductManagement.API",
-  "BasePath": "_content/ProductManagement.API",
-  "Mode": "Default",
   "ManifestType": "Build",
-  "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [
-    {
-      "Name": "ProductManagement.API/wwwroot",
-      "Source": "ProductManagement.API",
-      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
-      "BasePath": "_content/ProductManagement.API",
-      "Pattern": "**"
-    }
-  ],
-  "Assets": [
-    {
-      "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/app.js",
-      "SourceId": "ProductManagement.API",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
-      "BasePath": "_content/ProductManagement.API",
-      "RelativePath": "app#[.{fingerprint}]?.js",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "Fingerprint": "mcen6il7j5",
-      "Integrity": "ZgbBaU7Fmeh7Khi3I31ByS1k3AK4kJxb6+v00KgT28U=",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/app.js"
-    },
-    {
-      "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/firebase-messaging-sw.js",
-      "SourceId": "ProductManagement.API",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
-      "BasePath": "_content/ProductManagement.API",
-      "RelativePath": "firebase-messaging-sw#[.{fingerprint}]?.js",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "Fingerprint": "8j2s0o7tdt",
-      "Integrity": "1AsL5th/PWRLT6ixzxwQzuXHuIjnuUnlIY7oPfC3ytY=",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/firebase-messaging-sw.js"
-    },
-    {
-      "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/index.html",
-      "SourceId": "ProductManagement.API",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
-      "BasePath": "_content/ProductManagement.API",
-      "RelativePath": "index#[.{fingerprint}]?.html",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "Fingerprint": "pl368clb8t",
-      "Integrity": "vR82REg/gcchqWDY+Nbnh998NDq4AHW88XQ7fj+pQfM=",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/index.html"
-    },
-    {
-      "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/script.js",
-      "SourceId": "ProductManagement.API",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
-      "BasePath": "_content/ProductManagement.API",
-      "RelativePath": "script#[.{fingerprint}]?.js",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "Fingerprint": "vaxl815u3a",
-      "Integrity": "Kej2QVw1vR2yHo78nmAqfpOEKFho4+cLp8lER2J9R3w=",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/script.js"
-    },
-    {
-      "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/style.css",
-      "SourceId": "ProductManagement.API",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
-      "BasePath": "_content/ProductManagement.API",
-      "RelativePath": "style#[.{fingerprint}]?.css",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "Fingerprint": "jm14pf8n9g",
-      "Integrity": "O3YsTbxM6rEA7FCi3F+x7tZemgAiTUj2Q1GFu1BYdsc=",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/style.css"
-    },
-    {
-      "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/yedek.html",
-      "SourceId": "ProductManagement.API",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
-      "BasePath": "_content/ProductManagement.API",
-      "RelativePath": "yedek#[.{fingerprint}]?.html",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "Fingerprint": "7dl5j3v8mf",
-      "Integrity": "lTXev0QQOWfarfLjSf1CKkOB1MHPyWpjxIHSH1nEras=",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/yedek.html"
-    },
-    {
-      "Identity": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/yedek2.js",
-      "SourceId": "ProductManagement.API",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/",
-      "BasePath": "_content/ProductManagement.API",
-      "RelativePath": "yedek2#[.{fingerprint}]?.js",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "Fingerprint": "sym3meu2u3",
-      "Integrity": "BMXVebonALM0TMQP1M0nuc1Bek6Kx9gF/5bxVR/DyXs=",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/yedek2.js"
-    }
-  ],
   "Endpoints": [
     {
       "Route": "app.js",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/app.js",
+      "AssetFile": "app.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
           "Name": "Accept-Ranges",
           "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
         },
         {
           "Name": "Content-Length",
@@ -189,10 +30,6 @@
         {
           "Name": "Last-Modified",
           "Value": "Mon, 14 Oct 2024 13:25:03 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
         }
       ],
       "EndpointProperties": [
@@ -204,12 +41,16 @@
     },
     {
       "Route": "app.mcen6il7j5.js",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/app.js",
+      "AssetFile": "app.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
           "Name": "Accept-Ranges",
           "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
         },
         {
           "Name": "Content-Length",
@@ -226,10 +67,6 @@
         {
           "Name": "Last-Modified",
           "Value": "Mon, 14 Oct 2024 13:25:03 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
         }
       ],
       "EndpointProperties": [
@@ -238,23 +75,27 @@
           "Value": "mcen6il7j5"
         },
         {
-          "Name": "label",
-          "Value": "app.js"
-        },
-        {
           "Name": "integrity",
           "Value": "sha256-ZgbBaU7Fmeh7Khi3I31ByS1k3AK4kJxb6+v00KgT28U="
+        },
+        {
+          "Name": "label",
+          "Value": "app.js"
         }
       ]
     },
     {
       "Route": "firebase-messaging-sw.8j2s0o7tdt.js",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/firebase-messaging-sw.js",
+      "AssetFile": "firebase-messaging-sw.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
           "Name": "Accept-Ranges",
           "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
         },
         {
           "Name": "Content-Length",
@@ -271,10 +112,6 @@
         {
           "Name": "Last-Modified",
           "Value": "Mon, 14 Oct 2024 22:49:32 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
         }
       ],
       "EndpointProperties": [
@@ -283,23 +120,27 @@
           "Value": "8j2s0o7tdt"
         },
         {
-          "Name": "label",
-          "Value": "firebase-messaging-sw.js"
-        },
-        {
           "Name": "integrity",
           "Value": "sha256-1AsL5th/PWRLT6ixzxwQzuXHuIjnuUnlIY7oPfC3ytY="
+        },
+        {
+          "Name": "label",
+          "Value": "firebase-messaging-sw.js"
         }
       ]
     },
     {
       "Route": "firebase-messaging-sw.js",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/firebase-messaging-sw.js",
+      "AssetFile": "firebase-messaging-sw.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
           "Name": "Accept-Ranges",
           "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
         },
         {
           "Name": "Content-Length",
@@ -316,10 +157,6 @@
         {
           "Name": "Last-Modified",
           "Value": "Mon, 14 Oct 2024 22:49:32 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
         }
       ],
       "EndpointProperties": [
@@ -331,12 +168,16 @@
     },
     {
       "Route": "index.html",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/index.html",
+      "AssetFile": "index.html",
       "Selectors": [],
       "ResponseHeaders": [
         {
           "Name": "Accept-Ranges",
           "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
         },
         {
           "Name": "Content-Length",
@@ -353,10 +194,6 @@
         {
           "Name": "Last-Modified",
           "Value": "Tue, 12 Nov 2024 22:22:00 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
         }
       ],
       "EndpointProperties": [
@@ -368,12 +205,16 @@
     },
     {
       "Route": "index.pl368clb8t.html",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/index.html",
+      "AssetFile": "index.html",
       "Selectors": [],
       "ResponseHeaders": [
         {
           "Name": "Accept-Ranges",
           "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
         },
         {
           "Name": "Content-Length",
@@ -390,10 +231,6 @@
         {
           "Name": "Last-Modified",
           "Value": "Tue, 12 Nov 2024 22:22:00 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
         }
       ],
       "EndpointProperties": [
@@ -402,23 +239,27 @@
           "Value": "pl368clb8t"
         },
         {
-          "Name": "label",
-          "Value": "index.html"
-        },
-        {
           "Name": "integrity",
           "Value": "sha256-vR82REg/gcchqWDY+Nbnh998NDq4AHW88XQ7fj+pQfM="
+        },
+        {
+          "Name": "label",
+          "Value": "index.html"
         }
       ]
     },
     {
       "Route": "script.js",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/script.js",
+      "AssetFile": "script.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
           "Name": "Accept-Ranges",
           "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
         },
         {
           "Name": "Content-Length",
@@ -435,10 +276,6 @@
         {
           "Name": "Last-Modified",
           "Value": "Mon, 18 Nov 2024 09:04:51 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
         }
       ],
       "EndpointProperties": [
@@ -450,12 +287,16 @@
     },
     {
       "Route": "script.vaxl815u3a.js",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/script.js",
+      "AssetFile": "script.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
           "Name": "Accept-Ranges",
           "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
         },
         {
           "Name": "Content-Length",
@@ -472,10 +313,6 @@
         {
           "Name": "Last-Modified",
           "Value": "Mon, 18 Nov 2024 09:04:51 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
         }
       ],
       "EndpointProperties": [
@@ -484,23 +321,27 @@
           "Value": "vaxl815u3a"
         },
         {
-          "Name": "label",
-          "Value": "script.js"
-        },
-        {
           "Name": "integrity",
           "Value": "sha256-Kej2QVw1vR2yHo78nmAqfpOEKFho4+cLp8lER2J9R3w="
+        },
+        {
+          "Name": "label",
+          "Value": "script.js"
         }
       ]
     },
     {
       "Route": "style.css",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/style.css",
+      "AssetFile": "style.css",
       "Selectors": [],
       "ResponseHeaders": [
         {
           "Name": "Accept-Ranges",
           "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
         },
         {
           "Name": "Content-Length",
@@ -517,10 +358,6 @@
         {
           "Name": "Last-Modified",
           "Value": "Tue, 12 Nov 2024 22:21:47 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
         }
       ],
       "EndpointProperties": [
@@ -532,12 +369,16 @@
     },
     {
       "Route": "style.jm14pf8n9g.css",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/style.css",
+      "AssetFile": "style.css",
       "Selectors": [],
       "ResponseHeaders": [
         {
           "Name": "Accept-Ranges",
           "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
         },
         {
           "Name": "Content-Length",
@@ -554,10 +395,6 @@
         {
           "Name": "Last-Modified",
           "Value": "Tue, 12 Nov 2024 22:21:47 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
         }
       ],
       "EndpointProperties": [
@@ -566,23 +403,27 @@
           "Value": "jm14pf8n9g"
         },
         {
-          "Name": "label",
-          "Value": "style.css"
-        },
-        {
           "Name": "integrity",
           "Value": "sha256-O3YsTbxM6rEA7FCi3F+x7tZemgAiTUj2Q1GFu1BYdsc="
+        },
+        {
+          "Name": "label",
+          "Value": "style.css"
         }
       ]
     },
     {
       "Route": "yedek.7dl5j3v8mf.html",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/yedek.html",
+      "AssetFile": "yedek.html",
       "Selectors": [],
       "ResponseHeaders": [
         {
           "Name": "Accept-Ranges",
           "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
         },
         {
           "Name": "Content-Length",
@@ -599,10 +440,6 @@
         {
           "Name": "Last-Modified",
           "Value": "Thu, 10 Oct 2024 21:45:45 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
         }
       ],
       "EndpointProperties": [
@@ -611,23 +448,27 @@
           "Value": "7dl5j3v8mf"
         },
         {
-          "Name": "label",
-          "Value": "yedek.html"
-        },
-        {
           "Name": "integrity",
           "Value": "sha256-lTXev0QQOWfarfLjSf1CKkOB1MHPyWpjxIHSH1nEras="
+        },
+        {
+          "Name": "label",
+          "Value": "yedek.html"
         }
       ]
     },
     {
       "Route": "yedek.html",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/yedek.html",
+      "AssetFile": "yedek.html",
       "Selectors": [],
       "ResponseHeaders": [
         {
           "Name": "Accept-Ranges",
           "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
         },
         {
           "Name": "Content-Length",
@@ -644,10 +485,6 @@
         {
           "Name": "Last-Modified",
           "Value": "Thu, 10 Oct 2024 21:45:45 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
         }
       ],
       "EndpointProperties": [
@@ -659,12 +496,16 @@
     },
     {
       "Route": "yedek2.js",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/yedek2.js",
+      "AssetFile": "yedek2.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
           "Name": "Accept-Ranges",
           "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
         },
         {
           "Name": "Content-Length",
@@ -681,10 +522,6 @@
         {
           "Name": "Last-Modified",
           "Value": "Sun, 13 Oct 2024 22:14:11 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
         }
       ],
       "EndpointProperties": [
@@ -696,12 +533,16 @@
     },
     {
       "Route": "yedek2.sym3meu2u3.js",
-      "AssetFile": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.API/wwwroot/yedek2.js",
+      "AssetFile": "yedek2.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
           "Name": "Accept-Ranges",
           "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
         },
         {
           "Name": "Content-Length",
@@ -718,10 +559,6 @@
         {
           "Name": "Last-Modified",
           "Value": "Sun, 13 Oct 2024 22:14:11 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
         }
       ],
       "EndpointProperties": [
@@ -730,12 +567,12 @@
           "Value": "sym3meu2u3"
         },
         {
-          "Name": "label",
-          "Value": "yedek2.js"
-        },
-        {
           "Name": "integrity",
           "Value": "sha256-BMXVebonALM0TMQP1M0nuc1Bek6Kx9gF/5bxVR/DyXs="
+        },
+        {
+          "Name": "label",
+          "Value": "yedek2.js"
         }
       ]
     }

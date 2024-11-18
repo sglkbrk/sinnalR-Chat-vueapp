@@ -38,6 +38,9 @@ namespace ProductManagement.API.Controllers
         [HttpPost]
         public IActionResult AddToken([FromBody] FbToken token)
         {
+            var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId == null) return BadRequest();
+            token.UserId = int.Parse(currentUserId ?? "0");
             _fbTokenService.AddToken(token);
             return Ok(token);
         }

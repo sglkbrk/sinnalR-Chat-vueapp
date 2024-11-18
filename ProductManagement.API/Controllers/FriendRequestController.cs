@@ -41,6 +41,9 @@ namespace ProductManagement.API.Controllers
         [HttpPost]
         public IActionResult AddFriendRequest([FromBody] FriendRequest friendRequest)
         {
+            var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId == null) return BadRequest();
+            friendRequest.SenderId = int.Parse(currentUserId ?? "0");
             _friendRequestService.AddFriendRequest(friendRequest);
             _chatHub.Clients.User(friendRequest.ReceiverId.ToString()).SendAsync("ReceiveNotification", new Dictionary<string, string> {
                 { "type", "refreshFriendRequests" },

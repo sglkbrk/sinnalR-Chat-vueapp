@@ -29,6 +29,10 @@
       "PackagePath": "staticwebassets/yedek2.js"
     },
     {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.ProductManagement.API.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
       "Id": "obj/Debug/net8.0/staticwebassets/msbuild.ProductManagement.API.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },
