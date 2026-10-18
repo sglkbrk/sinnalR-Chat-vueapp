@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/ProductManagement.Domain.csproj",
+      "projectUniqueName": "/Users/burak/Documents/Projects/sinnalR-Chat-vueapp/ProductManagement.Domain/ProductManagement.Domain.csproj",
       "projectName": "ProductManagement.Domain",
-      "projectPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/ProductManagement.Domain.csproj",
+      "projectPath": "/Users/burak/Documents/Projects/sinnalR-Chat-vueapp/ProductManagement.Domain/ProductManagement.Domain.csproj",
       "packagesPath": "/Users/burak/.nuget/packages/",
-      "outputPath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/obj/",
+      "outputPath": "/Users/burak/Documents/Projects/sinnalR-Chat-vueapp/ProductManagement.Domain/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/burak/.nuget/NuGet/NuGet.Config"
@@ -42,9 +42,9 @@
       "restoreAuditProperties": {
         "enableAudit": "true",
         "auditLevel": "low",
-        "auditMode": "all"
+        "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.100"
+      "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -60,22 +60,12 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[8.0.11, 8.0.11]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Ref",
-            "version": "[8.0.11, 8.0.11]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.100/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.100/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

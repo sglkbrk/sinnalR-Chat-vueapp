@@ -1,37 +1,22 @@
-version: '3.8'
-
 services:
-  db:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: ProductManagementDb
-      MYSQL_USER: burak
-      MYSQL_PASSWORD: 123456
-      MYSQL_ROOT_HOST: "%"
-    volumes:
-      - db_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
-    networks:
-      - app-network
-
   web:
     build: .
+    container_name: productmanagement-web
+    restart: unless-stopped
     ports:
-      - "8080:8080"   # HTTP portunu map ediyor
-      - "7266:7266"   # HTTPS portunu map ediyor
-    depends_on:
-      - db
+      - "127.0.0.1:5044:5044"   # HTTPS/HTTP port eşlemesi
+    env_file:
+      - .env
     environment:
-      ConnectionStrings__DefaultConnection: "Server=db;Database=ProductManagementDb;User=root;Password=123456"
-      
-
+      ASPNETCORE_URLS: "http://+:5044"
+      ConnectionStrings__DefaultConnection: "Server=${DB_HOST};Database=${MYSQL_DATABASE};User=${DB_USER};Password=${DB_PASSWORD}"
+      Minio__Endpoint: "${MINIO_ENDPOINT}"
+      Minio__AccessKey: "${MINIO_ACCESS_KEY}"
+      Minio__SecretKey: "${MINIO_SECRET_KEY}"
+      Jwt__Key: "${JWT_KEY}"
     networks:
       - app-network
-
-volumes:
-  db_data:
 
 networks:
   app-network:
+    external: true

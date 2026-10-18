@@ -1,11 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "CQi8gLXNsbs=",
+  "dgSpecHash": "SuEQ3J7HItA=",
   "success": true,
-  "projectFilePath": "/Users/burak/Desktop/Project/dotnet/ProductManagement/ProductManagement.Domain/ProductManagement.Domain.csproj",
-  "expectedPackageFiles": [
-    "/Users/burak/.nuget/packages/microsoft.netcore.app.ref/8.0.11/microsoft.netcore.app.ref.8.0.11.nupkg.sha512",
-    "/Users/burak/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.11/microsoft.aspnetcore.app.ref.8.0.11.nupkg.sha512"
-  ],
+  "projectFilePath": "/Users/burak/Documents/Projects/sinnalR-Chat-vueapp/ProductManagement.Domain/ProductManagement.Domain.csproj",
+  "expectedPackageFiles": [],
   "logs": []
 }
