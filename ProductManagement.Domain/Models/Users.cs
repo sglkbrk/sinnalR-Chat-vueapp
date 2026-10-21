@@ -1,21 +1,36 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-
-
-public class Users
+namespace ProductManagement.Domain.Models
 {
-    [Key]  // Birincil anahtar olduğunu belirtir
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int id { get; set; }
-    [Required(ErrorMessage = "Kullanıcı adı gereklidir.")]
-    public required string Username { get; set; }
-    [Required(ErrorMessage = "Email gereklidir.")]
-    [EmailAddress(ErrorMessage = "Geçersiz email adresi.")]
-    public required string Email { get; set; }
-    [Required(ErrorMessage = "Şifre gereklidir.")]
-    [MinLength(6, ErrorMessage = "Şifre en az 6 karakter olmalıdır.")]
-    public required string Password { get; set; }
+    public class Users
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int id { get; set; }
 
+        [Required(ErrorMessage = "Kullanıcı adı gereklidir.")]
+        [MaxLength(50)]
+        public required string Username { get; set; }
 
+        [Required(ErrorMessage = "Email gereklidir.")]
+        [EmailAddress(ErrorMessage = "Geçersiz email adresi.")]
+        [MaxLength(100)]
+        public required string Email { get; set; }
+
+        [Required(ErrorMessage = "Şifre gereklidir.")]
+        public required string Password { get; set; }
+
+        public string? AvatarUrl { get; set; }
+
+        [MaxLength(200)]
+        public string? StatusMessage { get; set; }
+
+        [MaxLength(20)]
+        public string? UserCode { get; set; }
+
+        public DateTime? LastSeenAt { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
 }

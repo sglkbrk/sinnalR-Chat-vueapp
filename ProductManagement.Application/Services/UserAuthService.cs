@@ -1,58 +1,94 @@
 using ProductManagement.Infrastructure.Data;
-
+using ProductManagement.Domain.Models;
+using ProductManagement.Application.DTO;
+using ProductManagement.Application.Common;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Security.Cryptography;
+using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-
 namespace ProductManagement.Application.Services
 {
-
     public class UserAuthService
     {
-
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
+
         public UserAuthService(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
         }
+
         public void Register(Users model)
         {
+            var trimmedUsername = model.Username?.Trim() ?? string.Empty;
+            var trimmedEmail = model.Email?.Trim().ToLowerInvariant() ?? string.Empty;
 
-            // Eğer model geçerliyse, parolayı hash'leyip kaydetme işlemi yapar
-            Users users = _context.Users.FirstOrDefault(x => x.Email == model.Email || x.Username == model.Username);
-            if (users != null)
+            if (string.IsNullOrWhiteSpace(trimmedUsername) || string.IsNullOrWhiteSpace(trimmedEmail) || string.IsNullOrWhiteSpace(model.Password))
             {
-                throw new Exception("Bu kullanıcı zaten kayıtlı");
+                throw new AppException("Lütfen kullanıcı adı, e-posta ve şifreyi eksiksiz girin.", HttpStatusCode.BadRequest, "VALIDATION_ERROR");
             }
-            else
+
+            if (model.Password.Length < 6)
             {
-                model.Password = HashPasswordMD5(model.Password);
-                _context.Users.Add(model);
+                throw new AppException("Şifre en az 6 karakter olmalıdır.", HttpStatusCode.BadRequest, "PASSWORD_TOO_SHORT");
+            }
+
+            bool exists = _context.Users.Any(x => x.Email.ToLower() == trimmedEmail || x.Username.ToLower() == trimmedUsername.ToLower());
+            if (exists)
+            {
+                throw new AppException("Bu kullanıcı adı veya e-posta adresi zaten kayıtlı.", HttpStatusCode.Conflict, "USER_ALREADY_EXISTS");
+            }
+
+            model.Username = trimmedUsername;
+            model.Email = trimmedEmail;
+            model.Password = PasswordHasher.HashPassword(model.Password);
+            model.CreatedAt = DateTime.UtcNow;
+
+            _context.Users.Add(model);
+            _context.SaveChanges();
+
+            if (string.IsNullOrEmpty(model.UserCode))
+            {
+                model.UserCode = model.id.ToString("D4");
                 _context.SaveChanges();
             }
-
-
-
         }
-        public async Task<string> Login(LoginModel model)
+
+        public async Task<(string token, Users user)> Login(LoginModel model)
         {
-            var user = await _context.Users.SingleOrDefaultAsync(x => x.Username == model.Username || x.Email == model.Username);
+            var trimmedIdentifier = model.Username?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(trimmedIdentifier) || string.IsNullOrWhiteSpace(model.Password))
+            {
+                throw new AppException("Kullanıcı adı ve şifre gereklidir.", HttpStatusCode.BadRequest, "VALIDATION_ERROR");
+            }
+
+            var user = await _context.Users.SingleOrDefaultAsync(x =>
+                x.Username.ToLower() == trimmedIdentifier.ToLower() ||
+                x.Email.ToLower() == trimmedIdentifier.ToLower());
 
             if (user == null)
-                throw new KeyNotFoundException("User not found.");
+            {
+                throw new AppException("Kullanıcı adı veya şifre hatalı.", HttpStatusCode.Unauthorized, "INVALID_CREDENTIALS");
+            }
 
-            if (user.Password != HashPasswordMD5(model.Password))
-                throw new UnauthorizedAccessException("Invalid password.");
+            if (!PasswordHasher.VerifyPassword(model.Password, user.Password, out bool needsRehash))
+            {
+                throw new AppException("Kullanıcı adı veya şifre hatalı.", HttpStatusCode.Unauthorized, "INVALID_CREDENTIALS");
+            }
 
-            return GenerateJwtToken(user);
+            if (needsRehash)
+            {
+                user.Password = PasswordHasher.HashPassword(model.Password);
+                await _context.SaveChangesAsync();
+            }
 
+            string token = GenerateJwtToken(user);
+            return (token, user);
         }
 
         public List<UserDto> GetUsersAsync(string currentUserId)
@@ -64,10 +100,18 @@ namespace ProductManagement.Application.Services
                 Id = u.id,
                 UserName = u.Username,
                 Email = u.Email,
+                AvatarUrl = u.AvatarUrl,
+                StatusMessage = u.StatusMessage,
+                LastSeenAt = u.LastSeenAt,
                 LastMessage = _context.Message
                     .Where(m => (m.SenderId == u.id && m.ReceiverId.ToString() == currentUserId) ||
                                 (m.ReceiverId == u.id && m.SenderId.ToString() == currentUserId))
                     .OrderByDescending(m => m.Timestamp)
+                    .Select(m => new MessageDto
+                    {
+                        Content = m.Content,
+                        Timestamp = m.Timestamp
+                    })
                     .FirstOrDefault()
             }).ToList();
 
@@ -81,43 +125,25 @@ namespace ProductManagement.Application.Services
                 .Where(u => u.id.ToString() != currentUserId).ToList();
             return users;
         }
-        private static string HashPasswordMD5(string password)
-        {
-
-            if (password == null)
-            {
-                throw new ArgumentNullException("Password cannot be null");
-            }
-            using (var md5 = MD5.Create())
-            {
-                var inputBytes = Encoding.UTF8.GetBytes(password);
-                var hashBytes = md5.ComputeHash(inputBytes);
-                var sb = new StringBuilder();
-                for (int i = 0; i < hashBytes.Length; i++)
-                {
-                    sb.Append(hashBytes[i].ToString("X2")); // Hex formatında temsil
-                }
-                return sb.ToString();
-            }
-        }
         private string GenerateJwtToken(Users user)
         {
             var claims = new[]
-           {
-            new Claim(JwtRegisteredClaimNames.Sub, user.id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim("name", user.Username)
-        };
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Sub, user.id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim("name", user.Username)
+            };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? "default_jwt_secret_key_1234567890_min_32_chars"));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
-                   issuer: _configuration["Jwt:Issuer"],
-                   audience: _configuration["Jwt:Audience"],
-                   claims: claims,
-                   expires: DateTime.Now.AddDays(30),
-                   signingCredentials: creds);
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddDays(30),
+                signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

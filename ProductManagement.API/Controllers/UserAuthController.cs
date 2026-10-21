@@ -1,70 +1,100 @@
 using Microsoft.AspNetCore.Mvc;
-using ProductManagement.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using ProductManagement.Application.Services;
-
+using ProductManagement.Application.Common;
+using ProductManagement.Domain.Models;
 
 [Route("api/[controller]")]
 [ApiController]
 public class UserAuthController : ControllerBase
 {
     private readonly UserAuthService _userAuthService;
+
     public UserAuthController(UserAuthService userAuthService)
     {
         _userAuthService = userAuthService;
     }
+
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] Users model)
+    public IActionResult Register([FromBody] Users model)
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            var firstError = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .FirstOrDefault() ?? "Geçersiz form verisi.";
+            return BadRequest(new { success = false, message = firstError, error = new { code = "VALIDATION_ERROR", message = firstError } });
         }
-        _userAuthService.Register(model);
-        return Ok();
+
+        try
+        {
+            _userAuthService.Register(model);
+            return Ok(new { success = true, message = "Kayıt başarılı." });
+        }
+        catch (AppException ex)
+        {
+            return StatusCode((int)ex.StatusCode, new { success = false, message = ex.Message, error = new { code = ex.ErrorCode, message = ex.Message } });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { success = false, message = ex.Message, error = new { code = "SERVER_ERROR", message = ex.Message } });
+        }
     }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new { success = false, message = "Kullanıcı adı ve şifre gereklidir.", error = new { code = "VALIDATION_ERROR", message = "Kullanıcı adı ve şifre gereklidir." } });
+        }
+
         try
         {
-            var token = await _userAuthService.Login(model);
-            return Ok(new { token });
+            var (token, user) = await _userAuthService.Login(model);
+            return Ok(new
+            {
+                success = true,
+                token = token,
+                data = new
+                {
+                    token = token,
+                    user = new
+                    {
+                        id = user.id,
+                        username = user.Username,
+                        email = user.Email
+                    }
+                }
+            });
         }
-        catch (KeyNotFoundException ex)
+        catch (AppException ex)
         {
-            return NotFound(ex.Message);
+            return StatusCode((int)ex.StatusCode, new { success = false, message = ex.Message, error = new { code = ex.ErrorCode, message = ex.Message } });
         }
-        catch (UnauthorizedAccessException ex)
+        catch (Exception ex)
         {
-            return Unauthorized(ex.Message);
-        }
-        catch
-        {
-            // Genel hata yönetimi
-            return StatusCode(500, "Internal server error.");
+            return StatusCode(500, new { success = false, message = "Giriş sırasında bir hata oluştu.", error = new { code = "SERVER_ERROR", message = ex.Message } });
         }
     }
 
     [Authorize]
     [HttpGet("users")]
-    public async Task<IActionResult> GetUsers()
+    public IActionResult GetUsers()
     {
-        // Mevcut kullanıcının ID'sini al
         var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        var users = _userAuthService.GetUsers(currentUserId);
+        var users = _userAuthService.GetUsers(currentUserId ?? "");
         return Ok(users);
     }
-
 
     [Authorize]
-    public async Task<IActionResult> GetUsersAsync()
+    [HttpGet("users-async")]
+    public IActionResult GetUsersAsync()
     {
-        // Mevcut kullanıcının ID'sini al
         var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        var users = _userAuthService.GetUsersAsync(currentUserId);
+        var users = _userAuthService.GetUsersAsync(currentUserId ?? "");
         return Ok(users);
     }
-
 }
 

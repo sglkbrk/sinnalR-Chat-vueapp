@@ -2,23 +2,31 @@ using Microsoft.AspNetCore.Mvc;
 using ProductManagement.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using ProductManagement.Application.Services;
+using ProductManagement.Application.Common;
 using Microsoft.AspNetCore.SignalR;
-
+using System.Security.Claims;
 
 namespace ProductManagement.API.Controllers
 {
-
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class FriendRequestController : Controller
+    public class FriendRequestController : ControllerBase
     {
         private readonly FriendRequestService _friendRequestService;
         private readonly IHubContext<ChatHub> _chatHub;
+
         public FriendRequestController(FriendRequestService friendRequestService, IHubContext<ChatHub> chatHub)
         {
             _friendRequestService = friendRequestService;
             _chatHub = chatHub;
+        }
+
+        private int GetCurrentUserId()
+        {
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(claim, out int id)) return id;
+            throw new AppException("Yetkisiz işlem.", System.Net.HttpStatusCode.Unauthorized, "UNAUTHORIZED");
         }
 
         [HttpGet("{id}")]
@@ -38,20 +46,32 @@ namespace ProductManagement.API.Controllers
         {
             return Ok(_friendRequestService.GetFriendRequestBySenderId(id));
         }
-        [HttpPost]
-        public IActionResult AddFriendRequest([FromBody] FriendRequest friendRequest)
-        {
-            var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (currentUserId == null) return BadRequest();
-            friendRequest.SenderId = int.Parse(currentUserId ?? "0");
-            _friendRequestService.AddFriendRequest(friendRequest);
-            _chatHub.Clients.User(friendRequest.ReceiverId.ToString()).SendAsync("ReceiveNotification", new Dictionary<string, string> {
-                { "type", "refreshFriendRequests" },
-                // { "name", friendRequest.Sender.Username },
-                // { "id", friendRequest.Sender.id.ToString() }
 
+        public class SendFriendRequestInput
+        {
+            public int? ReceiverId { get; set; }
+            public string? Username { get; set; }
+        }
+
+        [HttpPost]
+        public IActionResult AddFriendRequest([FromBody] SendFriendRequestInput input)
+        {
+            int currentUserId = GetCurrentUserId();
+            var request = _friendRequestService.SendFriendRequest(currentUserId, input.Username, input.ReceiverId);
+
+            _chatHub.Clients.User(request.ReceiverId.ToString()).SendAsync("ReceiveNotification", new Dictionary<string, string> {
+                { "type", "refreshFriendRequests" }
             });
-            return Ok(friendRequest);
+
+            return Ok(request);
+        }
+
+        [HttpPost("cancel/{id}")]
+        public IActionResult CancelFriendRequest(int id)
+        {
+            int currentUserId = GetCurrentUserId();
+            _friendRequestService.CancelFriendRequest(id, currentUserId);
+            return Ok(ApiResponse.Ok());
         }
 
         [HttpPut]
@@ -65,21 +85,28 @@ namespace ProductManagement.API.Controllers
         public IActionResult DeleteFriendRequest(int id)
         {
             _friendRequestService.DeleteFriendRequest(id);
-            return Ok();
+            return Ok(ApiResponse.Ok());
         }
 
         [HttpPut("AcceptAndRejectFriendRequest/{id}/{friendRequestStatus}")]
         public IActionResult AcceptAndRejectFriendRequest(int id, FriendRequestStatus friendRequestStatus)
         {
+            int currentUserId = GetCurrentUserId();
             var friendRequest = _friendRequestService.GetFriendRequestById(id);
-            _friendRequestService.AcceptAndRejectFriendRequest(id, friendRequestStatus);
-            if (friendRequestStatus.Equals(FriendRequestStatus.Accepted)) _chatHub.Clients.User(friendRequest.SenderId.ToString()).SendAsync("ReceiveNotification", new Dictionary<string, string> {
-                { "type", "refreshUsers" },
-                { "name", friendRequest.Receiver.Username },
-                { "id", friendRequest.Receiver.id.ToString() }
+            if (friendRequest == null) return NotFound();
 
-            });
-            return Ok();
+            _friendRequestService.AcceptAndRejectFriendRequest(id, friendRequestStatus, currentUserId);
+
+            if (friendRequestStatus == FriendRequestStatus.Accepted)
+            {
+                _chatHub.Clients.User(friendRequest.SenderId.ToString()).SendAsync("ReceiveNotification", new Dictionary<string, string> {
+                    { "type", "refreshUsers" },
+                    { "name", friendRequest.Receiver?.Username ?? "Arkadaş" },
+                    { "id", friendRequest.ReceiverId.ToString() }
+                });
+            }
+
+            return Ok(ApiResponse.Ok());
         }
     }
 }

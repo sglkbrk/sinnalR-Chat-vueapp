@@ -27,12 +27,41 @@ namespace ProductManagement.API.Controllers
             return Ok(new { Key = key, Url = _minioFileService.GetFileUrl(key) });
         }
 
-        [HttpGet("download/{key}")]
+        [HttpGet("download/{*key}")]
         public async Task<IActionResult> Download(string key)
         {
-            var stream = await _minioFileService.GetFileAsync(key);
-            // İçerik tipini belirlemek için dosya uzantısına göre ayarlayabilirsiniz
-            return File(stream, "application/octet-stream", key);
+            try
+            {
+                var stream = await _minioFileService.GetFileAsync(key);
+                var contentType = GetContentType(key);
+                Response.Headers["Cache-Control"] = "public, max-age=86400";
+                return File(stream, contentType);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = "Dosya bulunamadı.", error = ex.Message });
+            }
+        }
+
+        private static string GetContentType(string key)
+        {
+            var ext = Path.GetExtension(key).ToLowerInvariant();
+            return ext switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                ".webp" => "image/webp",
+                ".svg" => "image/svg+xml",
+                ".mp3" => "audio/mpeg",
+                ".wav" => "audio/wav",
+                ".webm" => "audio/webm",
+                ".ogg" => "audio/ogg",
+                ".m4a" => "audio/mp4",
+                ".mp4" => "video/mp4",
+                ".pdf" => "application/pdf",
+                _ => "application/octet-stream"
+            };
         }
 
         [HttpGet("url/{key}")]

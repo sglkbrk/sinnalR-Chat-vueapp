@@ -68,15 +68,50 @@ namespace ProductManagement.Application.Services
 
         public string GetFileUrl(string key)
         {
-            // MinIO'da dosyaları genel erişilebilir yapmak için presigned URL kullanabilirsiniz
             var request = new GetPreSignedUrlRequest
             {
                 BucketName = _bucketName,
                 Key = key,
-                Expires = DateTime.UtcNow.AddHours(1)
+                Expires = DateTime.UtcNow.AddHours(24)
             };
 
             return _s3Client.GetPreSignedURL(request);
+        }
+
+        public async Task<string> UploadStreamAsync(Stream stream, string fileName, string contentType)
+        {
+            var extension = Path.GetExtension(fileName);
+            if (string.IsNullOrWhiteSpace(extension)) extension = ".jpg";
+            var key = "avatars/" + Guid.NewGuid().ToString("N") + extension;
+
+            var putRequest = new PutObjectRequest
+            {
+                BucketName = _bucketName,
+                Key = key,
+                InputStream = stream,
+                ContentType = contentType
+            };
+
+            await _s3Client.PutObjectAsync(putRequest);
+            return key;
+        }
+
+        public async Task DeleteFileAsync(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key)) return;
+            try
+            {
+                var deleteRequest = new DeleteObjectRequest
+                {
+                    BucketName = _bucketName,
+                    Key = key
+                };
+                await _s3Client.DeleteObjectAsync(deleteRequest);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[MinIO] Dosya silme hatası ({key}): {ex.Message}");
+            }
         }
     }
 }

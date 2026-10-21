@@ -1,11 +1,10 @@
 .vs/
-./ProductManagement.API/serviceAccountKey.json
-/ProductManagement.API/serviceAccountKey.json
-/ProductManagement.API/bin/Debug/net8.0/serviceAccountKey.json
-ProductManagement.API/bin/Debug/net8.0/serviceAccountKey.json
-/ProductManagement.Tests/bin/Debug/net8.0/serviceAccountKey.json
-ProductManagement.Tests/bin/Debug/net8.0/serviceAccountKey.json
-*/serviceAccountKey.json
+bin/
+obj/
+*.user
+*.suo
+**/serviceAccountKey.json
+*firebase-adminsdk*.json
 
 # Environment variables
 .env

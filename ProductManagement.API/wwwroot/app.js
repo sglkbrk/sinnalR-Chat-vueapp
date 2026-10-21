@@ -1,114 +1,130 @@
-// app.js
+// app.js - Firebase Cloud Messaging (WebPush) İstemcisi
 
-// Firebase SDK'sını içe aktarın
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyA_QoXR5jBgGN_5BiVF0J-LUVo9NO7p-84",
+    authDomain: "bnetclone.firebaseapp.com",
+    projectId: "bnetclone",
+    storageBucket: "bnetclone.appspot.com",
+    messagingSenderId: "337788997101",
+    appId: "1:337788997101:web:4c00e9e662fa5383cf6be4"
+};
 
+const VAPID_KEY = "BK3CENDgnEDY-QgFfRF_Mn2xbZ77yk2LzhwWktpmqufCUYe8yNBP-aEIKWBegnFqOzNZzbwqZM8gH3Cy8K0eUF4";
 
-function sendTokenToServer(currentToken) {
-    if ('serviceWorker' in navigator) {
-    }else {
-      
-        return
-    }
-    const firebaseConfig = {
-        apiKey: "AIzaSyA_QoXR5jBgGN_5BiVF0J-LUVo9NO7p-84",
-        authDomain: "bnetclone.firebaseapp.com",
-        projectId: "bnetclone",
-        storageBucket: "bnetclone.appspot.com",
-        messagingSenderId: "337788997101",
-        appId: "1:337788997101:web:4c00e9e662fa5383cf6be4"
-    };
-    
-    // Firebase'i başlat
+let fbApp = null;
+let fbMessaging = null;
 
-        const app = firebase.initializeApp(firebaseConfig);
-        const messaging = firebase.messaging(app);
-
-    
-    // Service Worker'ı kayıt et
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/firebase-messaging-sw.js')
-        .then((registration) => {
-            console.log('Service Worker kayıt edildi:', registration);
-            // FCM token alırken Service Worker'ı kullanmak için
-            // messaging.useServiceWorker(registration);
-        }).catch((err) => {
-            console.error('Service Worker kaydedilemedi:', err);
-        });
-    }
-    
-    // Bildirim izni isteyin
-    Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-            console.log('Bildirim izni verildi.');
-            // Token al
-            messaging.getToken(messaging, { vapidKey: 'BK3CENDgnEDY-QgFfRF_Mn2xbZ77yk2LzhwWktpmqufCUYe8yNBP-aEIKWBegnFqOzNZzbwqZM8gH3Cy8K0eUF4' })
-            .then((currentToken) => {
-                if (currentToken) {
-                    console.log('FCM Token:', currentToken);
-                    // Token'ı backend'e gönderin
-                    sendTokenToServer(currentToken);
-                } else {
-                    console.log('Token alınamadı.');
-                }
-            }).catch((err) => {
-                console.error('Token alınırken hata oluştu:', err);
-            });
+function getMessagingInstance() {
+    if (!fbMessaging) {
+        if (!firebase.apps.length) {
+            fbApp = firebase.initializeApp(FIREBASE_CONFIG);
         } else {
-            console.log('Bildirim izni reddedildi.');
+            fbApp = firebase.app();
         }
-    });
-    
-    // Önyüzde gelen mesajları dinleyin
-    messaging.onMessage(messaging, (payload) => {
-        // console.log('Önyüzde gelen mesaj:', payload);
-        // // Bildirimi göster
-        // const notificationTitle = payload.notification.title;
-        // const notificationOptions = {
-        //     body: payload.notification.body,
-        //     icon: '/firebase-logo.png' // İsteğe bağlı ikon
-        // };
-    
-        // new Notification(notificationTitle, notificationOptions);
-    });
-    
-    // Token'ı backend'e gönderme fonksiyonu
-    function sendTokenToServer(fbtoken) {
-        let token = localStorage.getItem('token');
-        let userId = localStorage.getItem('userId');
-        fetch('/api/FbToken', { // Backend API endpoint'iniz
+        fbMessaging = firebase.messaging(fbApp);
+    }
+    return fbMessaging;
+}
+
+// Backend'e token gönderme fonksiyonu
+async function sendFbTokenToBackend(fcmToken) {
+    const authToken = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+
+    if (!authToken || !userId || !fcmToken) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/FbToken', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                'Authorization': `Bearer ${authToken}`
             },
-            body: JSON.stringify({ Token: fbtoken,UserId: userId})
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Token sunucuya gönderildi:', data);
-        })
-        .catch((error) => {
-            console.error('Token sunucuya gönderilemedi:', error);
+            body: JSON.stringify({ Token: fcmToken, UserId: parseInt(userId) })
         });
-    }
-    
-    
-    navigator.serviceWorker.addEventListener('message', function(event) {
-        if (event.data.action === 'handleNotificationClick') {
-            const data = event.data.data;
-            // Burada sayfanız açıkken yapılacak işlemleri gerçekleştirin
-            console.log('Notification Click Action:', data);
-            // Örneğin, belirli bir fonksiyonu çağırabilirsiniz
-            handleNotificationClick(data);
+        if (response.ok) {
+            console.log('[FCM] Token başarıyla backend\'e kaydedildi.');
+        } else {
+            console.warn('[FCM] Token backend\'e kaydedilemedi. HTTP:', response.status);
         }
-    });
-    
-    // Bildirim tıklama işlemlerini gerçekleştiren fonksiyon
-    function handleNotificationClick(data) {
-        // Burada sayfanızda yapılacak işlemleri tanımlayın
-        // Örneğin, belirli bir bölüme kaydırma, veriyi güncelleme vb.
-        console.log('Handling notification click with data:', data);
-        // Örneğin, bir modal açmak veya sayfayı belirli bir yere kaydırmak
+    } catch (err) {
+        console.error('[FCM] Token gönderim hatası:', err);
     }
 }
-// Firebase yapılandırma
+
+// Ana başlatıcı fonksiyon
+async function initPushNotifications() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        console.log('[FCM] Bu tarayıcı Push bildirimlerini desteklemiyor.');
+        return;
+    }
+
+    try {
+        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        console.log('[FCM] Service Worker kayıt başarılı:', registration);
+
+        const messaging = getMessagingInstance();
+
+        // Bildirim izni durumu
+        let permission = Notification.permission;
+        if (permission === 'default') {
+            permission = await Notification.requestPermission();
+        }
+
+        if (permission === 'granted') {
+            console.log('[FCM] Bildirim izni onaylı.');
+            const currentToken = await messaging.getToken({
+                vapidKey: VAPID_KEY,
+                serviceWorkerRegistration: registration
+            });
+
+            if (currentToken) {
+                console.log('[FCM] Token alındı:', currentToken);
+                await sendFbTokenToBackend(currentToken);
+            } else {
+                console.warn('[FCM] Cihaz token\'ı üretilemedi.');
+            }
+        } else {
+            console.log('[FCM] Bildirim izni reddedildi veya varsayılanda bırakıldı:', permission);
+        }
+
+        // Ön planda gelen bildirimleri dinle
+        messaging.onMessage((payload) => {
+            console.log('[FCM] Ön planda gelen mesaj:', payload);
+            const title = payload.notification?.title || payload.data?.name || 'Yeni Mesaj';
+            const body = payload.notification?.body || payload.data?.body || '';
+            const icon = payload.notification?.icon || payload.data?.image || '/firebase-logo.png';
+
+            // Sayfa gizliyse veya sekme odakta değilse sistem bildirimi göster
+            if (document.hidden && Notification.permission === 'granted') {
+                new Notification(title, {
+                    body: body,
+                    icon: icon,
+                    data: payload.data
+                });
+            }
+        });
+
+    } catch (err) {
+        console.error('[FCM] Push başlatma sırasında hata oluştu:', err);
+    }
+}
+
+// Service worker mesajlarını dinle (tıklama vb.)
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', function (event) {
+        if (event.data && event.data.action === 'handleNotificationClick') {
+            console.log('[FCM SW Message] Bildirim tıklama verisi:', event.data.data);
+            const senderId = event.data.data;
+            if (window.vueAppInstance && typeof window.vueAppInstance.selectUserById === 'function') {
+                window.vueAppInstance.selectUserById(senderId);
+            }
+        }
+    });
+}
+
+// Geriye dönük uyumluluk için global fonksiyon adları
+window.initPushNotifications = initPushNotifications;
+window.sendTokenToServer = initPushNotifications;

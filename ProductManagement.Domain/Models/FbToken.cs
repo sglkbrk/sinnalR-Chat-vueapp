@@ -1,4 +1,3 @@
-using System.Xml;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -15,6 +14,8 @@ namespace ProductManagement.Domain.Models
 
         public required string Token { get; set; }
 
+        public string? DeviceInfo { get; set; }
 
+        public DateTime LastUpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

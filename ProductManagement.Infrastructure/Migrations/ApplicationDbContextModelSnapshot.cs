@@ -47,17 +47,24 @@ namespace ProductManagement.Infrastructure.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("DeviceInfo")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("LastUpdatedAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("Token")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("Token");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("FbToken");
                 });
@@ -76,6 +83,15 @@ namespace ProductManagement.Infrastructure.Migrations
                     b.Property<DateTime>("FriendsSince")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsMuted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsPinned")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -83,7 +99,8 @@ namespace ProductManagement.Infrastructure.Migrations
 
                     b.HasIndex("FriendUserId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "FriendUserId")
+                        .IsUnique();
 
                     b.ToTable("Friend");
                 });
@@ -115,7 +132,7 @@ namespace ProductManagement.Infrastructure.Migrations
 
                     b.HasIndex("ReceiverId");
 
-                    b.HasIndex("SenderId");
+                    b.HasIndex("SenderId", "ReceiverId");
 
                     b.ToTable("FriendRequest");
                 });
@@ -135,13 +152,31 @@ namespace ProductManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<DateTime?>("EditedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("FileUrl")
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<bool>("IsDeletedForReceiver")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsDeletedForSender")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("MetadataJson")
+                        .HasColumnType("longtext");
+
                     b.Property<int>("ReceiverId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReplyToMessageId")
                         .HasColumnType("int");
 
                     b.Property<int>("SenderId")
@@ -162,12 +197,14 @@ namespace ProductManagement.Infrastructure.Migrations
 
                     b.HasIndex("ReceiverId");
 
-                    b.HasIndex("SenderId");
+                    b.HasIndex("ReplyToMessageId");
+
+                    b.HasIndex("SenderId", "ReceiverId", "Timestamp");
 
                     b.ToTable("Message");
                 });
 
-            modelBuilder.Entity("Users", b =>
+            modelBuilder.Entity("ProductManagement.Domain.Models.Users", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -175,28 +212,53 @@ namespace ProductManagement.Infrastructure.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
 
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTime?>("LastSeenAt")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("StatusMessage")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("UserCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.HasKey("id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Username")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
 
             modelBuilder.Entity("ProductManagement.Domain.Models.FbToken", b =>
                 {
-                    b.HasOne("Users", "User")
-                        .WithOne()
-                        .HasForeignKey("ProductManagement.Domain.Models.FbToken", "UserId")
+                    b.HasOne("ProductManagement.Domain.Models.Users", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -205,13 +267,13 @@ namespace ProductManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("ProductManagement.Domain.Models.Friend", b =>
                 {
-                    b.HasOne("Users", "FriendUser")
+                    b.HasOne("ProductManagement.Domain.Models.Users", "FriendUser")
                         .WithMany()
                         .HasForeignKey("FriendUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Users", "User")
+                    b.HasOne("ProductManagement.Domain.Models.Users", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -224,16 +286,16 @@ namespace ProductManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("ProductManagement.Domain.Models.FriendRequest", b =>
                 {
-                    b.HasOne("Users", "Receiver")
+                    b.HasOne("ProductManagement.Domain.Models.Users", "Receiver")
                         .WithMany()
                         .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Users", "Sender")
+                    b.HasOne("ProductManagement.Domain.Models.Users", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Receiver");
@@ -247,19 +309,26 @@ namespace ProductManagement.Infrastructure.Migrations
                         .WithMany("Messages")
                         .HasForeignKey("ChatRoomId");
 
-                    b.HasOne("Users", "Receiver")
+                    b.HasOne("ProductManagement.Domain.Models.Users", "Receiver")
                         .WithMany()
                         .HasForeignKey("ReceiverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Users", "Sender")
+                    b.HasOne("ProductManagement.Domain.Models.Message", "ReplyToMessage")
+                        .WithMany()
+                        .HasForeignKey("ReplyToMessageId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ProductManagement.Domain.Models.Users", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Receiver");
+
+                    b.Navigation("ReplyToMessage");
 
                     b.Navigation("Sender");
                 });

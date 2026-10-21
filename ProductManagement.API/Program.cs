@@ -14,10 +14,39 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (FirebaseApp.DefaultInstance == null)
 {
-    FirebaseApp.Create(new AppOptions()
+    try
     {
-        Credential = GoogleCredential.FromFile("serviceAccountKey.json"), // Servis hesabı anahtar dosyanızın yolu
-    });
+        var firebasePath = builder.Configuration["Firebase:CredentialPath"]
+                           ?? Environment.GetEnvironmentVariable("FIREBASE_CREDENTIAL_PATH")
+                           ?? Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS")
+                           ?? "serviceAccountKey.json";
+
+        var firebaseJson = Environment.GetEnvironmentVariable("FIREBASE_CONFIG_JSON");
+
+        GoogleCredential? credential = null;
+        if (!string.IsNullOrEmpty(firebaseJson))
+        {
+            credential = GoogleCredential.FromJson(firebaseJson);
+        }
+        else if (File.Exists(firebasePath))
+        {
+            credential = GoogleCredential.FromFile(firebasePath);
+        }
+
+        if (credential != null)
+        {
+            FirebaseApp.Create(new AppOptions { Credential = credential });
+            Console.WriteLine("[Firebase] FirebaseApp başarıyla başlatıldı.");
+        }
+        else
+        {
+            Console.WriteLine("[Firebase Uyarı] Firebase servis hesabı anahtarı bulunamadı (serviceAccountKey.json). Push bildirimler devre dışı olabilir.");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Firebase Hata] Başlatılırken hata oluştu: {ex.Message}");
+    }
 }
 
 Log.Logger = new LoggerConfiguration()
@@ -37,8 +66,13 @@ builder.Services.AddScoped<UserAuthService>();
 builder.Services.AddScoped<FbTokenService>();
 builder.Services.AddScoped<FriendService>();
 builder.Services.AddScoped<FriendRequestService>();
+builder.Services.AddScoped<UserService>();
 builder.Services.AddSingleton<MinioFileService>();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -143,6 +177,20 @@ app.UseEndpoints(endpoints =>
     });
     endpoints.MapHub<ChatHub>("/chatHub");
 });
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    try
+    {
+        dbContext.Database.Migrate();
+        Log.Information("Veritabanı migration'ları başarıyla uygulandı.");
+    }
+    catch (Exception ex)
+    {
+        Log.Warning("Veritabanı migration uygulanamadı (MySQL hazır olmayabilir): {Message}", ex.Message);
+    }
+}
 
 try
 {

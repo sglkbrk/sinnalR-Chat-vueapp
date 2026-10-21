@@ -1,10 +1,8 @@
 // firebase-messaging-sw.js
 
-// Firebase'i yükleyin
 importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js');
 
-// Firebase yapılandırma
 firebase.initializeApp({
     apiKey: "AIzaSyA_QoXR5jBgGN_5BiVF0J-LUVo9NO7p-84",
     authDomain: "bnetclone.firebaseapp.com",
@@ -17,42 +15,59 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 // Arka planda gelen mesajları ele al
-messaging.onBackgroundMessage(function(payload) {
+messaging.onBackgroundMessage(function (payload) {
     console.log('[firebase-messaging-sw.js] Gelen arka plan mesajı:', payload);
-    const notificationTitle = payload.data.name;
+
+    const data = payload.data || {};
+    const notification = payload.notification || {};
+
+    const notificationTitle = notification.title || data.name || data.title || 'Yeni Mesaj';
     const notificationOptions = {
-        body: payload.data.body,
-        icon: payload.data.image, // İsteğe bağlı ikon
+        body: notification.body || data.body || 'Bir yeni mesajınız var.',
+        icon: notification.icon || data.image || '/firebase-logo.png',
+        tag: notification.tag || `chat-${data.senderId || 'general'}`,
+        renotify: true,
         data: {
-            url: payload.data.url || '/', // Varsayılan bir URL ekleyin
-            senderId: payload.data.senderId // Ek veri
+            url: data.url || '/',
+            senderId: data.senderId || null
         }
     };
 
-    self.registration.showNotification(notificationTitle, notificationOptions);
+    return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// Bildirim tıklama olayını yönetme
-self.addEventListener('notificationclick', function(event) {
-    
-    event.notification.close(); // Bildirimi kapat
+// Bildirime tıklanma olayı
+self.addEventListener('notificationclick', function (event) {
+    event.notification.close();
 
-    const targetUrl = event.notification.data.url; // Bildirimdeki URL
-    const additionalData = event.notification.data.senderId; // Ek veri
+    const notifData = event.notification.data || {};
+    const targetUrl = notifData.url || '/';
+    const senderId = notifData.senderId;
 
-    event.notification.close(); // Bildirimi kapat
     event.waitUntil(
-        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
             for (const client of clientList) {
-                if (client.url === targetUrl && 'focus' in client) {
-                    client.postMessage({ action: 'handleNotificationClick', data: additionalData });
+                // Eğer uygulama sekmesi açıksa odaklan ve mesaj gönder
+                if ('focus' in client) {
+                    if (senderId) {
+                        client.postMessage({ action: 'handleNotificationClick', data: senderId });
+                    }
                     return client.focus();
                 }
             }
             if (clients.openWindow) {
-            
                 return clients.openWindow(targetUrl);
             }
         })
     );
 });
+
+// PWA Service Worker yaşam döngüsü
+self.addEventListener('install', function (event) {
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', function (event) {
+    event.waitUntil(clients.claim());
+});
+
