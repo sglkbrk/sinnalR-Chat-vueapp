@@ -122,23 +122,11 @@ createApp({
             this.canInstallPWA = true;
         });
 
-        if(this.$refs.msgDiv){
-            this.$refs.msgDiv.addEventListener('scroll', () => {
-                if (this.$refs.msgDiv.scrollTop === 0 && isScrollingEnabled && this.messages.length > 0) {
-                    this.loadMessages(this.myuser.sub, this.selectedUserId);
-                }
-                const distFromBottom = this.$refs.msgDiv.scrollHeight - this.$refs.msgDiv.scrollTop - this.$refs.msgDiv.clientHeight;
-                this.showScrollBottomBtn = distFromBottom > 150;
-            });
-        }  
         document.addEventListener('visibilitychange', this.handleVisibilityChange);
         document.addEventListener('click', (event) => {
-            if (this.showEmojiPicker && !this.$refs.emojiPicker.contains(event.target) && event.target !== this.$refs.emojiIcon) {
+            if (this.showEmojiPicker && this.$refs.emojiPicker && !this.$refs.emojiPicker.contains(event.target) && (!this.$refs.emojiIcon || event.target !== this.$refs.emojiIcon)) {
                 this.showEmojiPicker = false;
             }
-        });
-        this.$refs.emojiPicker.addEventListener('emoji-click', event => {
-            this.messageText += event.detail.unicode;
         });
 
         // Phase 5: Süresi dolan mesajları her saniye kontrol et
@@ -841,7 +829,9 @@ createApp({
             return safe;
         },
         toggleConversationArea() {
-            this.$refs.conversationArea.classList.toggle('open');
+            if (this.$refs.conversationArea) {
+                this.$refs.conversationArea.classList.toggle('open');
+            }
         },
         // =====================================================================
         // Phase 2: Avatar Helpers & Profile Management
@@ -1426,15 +1416,17 @@ createApp({
         },
         renderMessage(messages,receiverId) {
             const msgDiv2 = this.$refs.msgDiv;
-            var sy = msgDiv2.scrollHeight;
+            var sy = msgDiv2 ? msgDiv2.scrollHeight : 0;
             if(messages.length == 0 && page > 1) {
                 this.endMessageVariable = true
             } 
             this.messages  =  messages.concat(this.messages)
             this.cachesMessages[receiverId] = this.messages;
             setTimeout(() => {
-                if(page ==1) msgDiv2.scrollTop = msgDiv2.scrollHeight; 
-                else  msgDiv2.scrollTop = msgDiv2.scrollHeight - sy;
+                const targetDiv = this.$refs.msgDiv;
+                if (!targetDiv) return;
+                if(page == 1) targetDiv.scrollTop = targetDiv.scrollHeight; 
+                else  targetDiv.scrollTop = targetDiv.scrollHeight - sy;
                 isScrollingEnabled = true;
                 page++;
             }, 100);
@@ -1508,20 +1500,32 @@ createApp({
             // İstenen formatta birleştirme
             return `${day} ${month} ${hours}:${minutes}`;
         },
+        onChatScroll() {
+            if (!this.$refs.msgDiv) return;
+            if (this.$refs.msgDiv.scrollTop === 0 && isScrollingEnabled && this.messages.length > 0) {
+                this.loadMessages(this.myuser.sub, this.selectedUserId);
+            }
+            const distFromBottom = this.$refs.msgDiv.scrollHeight - this.$refs.msgDiv.scrollTop - this.$refs.msgDiv.clientHeight;
+            this.showScrollBottomBtn = distFromBottom > 150;
+        },
+        onEmojiClick(event) {
+            if (event && event.detail && event.detail.unicode) {
+                this.messageText += event.detail.unicode;
+            }
+        },
         toogleEmojiBox() {
-            this.showEmojiPicker = !this.showEmojiPicker
+            this.showEmojiPicker = !this.showEmojiPicker;
         },
         triggerFileSelect() {
             this.acceptType = '*';
             setTimeout(() => {
-                this.$refs.fileInput.click();
+                if (this.$refs.fileInput) this.$refs.fileInput.click();
             }, 100);
-            
         },
         triggerImageSelect() {
             this.acceptType = 'image/*'; 
             setTimeout(() => {
-                this.$refs.fileInput.click();
+                if (this.$refs.fileInput) this.$refs.fileInput.click();
             }, 100);
         },
         handlePaste(event) {
