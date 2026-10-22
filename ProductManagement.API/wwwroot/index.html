@@ -22,7 +22,7 @@
 
   <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
-  <link rel="stylesheet" href="./style.css?v=2.0.5">
+  <link rel="stylesheet" href="./style.css?v=2.0.6">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
@@ -198,13 +198,13 @@
             <path d="M256.025.05C117.67-2.678 3.184 107.038.025 245.383a240.703 240.703 0 0085.333 182.613v73.387c0 5.891 4.776 10.667 10.667 10.667a10.67 10.67 0 005.653-1.621l59.456-37.141a264.142 264.142 0 0094.891 17.429c138.355 2.728 252.841-106.988 256-245.333C508.866 107.038 394.38-2.678 256.025.05z"/>
           </svg>
         </div>
-        <h2>SignalR Chat Web</h2>
-        <p>Mesajlaşmaya başlamak için soldaki listeden bir sohbet seçin veya yeni bir arkadaş ekleyin.</p>
+        <h2>Ekip Lounge'a Hoş Geldin! 👋</h2>
+        <p>Göz yormayan sıcak kahve & lounge teması devrede. Soldan bir arkadaşını seç, sohbete başla veya XOX / Taş-Kağıt-Makas düellosuna davet et!</p>
         <button class="btn-action-sm btn-action-primary" style="margin-top: 8px; padding: 10px 18px;" @click="openSearchModal()">
           <i class="fas fa-user-plus"></i> Arkadaş Ara & Ekle
         </button>
         <div class="empty-state-footer">
-          <i class="fas fa-lock"></i> Uçtan uca SignalR bağlantısı ile gerçek zamanlı iletişim
+          <i class="fas fa-couch"></i> Arkadaş ortamına özel cozy lounge ve SignalR gerçek zamanlı iletişim
         </div>
       </div>
     </div>
@@ -245,16 +245,19 @@
 
         <div style="display: flex; align-items: center; gap: 8px;">
           <!-- Dürtme (Buzz) -->
-          <button class="conv-action-btn" @click="sendBuzz()" :disabled="buzzCooldown > 0" :title="buzzCooldown > 0 ? `Dürtmek için bekleyin (${buzzCooldown}s)` : 'Titreşim Gönder (Dürt)'">
+          <button class="conv-action-btn arcade-pill-btn arcade-buzz" @click="sendBuzz()" :disabled="buzzCooldown > 0" :title="buzzCooldown > 0 ? `Dürtmek için bekleyin (${buzzCooldown}s)` : 'Titreşim Gönder (Dürt)'">
             <i class="fas fa-bolt" :style="{ color: buzzCooldown > 0 ? 'var(--settings-icon-color)' : '#f59e0b' }"></i>
+            <span class="arcade-label">Dürt</span>
           </button>
           <!-- Mini Oyun (XOX) -->
-          <button class="conv-action-btn" @click="startXoxGame()" title="XOX Mini Oyunu Başlat">
+          <button class="conv-action-btn arcade-pill-btn arcade-game" @click="startXoxGame()" title="XOX Mini Oyunu Başlat">
             <i class="fas fa-gamepad"></i>
+            <span class="arcade-label">XOX</span>
           </button>
           <!-- Mini Oyun (Taş-Kağıt-Makas) -->
-          <button class="conv-action-btn" @click="startRpsGame()" title="Taş-Kağıt-Makas Düellosu Başlat">
+          <button class="conv-action-btn arcade-pill-btn arcade-game" @click="startRpsGame()" title="Taş-Kağıt-Makas Düellosu Başlat">
             <i class="fas fa-hand-scissors"></i>
+            <span class="arcade-label">TKM</span>
           </button>
           <!-- In-Chat Search -->
           <button class="conv-action-btn" @click="toggleInChatSearch()" :title="showInChatSearch ? 'Aramayı Kapat' : 'Sohbet İçi Arama'">
@@ -971,7 +974,7 @@
  </div>
 </div>
 <canvas id="confetti-canvas"></canvas>
-<script src="app.js?v=2.0.5"></script>
-<script src="./script.js?v=2.0.5"></script>
+<script src="app.js?v=2.0.6"></script>
+<script src="./script.js?v=2.0.6"></script>
 </body>
 </html>

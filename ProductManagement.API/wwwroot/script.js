@@ -101,6 +101,14 @@ createApp({
         window.vueAppInstance = this;
         localStorage.removeItem('password'); // Eski güvenlik açığını temizle
         localStorage.getItem('theme') && document.body.setAttribute('data-theme', localStorage.getItem('theme'));
+        const savedDarkMode = localStorage.getItem('darkMode');
+        if (savedDarkMode === 'true') {
+            this.darkMode = true;
+            document.body.classList.add('dark-mode');
+        } else {
+            this.darkMode = false;
+            document.body.classList.remove('dark-mode');
+        }
         this.token = localStorage.getItem('token');
         if (this.token) {
             this.myuser = this.parseJwt(this.token);
@@ -206,8 +214,9 @@ createApp({
     },
     methods: {
         changeTheme(){
-            this.darkMode = !this.darkMode
-            document.body.classList.toggle('dark-mode');
+            this.darkMode = !this.darkMode;
+            document.body.classList.toggle('dark-mode', this.darkMode);
+            localStorage.setItem('darkMode', this.darkMode ? 'true' : 'false');
         },
         changeColor(color){
             localStorage.setItem('theme', color);
