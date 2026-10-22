@@ -421,7 +421,10 @@ createApp({
                         "isHovered": false
                     };
 
-                    if (this.messages.length && this.messages[this.messages.length - 1].senderId == item.senderId) {
+                    if (this.messages.length && 
+                        this.messages[this.messages.length - 1].senderId == item.senderId &&
+                        item.type != 6 &&
+                        !this.messages[this.messages.length - 1].messages.some(m => m.type == 6)) {
                         this.messages[this.messages.length - 1].messages.push(item);
                     } else {
                         this.messages.push({
@@ -502,6 +505,12 @@ createApp({
 
             // Phase 4: Sohbet Temizleme Dinleyicisi
             this.connection.on('ReceiveClearChat', (friendId) => {
+                const target = this.users.find(u => u.id == friendId);
+                if (target) {
+                    target.lastMessage = null;
+                    target.notSeenMessagesCount = 0;
+                    this.users = this.sortUsersByLastMessage(this.users);
+                }
                 if (this.selectedUserId == friendId) {
                     this.messages = [];
                     if (this.cachesMessages) {
@@ -577,14 +586,10 @@ createApp({
                             showReactionPicker: false,
                             isHovered: false
                         };
-                        if (this.messages.length && this.messages[this.messages.length - 1].senderId == senderId) {
-                            this.messages[this.messages.length - 1].messages.push(gameItem);
-                        } else {
-                            this.messages.push({
-                                senderId: senderId,
-                                messages: [gameItem]
-                            });
-                        }
+                        this.messages.push({
+                            senderId: senderId,
+                            messages: [gameItem]
+                        });
                     }
                     if (senderId != this.myuser.sub) {
                         this.sendSeen(senderId, 2);
@@ -943,7 +948,10 @@ createApp({
                         "isHovered": false
                     };
                     let reactiveItem = null;
-                    if (this.messages && this.messages.length && this.messages[this.messages.length - 1].senderId == msg.SenderId) {
+                    if (this.messages && this.messages.length && 
+                        this.messages[this.messages.length - 1].senderId == msg.SenderId &&
+                        msg.Type != 6 &&
+                        !this.messages[this.messages.length - 1].messages.some(m => m.type == 6)) {
                         const groupMsgs = this.messages[this.messages.length - 1].messages;
                         groupMsgs.push(item);
                         reactiveItem = groupMsgs[groupMsgs.length - 1];
@@ -1614,13 +1622,16 @@ createApp({
                     msg.audioDuration = 0;
                     msg.showReactionPicker = false;
                     msg.isHovered = false;
-                    if(msg.senderId != arr[arr.length - 1]?.senderId) {
+                    if (msg.type == 6 || 
+                        arr.length === 0 || 
+                        msg.senderId != arr[arr.length - 1]?.senderId || 
+                        arr[arr.length - 1].messages.some(m => m.type == 6)) {
                         arr.push({
                             senderId: msg.senderId,
                             messages:[msg]
-                        })
-                    }else {
-                        arr[arr.length - 1].messages.push(msg)
+                        });
+                    } else {
+                        arr[arr.length - 1].messages.push(msg);
                     }
                 })
                 this.renderMessage(arr,receiverId);
@@ -2024,39 +2035,98 @@ createApp({
             }
         },
 
-        // 5. Clear Chat History
-        async confirmClearChat() {
+        // 5. Delete Chat / Clear Chat History
+        async confirmDeleteChat(targetUser) {
+            targetUser = targetUser || this.selectedUser;
+            if (!targetUser) return;
+
             const res = await Swal.fire({
-                title: 'Sohbet Geçmişini Temizle',
-                text: 'Bu sohbetteki tüm iletiler yalnızca sizin için silinecektir. Devam etmek istiyor musunuz?',
+                title: 'Sohbeti Sil',
+                html: `
+                    <div style="font-size: 14px; margin-bottom: 12px; color: var(--body-color); line-height: 1.5;">
+                        <b>${targetUser.userName}</b> ile olan tüm sohbet geçmişi ve iletiler silinecektir.
+                    </div>
+                    <div style="margin-top: 14px; text-align: left; padding: 10px 14px; background: var(--input-bg); border-radius: 10px; font-size: 13px; border: 1px solid var(--border-color);">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--body-color); user-select: none;">
+                            <input type="checkbox" id="swal-remove-friend" style="width: 16px; height: 16px; cursor: pointer;">
+                            <span>Bu kişiyi arkadaş listemden de kaldır</span>
+                        </label>
+                    </div>
+                `,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: 'Evet, Temizle',
-                cancelButtonText: 'Vazgeç'
+                confirmButtonText: '<i class="fas fa-trash-alt"></i> Evet, Sohbeti Sil',
+                cancelButtonText: 'Vazgeç',
+                preConfirm: () => {
+                    const cb = document.getElementById('swal-remove-friend');
+                    return {
+                        removeFriend: cb ? cb.checked : false
+                    };
+                }
             });
+
             if (res.isConfirmed) {
+                const removeFriend = res.value?.removeFriend || false;
                 try {
+                    // 1. Clear chat messages on server
                     if (this.connection) {
-                        await this.connection.invoke('ClearChat', this.selectedUserId.toString());
+                        await this.connection.invoke('ClearChat', targetUser.id.toString());
+                    } else {
+                        await fetch(`/api/Message/clear/${targetUser.id}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${this.token}` }
+                        });
                     }
-                    this.messages = [];
+
+                    // 2. Clear local message cache
                     if (this.cachesMessages) {
-                        this.cachesMessages[this.selectedUserId] = [];
+                        this.cachesMessages[targetUser.id] = [];
                     }
+
+                    // 3. If currently selected, clear active chat and close mobile view
+                    if (this.selectedUserId === targetUser.id) {
+                        this.messages = [];
+                        this.selectedUserId = null;
+                        this.selectedUserName = null;
+                        this.closeChatMobile();
+                    }
+
+                    // 4. If removeFriend checked, delete friendship
+                    if (removeFriend) {
+                        await fetch(`/api/Friend/remove/${targetUser.id}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${this.token}` }
+                        });
+                        this.users = this.users.filter(u => u.id !== targetUser.id);
+                    } else {
+                        targetUser.lastMessage = null;
+                        targetUser.notSeenMessagesCount = 0;
+                        this.users = this.sortUsersByLastMessage(this.users);
+                    }
+
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
                         icon: 'success',
-                        title: 'Sohbet geçmişi temizlendi',
+                        title: removeFriend ? 'Sohbet ve arkadaş silindi' : 'Sohbet başarıyla silindi',
                         showConfirmButton: false,
                         timer: 2000
                     });
                 } catch (err) {
-                    console.error('Sohbet temizleme hatası:', err);
+                    console.error('Sohbet silme hatası:', err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata',
+                        text: 'Sohbet silinirken bir sorun oluştu.'
+                    });
                 }
             }
+        },
+
+        async confirmClearChat() {
+            await this.confirmDeleteChat(this.selectedUser);
         },
 
         // 6. In-Chat Message Search

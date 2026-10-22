@@ -104,8 +104,8 @@ namespace ProductManagement.Application.Services
                 StatusMessage = u.StatusMessage,
                 LastSeenAt = u.LastSeenAt,
                 LastMessage = _context.Message
-                    .Where(m => (m.SenderId == u.id && m.ReceiverId.ToString() == currentUserId) ||
-                                (m.ReceiverId == u.id && m.SenderId.ToString() == currentUserId))
+                    .Where(m => (m.SenderId == u.id && m.ReceiverId.ToString() == currentUserId && !m.IsDeletedForReceiver) ||
+                                (m.ReceiverId == u.id && m.SenderId.ToString() == currentUserId && !m.IsDeletedForSender))
                     .OrderByDescending(m => m.Timestamp)
                     .Select(m => new MessageDto
                     {

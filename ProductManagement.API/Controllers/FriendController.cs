@@ -47,5 +47,13 @@ namespace ProductManagement.API.Controllers
             _friendService.UpdateFriendSettings(currentUserId, friendUserId, input.IsPinned, input.IsMuted, input.IsArchived);
             return Ok(ApiResponse.Ok());
         }
+
+        [HttpDelete("remove/{friendUserId}")]
+        public IActionResult RemoveFriend(int friendUserId)
+        {
+            int currentUserId = GetCurrentUserId();
+            _friendService.RemoveFriend(currentUserId, friendUserId);
+            return Ok(ApiResponse.Ok());
+        }
     }
 }

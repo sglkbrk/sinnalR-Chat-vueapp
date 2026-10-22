@@ -183,5 +183,62 @@ namespace ProductManagement.Tests
             var updatedProfile = await userService.GetProfileAsync(5);
             Assert.Equal("New status", updatedProfile.StatusMessage);
         }
+
+        [Fact]
+        public void RemoveFriend_ShouldRemoveBidirectionalFriendship()
+        {
+            // Arrange
+            using var context = CreateInMemoryDbContext();
+            var user1 = new Users { id = 1, Username = "alice", Email = "alice@test.com", Password = "hash" };
+            var user2 = new Users { id = 2, Username = "bob", Email = "bob@test.com", Password = "hash" };
+            context.Users.AddRange(user1, user2);
+            context.Friend.Add(new Friend { UserId = 1, FriendUserId = 2 });
+            context.Friend.Add(new Friend { UserId = 2, FriendUserId = 1 });
+            context.SaveChanges();
+
+            var friendService = new FriendService(context);
+
+            // Act: Remove friendship between 1 and 2
+            var removed = friendService.RemoveFriend(1, 2);
+
+            // Assert
+            Assert.True(removed);
+            Assert.False(friendService.IsFriend(1, 2));
+            Assert.False(friendService.IsFriend(2, 1));
+        }
+
+        [Fact]
+        public void GetChatFriends_ShouldIgnoreDeletedMessagesForUser()
+        {
+            // Arrange
+            using var context = CreateInMemoryDbContext();
+            var user1 = new Users { id = 1, Username = "alice", Email = "alice@test.com", Password = "hash" };
+            var user2 = new Users { id = 2, Username = "bob", Email = "bob@test.com", Password = "hash" };
+            context.Users.AddRange(user1, user2);
+            context.Friend.Add(new Friend { UserId = 1, FriendUserId = 2 });
+            context.Friend.Add(new Friend { UserId = 2, FriendUserId = 1 });
+
+            // Message from user 2 to user 1, but user 1 cleared/deleted it (IsDeletedForReceiver = true)
+            context.Message.Add(new Message
+            {
+                Id = 100,
+                SenderId = 2,
+                ReceiverId = 1,
+                Content = "Eski mesaj",
+                Timestamp = DateTime.UtcNow,
+                IsDeletedForReceiver = true
+            });
+            context.SaveChanges();
+
+            var friendService = new FriendService(context);
+
+            // Act: GetChatFriends for User 1
+            var chatFriends = friendService.GetChatFriends(1);
+
+            // Assert: Bob's LastMessage should be null since it was deleted for user 1
+            var bob = chatFriends.FirstOrDefault(f => f.Id == 2);
+            Assert.NotNull(bob);
+            Assert.Null(bob.LastMessage);
+        }
     }
 }

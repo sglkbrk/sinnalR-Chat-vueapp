@@ -22,7 +22,7 @@
 
   <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
-  <link rel="stylesheet" href="./style.css?v=2.0.6">
+  <link rel="stylesheet" href="./style.css?v=2.0.8">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
@@ -179,6 +179,9 @@
           <div v-if="user.notSeenMessagesCount" class="notSeenMessages">
               <strong>{{ user.notSeenMessagesCount }}</strong>
           </div>
+          <button class="msg-quick-delete-btn" @click.stop="confirmDeleteChat(user)" title="Sohbeti Sil">
+            <i class="fas fa-trash-alt"></i>
+          </button>
       </div>
     </div>
 
@@ -266,6 +269,10 @@
           <button class="conv-action-btn" v-if="selectedUser" @click="togglePin(selectedUser)" :title="selectedUser.isPinned ? 'Sabitlemeyi Kaldır' : 'Sohbeti Başa Sabitle'">
             <span style="font-size: 15px;">📌</span>
           </button>
+          <!-- Sohbeti Sil -->
+          <button class="conv-action-btn danger-hover" v-if="selectedUser" @click="confirmDeleteChat(selectedUser)" title="Sohbeti Sil">
+            <i class="fas fa-trash-alt"></i>
+          </button>
           <button class="conv-action-btn" @click="settingsBoxVis = !settingsBoxVis" :title="settingsBoxVis ? 'Detayları Gizle' : 'Kişi Detayları & Medya'">
             <i class="fas fa-info-circle"></i>
           </button>
@@ -304,7 +311,7 @@
             <span>{{ getDateBadge(msgGroup.messages[0].timestamp) }}</span>
           </div>
 
-          <div :class="['chat-msg', msgGroup.senderId == myuser.sub ? 'owner' : '', msgGroup.messages.some(m => m.type == 6) ? 'is-game-row' : '']"> 
+          <div :class="['chat-msg', msgGroup.senderId == myuser.sub ? 'owner' : '', (msgGroup.messages.length === 1 && msgGroup.messages[0].type == 6) ? 'is-game-row' : '']"> 
             <div class="chat-msg-profile" v-if="msgGroup.senderId != myuser.sub">
               <img class="chat-msg-img" :src="getSenderAvatar(msgGroup.senderId)" alt="" />
             </div>
@@ -775,8 +782,8 @@
 
     <!-- Clear Chat Danger Action -->
     <div class="detail-section" style="margin-top: 24px; margin-bottom: 24px;">
-      <button class="btn-danger-outline" @click="confirmClearChat()" style="width: 100%; justify-content: center;">
-        <i class="fas fa-trash-alt"></i> Sohbet Geçmişini Temizle
+      <button class="btn-danger-outline" @click="confirmDeleteChat(selectedUser)" style="width: 100%; justify-content: center;">
+        <i class="fas fa-trash-alt"></i> Sohbeti Sil
       </button>
     </div>
   </div>
@@ -974,7 +981,7 @@
  </div>
 </div>
 <canvas id="confetti-canvas"></canvas>
-<script src="app.js?v=2.0.6"></script>
-<script src="./script.js?v=2.0.6"></script>
+<script src="app.js?v=2.0.8"></script>
+<script src="./script.js?v=2.0.8"></script>
 </body>
 </html>

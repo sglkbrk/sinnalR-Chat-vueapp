@@ -41,13 +41,14 @@ namespace ProductManagement.Application.Services
                     IsMuted = u.IsMuted,
                     IsArchived = u.IsArchived,
                     LastMessage = _context.Message
-                        .Where(m => (m.SenderId == u.FriendUserId && m.ReceiverId == userId) ||
-                                    (m.ReceiverId == u.FriendUserId && m.SenderId == userId))
+                        .Where(m => (m.SenderId == u.FriendUserId && m.ReceiverId == userId && !m.IsDeletedForReceiver) ||
+                                    (m.ReceiverId == u.FriendUserId && m.SenderId == userId && !m.IsDeletedForSender))
                         .OrderByDescending(m => m.Timestamp)
                         .FirstOrDefault(),
                     NotSeenMessagesCount = _context.Message
                         .Count(m => m.ReceiverId == userId &&
                                     m.SenderId == u.FriendUserId &&
+                                    !m.IsDeletedForReceiver &&
                                     m.Status != messageStatus.Seen)
                 })
                 .AsEnumerable()
@@ -108,6 +109,19 @@ namespace ProductManagement.Application.Services
                 _context.Friend.Remove(friend);
                 _context.SaveChanges();
             }
+        }
+
+        public bool RemoveFriend(int userId, int friendUserId)
+        {
+            var friendships = _context.Friend
+                .Where(f => (f.UserId == userId && f.FriendUserId == friendUserId) ||
+                            (f.UserId == friendUserId && f.FriendUserId == userId))
+                .ToList();
+            if (!friendships.Any()) return false;
+
+            _context.Friend.RemoveRange(friendships);
+            _context.SaveChanges();
+            return true;
         }
     }
 }

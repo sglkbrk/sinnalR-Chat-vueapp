@@ -347,7 +347,8 @@ html {
   font-weight: 500;
   font-size: 12px;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .msg-message {
@@ -1057,6 +1058,55 @@ html {
   background-color:  var(--theme-color);
   align-items: center;
   justify-content: center;
+  transition: opacity 0.2s ease;
+}
+
+.msg-quick-delete-btn {
+  opacity: 0;
+  pointer-events: none;
+  background: none;
+  border: none;
+  color: var(--settings-icon-color);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: absolute;
+  right: 12px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-size: 13px;
+  z-index: 2;
+}
+
+.msg:hover .msg-quick-delete-btn {
+  opacity: 0.75;
+  pointer-events: auto;
+}
+
+.msg:hover .notSeenMessages {
+  opacity: 0;
+}
+
+.msg-quick-delete-btn:hover {
+  opacity: 1 !important;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+  transform: scale(1.1);
+}
+
+@media (hover: none) {
+  .msg-quick-delete-btn {
+    opacity: 0.45;
+    pointer-events: auto;
+  }
+}
+
+.conv-action-btn.danger-hover:hover {
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.12) !important;
 }
 
 
@@ -3042,17 +3092,38 @@ html {
   max-width: 100% !important;
   width: 100% !important;
   margin-left: 0 !important;
+  margin-right: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
 }
 
+/* Normal message bubbles must ALWAYS stay left (receiver) or right (owner), NEVER centered */
+.chat-msg:not(.is-game-row) .chat-msg-content {
+  align-items: flex-start !important;
+}
+
+.chat-msg.owner:not(.is-game-row) .chat-msg-content {
+  align-items: flex-end !important;
+}
+
+.chat-msg-bubble-wrapper:not(.chat-msg-game-wrapper) {
+  align-self: flex-start !important;
+  max-width: 75% !important;
+}
+
+.owner .chat-msg-bubble-wrapper:not(.chat-msg-game-wrapper) {
+  align-self: flex-end !important;
+}
+
 .chat-msg-game-wrapper {
   width: 100% !important;
+  max-width: 440px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
-  margin: 10px 0 !important;
+  margin: 10px auto !important;
+  align-self: center !important;
 }
 
 /* Independent, Unified Card Bubble: Overrides owner blue and speech-bubble styling */
