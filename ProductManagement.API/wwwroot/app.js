@@ -95,7 +95,13 @@ async function initPushNotifications() {
             console.log('[FCM] Ön planda gelen mesaj:', payload);
             const title = payload.notification?.title || payload.data?.name || 'Yeni Mesaj';
             const body = payload.notification?.body || payload.data?.body || '';
-            const icon = payload.notification?.icon || payload.data?.image || '/firebase-logo.png';
+            let icon = payload.notification?.icon || payload.data?.image || '';
+
+            if (!icon || icon.includes('randomuser.me')) {
+                icon = `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=4f46e5&color=fff&rounded=true&size=192`;
+            } else if (icon.startsWith('/')) {
+                icon = window.location.origin + icon;
+            }
 
             // Sayfa gizliyse veya sekme odakta değilse sistem bildirimi göster
             if (document.hidden && Notification.permission === 'granted') {

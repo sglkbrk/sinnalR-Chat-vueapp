@@ -21,10 +21,22 @@ messaging.onBackgroundMessage(function (payload) {
     const data = payload.data || {};
     const notification = payload.notification || {};
 
-    const notificationTitle = notification.title || data.name || data.title || 'Yeni Mesaj';
+    const senderName = data.name || notification.title || 'Yeni Mesaj';
+    let iconUrl = notification.icon || data.image || '';
+
+    // Eski randomuser.me mock resimleri veya boş resim kontrolü
+    if (!iconUrl || iconUrl.includes('randomuser.me')) {
+        iconUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(senderName)}&background=4f46e5&color=fff&rounded=true&size=192`;
+    } else if (iconUrl.startsWith('/')) {
+        // Relative path ise origin ile tam URL oluştur
+        iconUrl = self.location.origin + iconUrl;
+    }
+
+    const notificationTitle = senderName;
     const notificationOptions = {
         body: notification.body || data.body || 'Bir yeni mesajınız var.',
-        icon: notification.icon || data.image || '/firebase-logo.png',
+        icon: iconUrl,
+        badge: '/icons/icon-192x192.png',
         tag: notification.tag || `chat-${data.senderId || 'general'}`,
         renotify: true,
         data: {

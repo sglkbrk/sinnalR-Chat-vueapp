@@ -51,13 +51,46 @@ namespace ProductManagement.Application.Services
             _context.SaveChanges();
         }
 
+        private string GetSenderAvatarUrl(string senderId, string senderName)
+        {
+            if (int.TryParse(senderId, out int sId) && sId > 0)
+            {
+                var user = _context.Users.FirstOrDefault(u => u.id == sId);
+                if (user != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(user.AvatarUrl) && !user.AvatarUrl.Contains("randomuser.me"))
+                    {
+                        if (user.AvatarUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                            user.AvatarUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return user.AvatarUrl;
+                        }
+
+                        return $"/api/MinioFile/download/{user.AvatarUrl}";
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(user.Username))
+                    {
+                        senderName = user.Username;
+                    }
+                }
+            }
+
+            var displayName = string.IsNullOrWhiteSpace(senderName) ? "User" : senderName;
+            return $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(displayName)}&background=4f46e5&color=fff&rounded=true&size=192";
+        }
+
         public async Task SendNotificationToUserAsync(int userId, string body, string name, string senderId)
         {
             if (FirebaseApp.DefaultInstance == null) return;
             var tokens = GetTokensByUserId(userId);
+            if (tokens == null || !tokens.Any()) return;
+
+            string avatarUrl = GetSenderAvatarUrl(senderId, name);
+
             foreach (var token in tokens)
             {
-                await SendNotificationAsync(body, name, token, senderId);
+                await SendNotificationAsync(body, name, token, senderId, avatarUrl);
             }
         }
 
@@ -86,12 +119,17 @@ namespace ProductManagement.Application.Services
             }
         }
 
-        public async Task SendNotificationAsync(string body, string name, string token, string senderId)
+        public async Task SendNotificationAsync(string body, string name, string token, string senderId, string? avatarUrl = null)
         {
             if (FirebaseApp.DefaultInstance == null)
             {
                 Console.WriteLine("[Push] FirebaseApp başlatılmadığı için bildirim gönderilemedi.");
                 return;
+            }
+
+            if (string.IsNullOrWhiteSpace(avatarUrl))
+            {
+                avatarUrl = GetSenderAvatarUrl(senderId, name);
             }
 
             var message = new FirebaseAdmin.Messaging.Message()
@@ -103,7 +141,7 @@ namespace ProductManagement.Application.Services
                     { "senderId", senderId },
                     { "name", name ?? "Yeni Mesaj" },
                     { "body", body ?? "" },
-                    { "image", $"https://randomuser.me/api/portraits/men/{senderId}.jpg" }
+                    { "image", avatarUrl }
                 },
                 Webpush = new WebpushConfig
                 {
@@ -116,7 +154,7 @@ namespace ProductManagement.Application.Services
                     {
                         Title = name ?? "Yeni Mesaj",
                         Body = body ?? "",
-                        Icon = $"https://randomuser.me/api/portraits/men/{senderId}.jpg",
+                        Icon = avatarUrl,
                         Tag = $"chat-{senderId}"
                     }
                 }

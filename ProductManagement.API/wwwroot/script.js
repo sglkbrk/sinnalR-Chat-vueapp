@@ -728,9 +728,13 @@ createApp({
         },
         showNotification(message, senderId, name, type) {
             if ("Notification" in window && Notification.permission === "granted") {
-                const iconUrl = this.getSenderAvatar(senderId);
+                let iconUrl = this.getSenderAvatar(senderId);
+                const senderDisplayName = name || "Bilinmeyen";
+                if (!iconUrl || iconUrl.includes('randomuser.me') || iconUrl.startsWith('data:image/svg')) {
+                    iconUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(senderDisplayName)}&background=4f46e5&color=fff&rounded=true&size=192`;
+                }
                 const notification = new Notification("Yeni Mesaj", {
-                    body: "Gönderen: " + (name || "Bilinmeyen") + "\nMesaj: " + (message || ""),
+                    body: "Gönderen: " + senderDisplayName + "\nMesaj: " + (message || ""),
                     icon: iconUrl,
                     data: { senderId: senderId }
                 });
