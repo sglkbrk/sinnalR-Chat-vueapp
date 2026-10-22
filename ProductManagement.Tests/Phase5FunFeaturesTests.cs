@@ -131,5 +131,57 @@ namespace ProductManagement.Tests
             Assert.True(reloaded.IsDeleted);
             Assert.Contains("süresi doldu", reloaded.Content);
         }
+
+        [Fact]
+        public async Task StartRpsGame_ShouldInitializeBestOfThreeState()
+        {
+            using var context = CreateInMemoryDbContext();
+            var service = new MessageService(context);
+
+            var gameMsg = await service.StartRpsGameAsync(1, 2, "Alice", "Bob");
+
+            Assert.NotNull(gameMsg);
+            Assert.Equal(messageType.Game, gameMsg.Type);
+
+            var state = System.Text.Json.JsonSerializer.Deserialize<ProductManagement.Application.DTO.RpsGameState>(gameMsg.MetadataJson!);
+            Assert.NotNull(state);
+            Assert.Equal("rps", state.GameType);
+            Assert.Equal(1, state.Player1Id);
+            Assert.Equal(2, state.Player2Id);
+            Assert.Equal(3, state.TargetScore);
+            Assert.Equal("playing", state.Status);
+        }
+
+        [Fact]
+        public async Task MakeRpsMove_ThreeRoundsWon_ShouldFinishGameWithWinner()
+        {
+            using var context = CreateInMemoryDbContext();
+            var service = new MessageService(context);
+
+            var gameMsg = await service.StartRpsGameAsync(1, 2, "Alice", "Bob");
+
+            // Round 1: Alice (rock) beats Bob (scissors) -> 1-0
+            await service.MakeRpsMoveAsync(gameMsg.Id, 1, "rock");
+            var (_, stateR1) = await service.MakeRpsMoveAsync(gameMsg.Id, 2, "scissors");
+            Assert.Equal(1, stateR1.Player1Score);
+            Assert.Equal(0, stateR1.Player2Score);
+            Assert.Equal(2, stateR1.Round);
+            Assert.Null(stateR1.Player1Choice);
+            Assert.Null(stateR1.Player2Choice);
+
+            // Round 2: Alice (paper) beats Bob (rock) -> 2-0
+            await service.MakeRpsMoveAsync(gameMsg.Id, 1, "paper");
+            await service.MakeRpsMoveAsync(gameMsg.Id, 2, "rock");
+
+            // Round 3: Alice (scissors) beats Bob (paper) -> 3-0 (Alice wins!)
+            await service.MakeRpsMoveAsync(gameMsg.Id, 1, "scissors");
+            var (finalMsg, finalState) = await service.MakeRpsMoveAsync(gameMsg.Id, 2, "paper");
+
+            Assert.Equal("finished", finalState.Status);
+            Assert.Equal("Alice", finalState.Winner);
+            Assert.Equal(3, finalState.Player1Score);
+            Assert.Contains("Alice", finalMsg.Content);
+            Assert.Contains("kazandı", finalMsg.Content);
+        }
     }
 }

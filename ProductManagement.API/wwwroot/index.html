@@ -22,7 +22,7 @@
 
   <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
-  <link rel="stylesheet" href="./style.css?v=2.0.2">
+  <link rel="stylesheet" href="./style.css?v=2.0.3">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
@@ -153,12 +153,12 @@
     <!-- Conversations List -->
     <div class="conversation-list">
       <div v-if="filteredUsers.length === 0" class="empty-conversation-msg">
-        {{ chatFilterQuery ? 'Eşleşen sohbet bulunamadı.' : 'Henüz arkadaşınız yok. (+) butonu ile arkadaş ekleyin.' }}
+        {{ chatFilterQuery ? 'Eşleşen sohbet bulunamadı.' : 'Henüz arkadaşınız yok. Üstteki arkadaş ekle ikonu ile arkadaş ekleyin.' }}
       </div>
 
       <div v-for="(user, index) in filteredUsers" :key="user.id" 
            @click="selectUser(user.id, user.userName)" 
-           :class="['msg', isUserOnline(user.id) ? 'online' : '', user.id === selectedUserId ? 'active' : '']">
+           :class="['msg', user.id === selectedUserId ? 'active' : '']">
           <div class="msg-profile-wrapper">
             <img class="msg-profile" :src="getAvatar(user)" alt="" />
             <span v-if="isUserOnline(user.id)" class="online-indicator-dot" title="Çevrimiçi"></span>
@@ -182,7 +182,6 @@
       </div>
     </div>
 
-    <button @click="openSearchModal()" class="add" title="Arkadaş Ara & Ekle"></button>
     <div class="overlay"></div>
   </div>
 
@@ -253,6 +252,10 @@
           <button class="conv-action-btn" @click="startXoxGame()" title="XOX Mini Oyunu Başlat">
             <i class="fas fa-gamepad"></i>
           </button>
+          <!-- Mini Oyun (Taş-Kağıt-Makas) -->
+          <button class="conv-action-btn" @click="startRpsGame()" title="Taş-Kağıt-Makas Düellosu Başlat">
+            <i class="fas fa-hand-scissors"></i>
+          </button>
           <!-- In-Chat Search -->
           <button class="conv-action-btn" @click="toggleInChatSearch()" :title="showInChatSearch ? 'Aramayı Kapat' : 'Sohbet İçi Arama'">
             <i class="fas fa-search"></i>
@@ -303,12 +306,14 @@
               <img class="chat-msg-img" :src="getSenderAvatar(msgGroup.senderId)" alt="" />
             </div>
             <div class="chat-msg-content">
-              <div :id="'msg-bubble-' + msg.id" class="chat-msg-bubble-wrapper" v-for="msg in msgGroup.messages" :key="msg.id"
-                   @mouseover="msg.isHovered = true"
-                   @mouseleave="msg.isHovered = false; msg.showReactionPicker = false">
+              <div :id="'msg-bubble-' + msg.id" 
+                   :class="['chat-msg-bubble-wrapper', (msg.isHovered || msg.showReactionPicker) ? 'has-active-popover' : '']" 
+                   v-for="msg in msgGroup.messages" :key="msg.id"
+                   @mouseenter="onMessageMouseEnter(msg)"
+                   @mouseleave="onMessageMouseLeave(msg)">
                 
                 <!-- Floating Action Toolbar on Hover -->
-                <div v-if="!msg.isDeleted" class="msg-actions-toolbar">
+                <div v-if="!msg.isDeleted" class="msg-actions-toolbar" @mouseenter="onMessageMouseEnter(msg)">
                   <!-- Quick React Button -->
                   <button class="msg-action-btn" @click.stop="toggleQuickReactPicker(msg)" title="Tepki Ver">
                     <i class="far fa-smile"></i>
@@ -328,7 +333,7 @@
                 </div>
 
                 <!-- Quick Reactions Popover -->
-                <div v-if="msg.showReactionPicker" class="quick-reaction-popover" @mouseleave="msg.showReactionPicker = false">
+                <div v-if="msg.showReactionPicker" class="quick-reaction-popover" @mouseenter="onMessageMouseEnter(msg)">
                   <span v-for="emoji in quickReactionEmojis" :key="emoji" class="quick-react-item" @click.stop="toggleReaction(msg, emoji)">
                     {{ emoji }}
                   </span>
@@ -337,81 +342,128 @@
                 <!-- Message Body Bubble -->
                 <div :class="['chat-msg-text', msg.isDeleted ? 'delete-msg' : '']">
                   <!-- Quoted Message Box (Reply) -->
-                  <div v-if="msg.replyToMessage" class="quoted-message-box" @click.stop="scrollToMessage(msg.replyToMessage.id)">
+                  <div v-if="msg.replyToMessage && !msg.isDeleted" class="quoted-message-box" @click.stop="scrollToMessage(msg.replyToMessage.id)">
                     <div class="quoted-content">
                       <span class="quoted-sender">{{ msg.replyToMessage.senderName || (msg.replyToMessage.senderId == myuser.sub ? 'Siz' : selectedUserName) }}</span>
-                      <span class="quoted-text">{{ msg.replyToMessage.content }}</span>
+                      <span class="quoted-text">{{ msg.replyToMessage.content || 'Medya / Dosya' }}</span>
                     </div>
                   </div>
 
-                  <svg v-if="msg.isDeleted" style="margin-right: 5px; margin-top: 2px;" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="none" d="M0 0h24v24H0z"></path>
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9A7.902 7.902 0 014 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1A7.902 7.902 0 0120 12c0 4.42-3.58 8-8 8z"></path>
-                  </svg>
+                  <div class="chat-msg-body-row">
+                    <svg v-if="msg.isDeleted" style="margin-right: 5px; margin-top: 2px; flex-shrink: 0;" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                      <path fill="none" d="M0 0h24v24H0z"></path>
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9A7.902 7.902 0 014 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1A7.902 7.902 0 0120 12c0 4.42-3.58 8-8 8z"></path>
+                    </svg>
 
-                  <!-- Type 0: Text -->
-                  <span v-if="msg.type == 0" class="chat-msg-text-body" v-html="formatMessage(msg.content)"></span>
+                    <!-- Type 0: Text -->
+                    <span v-if="msg.type == 0" class="chat-msg-text-body" v-html="formatMessage(msg.content)"></span>
 
-                  <!-- Type 1: Image (Click to enlarge) -->
-                  <div v-if="msg.type == 1" class="chat-msg-media-wrapper" @click="openMediaPreview(msg.fileUrl)" title="Büyütmek için tıklayın">
-                    <img @load="onImageLoad()" :src="'/api/MinioFile/download/' + msg.fileUrl" alt="Paylaşılan Görsel" />
-                  </div>
+                    <!-- Type 1: Image (Click to enlarge) -->
+                    <div v-if="msg.type == 1" class="chat-msg-media-wrapper" @click="openMediaPreview(msg.fileUrl)" title="Büyütmek için tıklayın">
+                      <img @load="onImageLoad()" :src="'/api/MinioFile/download/' + msg.fileUrl" alt="Paylaşılan Görsel" />
+                    </div>
 
-                  <!-- Type 2: File Attachment -->
-                  <div v-if="msg.type == 2" class="chat-msg-file-wrapper">
-                    <i class="fas fa-file-alt file-icon"></i>
-                    <span class="file-name">{{ msg.content }}</span>
-                    <button class="file-download-btn" @click="downloadFile(msg.fileUrl)" title="İndir">
-                      <i class="fas fa-arrow-down"></i>
-                    </button>
-                  </div>
+                    <!-- Type 2: File Attachment -->
+                    <div v-if="msg.type == 2" class="chat-msg-file-wrapper">
+                      <i class="fas fa-file-alt file-icon"></i>
+                      <span class="file-name">{{ msg.content }}</span>
+                      <button class="file-download-btn" @click="downloadFile(msg.fileUrl)" title="İndir">
+                        <i class="fas fa-arrow-down"></i>
+                      </button>
+                    </div>
 
-                  <!-- Type 3: Audio / Voice Message Player -->
-                  <div v-if="msg.type == 3" class="chat-msg-audio-wrapper">
-                    <button class="audio-play-btn" @click.stop="togglePlayAudio(msg)" :title="msg.isPlaying ? 'Durdur' : 'Oynat'">
-                      <i class="fas" :class="msg.isPlaying ? 'fa-pause' : 'fa-play'"></i>
-                    </button>
-                    <div class="audio-progress-container">
-                      <div class="audio-progress-bar" @click.stop="seekAudio(msg, $event)">
-                        <div class="audio-progress-fill" :style="{ width: (msg.audioProgress || 0) + '%' }"></div>
+                    <!-- Type 3: Audio / Voice Message Player -->
+                    <div v-if="msg.type == 3" class="chat-msg-audio-wrapper">
+                      <button class="audio-play-btn" @click.stop="togglePlayAudio(msg)" :title="msg.isPlaying ? 'Durdur' : 'Oynat'">
+                        <i class="fas" :class="msg.isPlaying ? 'fa-pause' : 'fa-play'"></i>
+                      </button>
+                      <div class="audio-progress-container">
+                        <div class="audio-progress-bar" @click.stop="seekAudio(msg, $event)">
+                          <div class="audio-progress-fill" :style="{ width: (msg.audioProgress || 0) + '%' }"></div>
+                        </div>
+                        <div class="audio-time-row">
+                          <span>{{ formatAudioTime(msg.audioCurrentTime || 0) }}</span>
+                          <span>{{ formatAudioTime(msg.audioDuration || 0) }}</span>
+                        </div>
                       </div>
-                      <div class="audio-time-row">
-                        <span>{{ formatAudioTime(msg.audioCurrentTime || 0) }}</span>
-                        <span>{{ formatAudioTime(msg.audioDuration || 0) }}</span>
+                      <audio :id="'audio-player-' + msg.id" 
+                             :src="'/api/MinioFile/download/' + msg.fileUrl" 
+                             @loadedmetadata="onAudioLoaded(msg, $event)" 
+                             @timeupdate="onAudioTimeUpdate(msg, $event)" 
+                             @ended="onAudioEnded(msg)" 
+                             preload="metadata" style="display:none;"></audio>
+                    </div>
+
+                    <!-- Type 5: Buzz / Dürtme -->
+                    <div v-if="msg.type == 5" class="buzz-msg-body">
+                      <span class="buzz-icon-pulse">⚡</span>
+                      <span>{{ msg.content }}</span>
+                    </div>
+
+                    <!-- Type 6: Mini Oyunlar (Taş-Kağıt-Makas & XOX) -->
+                    <div v-if="msg.type == 6 && getGameType(msg) === 'rps'" class="rps-game-box">
+                      <div class="rps-header">
+                        <span>🪨📄✂️ Taş-Kağıt-Makas</span>
+                        <span class="rps-round-badge" v-if="getRpsState(msg) && getRpsState(msg).status === 'playing'">{{ getRpsState(msg).round }}. Tur</span>
+                        <span class="rps-round-badge finished" v-else>Bitti</span>
+                      </div>
+                      <div class="rps-scoreboard" v-if="getRpsState(msg)">
+                        <div class="rps-player-score">
+                          <span class="rps-p-name">{{ getRpsState(msg).player1Name }}</span>
+                          <span class="rps-p-pts">{{ getRpsState(msg).player1Score }}</span>
+                          <span class="rps-p-status" v-if="getRpsState(msg).status === 'playing'">
+                            {{ getRpsState(msg).player1Choice ? '✅ Seçti' : '⏳ Bekliyor' }}
+                          </span>
+                        </div>
+                        <div class="rps-vs">VS</div>
+                        <div class="rps-player-score">
+                          <span class="rps-p-name">{{ getRpsState(msg).player2Name }}</span>
+                          <span class="rps-p-pts">{{ getRpsState(msg).player2Score }}</span>
+                          <span class="rps-p-status" v-if="getRpsState(msg).status === 'playing'">
+                            {{ getRpsState(msg).player2Choice ? '✅ Seçti' : '⏳ Bekliyor' }}
+                          </span>
+                        </div>
+                      </div>
+                      <div v-if="getRpsState(msg) && getRpsState(msg).lastRoundSummary" class="rps-last-round">
+                        {{ getRpsState(msg).lastRoundSummary }}
+                      </div>
+                      <div v-if="getRpsState(msg) && getRpsState(msg).status === 'playing'" class="rps-choices-row">
+                        <button class="rps-choice-btn" :class="{ 'selected': getMyRpsChoice(msg) === 'rock' }" :disabled="!!getMyRpsChoice(msg)" @click.stop="makeRpsMove(msg, 'rock')">
+                          <span class="rps-emoji">🪨</span>
+                          <span>Taş</span>
+                        </button>
+                        <button class="rps-choice-btn" :class="{ 'selected': getMyRpsChoice(msg) === 'paper' }" :disabled="!!getMyRpsChoice(msg)" @click.stop="makeRpsMove(msg, 'paper')">
+                          <span class="rps-emoji">📄</span>
+                          <span>Kağıt</span>
+                        </button>
+                        <button class="rps-choice-btn" :class="{ 'selected': getMyRpsChoice(msg) === 'scissors' }" :disabled="!!getMyRpsChoice(msg)" @click.stop="makeRpsMove(msg, 'scissors')">
+                          <span class="rps-emoji">✂️</span>
+                          <span>Makas</span>
+                        </button>
+                      </div>
+                      <div class="rps-status-bar">
+                        {{ getRpsStatusText(msg) }}
                       </div>
                     </div>
-                    <audio :id="'audio-player-' + msg.id" 
-                           :src="'/api/MinioFile/download/' + msg.fileUrl" 
-                           @loadedmetadata="onAudioLoaded(msg, $event)" 
-                           @timeupdate="onAudioTimeUpdate(msg, $event)" 
-                           @ended="onAudioEnded(msg)" 
-                           preload="metadata" style="display:none;"></audio>
-                  </div>
 
-                  <!-- Type 5: Buzz / Dürtme -->
-                  <div v-if="msg.type == 5" class="buzz-msg-body">
-                    <span class="buzz-icon-pulse">⚡</span>
-                    <span>{{ msg.content }}</span>
-                  </div>
-
-                  <!-- Type 6: XOX Mini Oyunu -->
-                  <div v-if="msg.type == 6" class="xox-game-box">
-                    <div class="xox-header">{{ msg.content }}</div>
-                    <div class="xox-grid">
-                      <div v-for="(cell, cIdx) in getXoxBoard(msg)" :key="cIdx" 
-                           :class="['xox-cell', cell === 'X' ? 'cell-x' : '', cell === 'O' ? 'cell-o' : '', isWinningCell(msg, cIdx) ? 'win-cell' : '', cell ? 'occupied' : '']"
-                           @click.stop="makeXoxMove(msg, cIdx)">
-                        {{ cell }}
+                    <div v-else-if="msg.type == 6" class="xox-game-box">
+                      <div class="xox-header">{{ msg.content }}</div>
+                      <div class="xox-grid">
+                        <div v-for="(cell, cIdx) in getXoxBoard(msg)" :key="cIdx" 
+                             :class="['xox-cell', cell === 'X' ? 'cell-x' : '', cell === 'O' ? 'cell-o' : '', isWinningCell(msg, cIdx) ? 'win-cell' : '', cell ? 'occupied' : '']"
+                             @click.stop="makeXoxMove(msg, cIdx)">
+                          {{ cell }}
+                        </div>
+                      </div>
+                      <div class="xox-status-bar">
+                        {{ getXoxStatusText(msg) }}
                       </div>
                     </div>
-                    <div class="xox-status-bar">
-                      {{ getXoxStatusText(msg) }}
-                    </div>
-                  </div>
 
-                  <!-- Type 7: Command Result -->
-                  <div v-if="msg.type == 7" class="command-result-text">
-                    <span v-html="formatMessage(msg.content)"></span>
+                    <!-- Type 7: Command Result -->
+                    <div v-if="msg.type == 7" class="command-result-text">
+                      <span v-html="formatMessage(msg.content)"></span>
+                    </div>
                   </div>
 
                   <!-- Metadata: Time, Edited Tag, Self-Destruct & Delivery Status -->
@@ -497,6 +549,24 @@
         </div>
       </div>
 
+      <!-- Slash Command Autocomplete Menu -->
+      <div v-if="showSlashMenu && filteredSlashCommands.length > 0" class="slash-command-menu">
+        <div class="slash-menu-header">
+          <span><i class="fas fa-terminal"></i> Hızlı Komutlar</span>
+          <span class="slash-menu-hint">↑↓ Seç • Enter Onayla • Esc Kapat</span>
+        </div>
+        <div v-for="(cmd, idx) in filteredSlashCommands" :key="cmd.command"
+             :class="['slash-command-item', idx === slashSelectedIndex ? 'active' : '']"
+             @mouseenter="slashSelectedIndex = idx"
+             @click.stop="selectSlashCommand(cmd, true)">
+          <span class="slash-cmd-icon">{{ cmd.icon }}</span>
+          <div class="slash-cmd-info">
+            <span class="slash-cmd-name">{{ cmd.command }}</span>
+            <span class="slash-cmd-desc">{{ cmd.description }}</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Chat Footer / Input -->
       <div class="chat-area-footer">
         <input type="file" ref="fileInput" :accept="acceptType" @change="handleFileChange" style="display: none;" />
@@ -530,7 +600,7 @@
           <button class="footer-icon-btn" @click="toogleEmojiBox()" ref="emojiIcon" title="Emoji Ekle">
             <i class="far fa-smile"></i>
           </button>
-          <input type="text" v-on:keyup.enter="handleFooterSend()" @input="onChangeMsg()" @paste="handlePaste" id="message" v-model="messageText" :placeholder="editingMessage ? 'Mesajı düzenleyin...' : (selectedSelfDestructSeconds > 0 ? `🔥 ${selectedSelfDestructSeconds} sn sonra silinecek mesaj yazın...` : 'Bir mesaj veya /zar, /yazitura yazın...')" autocomplete="off" />
+          <input type="text" @keydown="onMessageInputKeydown($event)" @input="onChangeMsg()" @paste="handlePaste" id="message" v-model="messageText" :placeholder="editingMessage ? 'Mesajı düzenleyin...' : (selectedSelfDestructSeconds > 0 ? `🔥 ${selectedSelfDestructSeconds} sn sonra silinecek mesaj yazın...` : 'Bir mesaj veya / ile komut yazın...')" autocomplete="off" />
           <button class="footer-send-btn" @click="handleFooterSend()" :title="editingMessage ? 'Güncelle' : 'Gönder'">
             <i class="fas fa-check" v-if="editingMessage"></i>
             <i class="fas fa-paper-plane" v-else-if="messageText.trim().length > 0"></i>
@@ -679,8 +749,8 @@
         <button class="tab-btn" :class="{ active: searchActiveTab === 'search' }" @click="searchActiveTab = 'search'">
           <i class="fas fa-search"></i> Kullanıcı Ara
         </button>
-        <button class="tab-btn" :class="{ active: searchActiveTab === 'requests' }" @click="searchActiveTab = 'requests'">
-          <i class="fas fa-inbox"></i> İstekler <span v-if="friendRequests.length" class="notification-badge" style="position: static; display: inline-flex; margin-left: 4px; font-size: 10px;">{{ friendRequests.length }}</span>
+        <button class="tab-btn" :class="{ active: searchActiveTab === 'requests' }" @click="switchToRequestsTab()">
+          <i class="fas fa-inbox"></i> İstekler <span v-if="(friendRequests.length + sentFriendRequests.length) > 0" class="notification-badge" style="position: static; display: inline-flex; margin-left: 4px; font-size: 10px;">{{ friendRequests.length + sentFriendRequests.length }}</span>
         </button>
       </div>
 
@@ -726,28 +796,60 @@
         </div>
       </div>
 
-      <!-- Tab 2: Incoming Requests -->
+      <!-- Tab 2: Incoming & Outgoing Requests -->
       <div v-if="searchActiveTab === 'requests'">
-        <div v-if="friendRequests.length === 0" style="text-align: center; padding: 30px; color: var(--msg-message);">
+        <div v-if="friendRequests.length === 0 && sentFriendRequests.length === 0" style="text-align: center; padding: 30px; color: var(--msg-message);">
           <i class="fas fa-user-clock" style="font-size: 32px; margin-bottom: 8px; opacity: 0.5;"></i>
-          <div>Bekleyen arkadaşlık isteği yok.</div>
+          <div>Bekleyen gelen veya gönderilen arkadaşlık isteği yok.</div>
         </div>
-        <div class="search-results-list" v-else>
-          <div class="search-result-item" v-for="req in friendRequests" :key="req.id">
-            <div class="search-user-info">
-              <img class="search-user-avatar" :src="getAvatar(req.sender)" alt="" />
-              <div class="search-user-details">
-                <span class="search-user-name">{{ req.sender ? req.sender.username : 'Kullanıcı' }}</span>
-                <span class="search-user-status">ID: #{{ req.senderId }}</span>
+
+        <div v-else style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Gelen İstekler -->
+          <div v-if="friendRequests.length > 0">
+            <div class="requests-section-title">
+              <i class="fas fa-arrow-down" style="color: #10b981;"></i> Bana Gelen İstekler ({{ friendRequests.length }})
+            </div>
+            <div class="search-results-list">
+              <div class="search-result-item" v-for="req in friendRequests" :key="'in-' + req.id">
+                <div class="search-user-info">
+                  <img class="search-user-avatar" :src="getAvatar(req.sender)" alt="" />
+                  <div class="search-user-details">
+                    <span class="search-user-name">{{ req.sender ? (req.sender.username || req.sender.userName) : ('Kullanıcı #' + req.senderId) }}</span>
+                    <span class="search-user-status">ID: #{{ req.senderId }} • Size istek gönderdi</span>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 6px;">
+                  <button class="btn-action-sm btn-action-success" @click="acceptFriendRequest(req.id)">
+                    <i class="fas fa-check"></i> Onayla
+                  </button>
+                  <button class="btn-action-sm btn-action-danger" @click="rejectFriendRequest(req.id)">
+                    <i class="fas fa-times"></i> Reddet
+                  </button>
+                </div>
               </div>
             </div>
-            <div style="display: flex; gap: 6px;">
-              <button class="btn-action-sm btn-action-success" @click="acceptFriendRequest(req.id)">
-                <i class="fas fa-check"></i> Onayla
-              </button>
-              <button class="btn-action-sm btn-action-danger" @click="rejectFriendRequest(req.id)">
-                <i class="fas fa-times"></i> Reddet
-              </button>
+          </div>
+
+          <!-- Gönderilen İstekler -->
+          <div v-if="sentFriendRequests.length > 0">
+            <div class="requests-section-title">
+              <i class="fas fa-paper-plane" style="color: var(--theme-color);"></i> Gönderdiğim İstekler ({{ sentFriendRequests.length }})
+            </div>
+            <div class="search-results-list">
+              <div class="search-result-item" v-for="req in sentFriendRequests" :key="'out-' + req.id">
+                <div class="search-user-info">
+                  <img class="search-user-avatar" :src="getAvatar(req.receiver)" alt="" />
+                  <div class="search-user-details">
+                    <span class="search-user-name">{{ req.receiver ? (req.receiver.username || req.receiver.userName) : ('Kullanıcı #' + req.receiverId) }}</span>
+                    <span class="search-user-status"><i class="fas fa-clock"></i> Onay bekleniyor • ID: #{{ req.receiverId }}</span>
+                  </div>
+                </div>
+                <div>
+                  <button class="btn-action-sm btn-action-danger" @click="cancelFriendRequest(req.id)">
+                    <i class="fas fa-times"></i> İptal Et
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -757,7 +859,7 @@
  </div>
 </div>
 <canvas id="confetti-canvas"></canvas>
-<script src="app.js?v=2.0.2"></script>
-<script src="./script.js?v=2.0.2"></script>
+<script src="app.js?v=2.0.3"></script>
+<script src="./script.js?v=2.0.3"></script>
 </body>
 </html>

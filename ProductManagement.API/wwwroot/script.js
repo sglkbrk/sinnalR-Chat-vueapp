@@ -74,11 +74,24 @@ createApp({
             mediaRecorder: null,
             audioChunks: [],
             // Phase 5: Fun Features State
+            sentFriendRequests: [],
             buzzCooldown: 0,
             buzzCooldownTimer: null,
             showSelfDestructMenu: false,
             selectedSelfDestructSeconds: 0,
-            expireCheckInterval: null
+            expireCheckInterval: null,
+            showSlashMenu: false,
+            slashSelectedIndex: 0,
+            slashCommands: [
+                { command: '/zar', icon: '🎲', description: '1-6 arası rastgele zar atar', immediate: true },
+                { command: '/yazitura', icon: '🪙', description: 'Havaya para atar (Yazı / Tura)', immediate: true },
+                { command: '/rastgele', icon: '🎯', description: 'Rastgele sayı üretir (örn: /rastgele 1-100)', immediate: false, template: '/rastgele 1-100' },
+                { command: '/xox', icon: '❌', description: 'Gerçek zamanlı XOX (Tic-Tac-Toe) oyunu başlatır', immediate: true },
+                { command: '/tkm', icon: '✂️', description: 'Gerçek zamanlı Taş-Kağıt-Makas düellosu başlatır', immediate: true },
+                { command: '/durt', icon: '⚡', description: 'Karşı tarafın ekranını sallar ve ses çalar', immediate: true },
+                { command: '/spoiler', icon: '🕵️', description: 'Dokununca açılan gizli mesaj gönderir', immediate: false, template: '/spoiler ' },
+                { command: '/yardim', icon: 'ℹ️', description: 'Tüm kullanılabilir komutları gösterir', immediate: true }
+            ]
         }
     },
     setup() {
@@ -123,6 +136,7 @@ createApp({
         });
 
         document.addEventListener('visibilitychange', this.handleVisibilityChange);
+        window.addEventListener('keydown', this.handleKeydown);
         document.addEventListener('click', (event) => {
             if (this.showEmojiPicker && this.$refs.emojiPicker && !this.$refs.emojiPicker.contains(event.target) && (!this.$refs.emojiIcon || event.target !== this.$refs.emojiIcon)) {
                 this.showEmojiPicker = false;
@@ -136,20 +150,29 @@ createApp({
     },
     beforeDestroy() {
         document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+        window.removeEventListener('keydown', this.handleKeydown);
         if (this.expireCheckInterval) clearInterval(this.expireCheckInterval);
         if (this.buzzCooldownTimer) clearInterval(this.buzzCooldownTimer);
     },
     watch: {
-        // messages: {
-        //   handler(newMessages) {
-        //     if(newMessages && newMessages.length)
-        //     this.cachesMessages[newMessages[0].receiverId] = newMessages
-        //     // Yeni mesaj eklendiğinde veya mevcut mesajlar güncellendiğinde yapılacak işlemler
-        //   },
-        //   deep: true // Dizi içindeki nesneleri dinlemek için gerekli
-        // }
+        messageText(newVal) {
+            if (newVal && newVal.startsWith('/') && !newVal.includes(' ')) {
+                this.showSlashMenu = true;
+                this.slashSelectedIndex = 0;
+            } else {
+                this.showSlashMenu = false;
+            }
+        }
     },
     computed: {
+        filteredSlashCommands() {
+            const text = (this.messageText || '');
+            if (!text.startsWith('/')) return [];
+            const parts = text.split(' ');
+            if (parts.length > 1) return [];
+            const query = parts[0].toLowerCase();
+            return this.slashCommands.filter(c => c.command.toLowerCase().startsWith(query));
+        },
         sortedUsers() {
             return this.sortUsersByLastMessage(this.users);
         },
@@ -195,11 +218,26 @@ createApp({
         },
         handleKeydown: function (event) {
             if (event.key === 'Escape') {
-                // ESC tuşuna basıldığında yapılacak işlemler
-                console.log('ESC tuşuna basıldı');
-                // Örneğin, bir modal kapatma işlemi
-                // this.closeModal();
-              }
+                if (this.showSettingsModal) {
+                    this.closeSettingsModal();
+                } else if (this.showSearchModal) {
+                    this.closeSearchModal();
+                } else if (this.showSlashMenu) {
+                    this.showSlashMenu = false;
+                } else if (this.showEmojiPicker) {
+                    this.showEmojiPicker = false;
+                } else if (this.showSelfDestructMenu) {
+                    this.showSelfDestructMenu = false;
+                } else if (this.showInChatSearch) {
+                    this.closeInChatSearch();
+                } else if (this.replyingToMessage) {
+                    this.cancelReply();
+                } else if (this.editingMessage) {
+                    this.cancelEdit();
+                } else if (this.settingsBoxVis) {
+                    this.settingsBoxVis = false;
+                }
+            }
         },
         toggleForm() {
             this.showLogin = !this.showLogin; // Toggle form between login and register
@@ -347,6 +385,8 @@ createApp({
                 const msgId = message.Id || message.id || (rawContent && rawContent.id);
                 const replyToMessage = message.ReplyToMessage || message.replyToMessage || (rawContent && rawContent.replyToMessage);
                 const replyToMessageId = message.ReplyToMessageId || message.replyToMessageId || (rawContent && rawContent.replyToMessageId);
+                const metadataJson = message.MetadataJson || message.metadataJson || (rawContent && (rawContent.metadataJson || rawContent.MetadataJson)) || null;
+                const expiresAt = message.ExpiresAt || message.expiresAt || (rawContent && (rawContent.expiresAt || rawContent.ExpiresAt)) || null;
 
                 if (senderId == this.selectedUserId) {
                     var item = {
@@ -358,6 +398,8 @@ createApp({
                         "status": rawContent ? rawContent.status : (message.status || 0),
                         "type": rawContent ? rawContent.type : (message.type || 0),
                         "fileUrl": rawContent ? rawContent.fileUrl : message.fileUrl,
+                        "metadataJson": metadataJson,
+                        "expiresAt": expiresAt,
                         "replyToMessageId": replyToMessageId,
                         "replyToMessage": replyToMessage,
                         "reactions": rawContent && rawContent.reactions ? rawContent.reactions : {},
@@ -379,11 +421,7 @@ createApp({
                         });
                     }
                     this.sendSeen(item.senderId, 2);
-                    setTimeout(() => {
-                        if (this.$refs.msgDiv) {
-                            this.$refs.msgDiv.scrollTop = this.$refs.msgDiv.scrollHeight;
-                        }
-                    }, 50);
+                    this.scrollToBottom(true);
                 } else {
                     const contentStr = rawContent ? (rawContent.content || '') : (message.content || '');
                     if (!this.isPageVisible()) {
@@ -400,11 +438,22 @@ createApp({
                     const lastGroup = this.messages[this.messages.length - 1];
                     if (lastGroup && lastGroup.messages && lastGroup.messages.length) {
                         const lastMsg = lastGroup.messages[lastGroup.messages.length - 1];
-                        if (lastMsg && (!lastMsg.id || lastMsg.id === 0)) {
-                            lastMsg.id = ack.id || ack.Id;
-                        }
-                        if (ack.replyToMessage || ack.ReplyToMessage) {
-                            lastMsg.replyToMessage = ack.replyToMessage || ack.ReplyToMessage;
+                        if (lastMsg) {
+                            if (!lastMsg.id || lastMsg.id === 0) {
+                                lastMsg.id = ack.id || ack.Id;
+                            }
+                            if (ack.content || ack.Content) {
+                                lastMsg.content = ack.content || ack.Content;
+                            }
+                            if (ack.type !== undefined || ack.Type !== undefined) {
+                                lastMsg.type = ack.type !== undefined ? ack.type : ack.Type;
+                            }
+                            if (ack.metadataJson || ack.MetadataJson) {
+                                lastMsg.metadataJson = ack.metadataJson || ack.MetadataJson;
+                            }
+                            if (ack.replyToMessage || ack.ReplyToMessage) {
+                                lastMsg.replyToMessage = ack.replyToMessage || ack.ReplyToMessage;
+                            }
                         }
                     }
                 }
@@ -492,7 +541,54 @@ createApp({
                 this.setLastMessage(this.selectedUserId, data.content || "⚡ Dürtme gönderildi!");
             });
 
-            // Phase 5: XOX Oyun Güncellemesi
+            // Phase 5: Yeni Oyun Başlatıldığında Anlık Gösterim (XOX & Taş-Kağıt-Makas)
+            this.connection.on('ReceiveGameStarted', (data) => {
+                const msgId = data.id || data.Id;
+                const senderId = data.senderId || data.SenderId;
+                const receiverId = data.receiverId || data.ReceiverId;
+                const content = data.content || data.Content || '🎮 Oyun Başladı!';
+                const metadataJson = data.metadataJson || data.MetadataJson;
+                const timestamp = data.timestamp || data.Timestamp || new Date();
+                const peerId = senderId == this.myuser.sub ? receiverId : senderId;
+
+                if (peerId == this.selectedUserId) {
+                    // Aynı id'li oyun kartı zaten eklendiyse tekrar ekleme
+                    const alreadyExists = this.messages.some(g => g && g.messages && g.messages.some(m => m.id == msgId));
+                    if (!alreadyExists) {
+                        const gameItem = {
+                            id: msgId,
+                            senderId: senderId,
+                            receiverId: receiverId,
+                            content: content,
+                            timestamp: timestamp,
+                            status: senderId == this.myuser.sub ? 0 : 2,
+                            type: 6,
+                            metadataJson: metadataJson,
+                            reactions: {},
+                            showReactionPicker: false,
+                            isHovered: false
+                        };
+                        if (this.messages.length && this.messages[this.messages.length - 1].senderId == senderId) {
+                            this.messages[this.messages.length - 1].messages.push(gameItem);
+                        } else {
+                            this.messages.push({
+                                senderId: senderId,
+                                messages: [gameItem]
+                            });
+                        }
+                    }
+                    if (senderId != this.myuser.sub) {
+                        this.sendSeen(senderId, 2);
+                    }
+                    this.scrollToBottom(true);
+                } else if (senderId != this.myuser.sub) {
+                    this.sendSeen(senderId, 1);
+                    this.setNotMessageCount(senderId, true);
+                }
+                this.setLastMessage(peerId, content);
+            });
+
+            // Phase 5: XOX ve Taş-Kağıt-Makas Oyun Güncellemesi
             this.connection.on('ReceiveGameUpdate', (data) => {
                 const msgId = data.messageId || data.MessageId;
                 const state = data.state || data.State;
@@ -507,9 +603,11 @@ createApp({
                         });
                     }
                 });
-                if (state && state.winner && state.winner !== 'Draw') {
+                const winner = state && (state.winner || state.Winner);
+                if (winner && winner !== 'Draw') {
                     this.triggerConfetti();
                 }
+                this.scrollToBottom(true);
             });
 
             // Phase 5: Süresi Dolan Mesaj Bildirimi
@@ -694,6 +792,59 @@ createApp({
                 return bTimestamp - aTimestamp;
             });
         },
+        onMessageInputKeydown(event) {
+            if (this.showSlashMenu && this.filteredSlashCommands.length > 0) {
+                if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    this.slashSelectedIndex = (this.slashSelectedIndex + 1) % this.filteredSlashCommands.length;
+                    return;
+                }
+                if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    this.slashSelectedIndex = (this.slashSelectedIndex - 1 + this.filteredSlashCommands.length) % this.filteredSlashCommands.length;
+                    return;
+                }
+                if (event.key === 'Tab') {
+                    event.preventDefault();
+                    const selected = this.filteredSlashCommands[this.slashSelectedIndex];
+                    if (selected) this.selectSlashCommand(selected, false);
+                    return;
+                }
+                if (event.key === 'Enter') {
+                    const selected = this.filteredSlashCommands[this.slashSelectedIndex];
+                    const trimmed = (this.messageText || '').trim();
+                    // Eğer kullanıcı tam komutu yazmadıysa (ör. "/z" veya sadece "/") listedeki seçili komutu uygula
+                    if (selected && trimmed.toLowerCase() !== selected.cmd.toLowerCase() && !trimmed.includes(' ')) {
+                        event.preventDefault();
+                        this.selectSlashCommand(selected, !selected.needsArg);
+                        return;
+                    }
+                }
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    this.showSlashMenu = false;
+                    return;
+                }
+            }
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                this.handleFooterSend();
+            }
+        },
+        selectSlashCommand(cmdObj, executeNow = false) {
+            if (!cmdObj) return;
+            this.showSlashMenu = false;
+            if (cmdObj.needsArg && !executeNow) {
+                this.messageText = cmdObj.cmd + ' ';
+                this.$nextTick(() => {
+                    const input = document.getElementById('message');
+                    if (input) input.focus();
+                });
+            } else {
+                this.messageText = cmdObj.cmd;
+                this.sendMessage();
+            }
+        },
         async handleFooterSend() {
             if (this.editingMessage) {
                 await this.commitEdit();
@@ -703,8 +854,29 @@ createApp({
         },
         async sendMessage() {
             if (!this.messageText || !this.messageText.trim()) return;
-            this.addMessage(this.messageText);
+            const text = this.messageText.trim();
+            const lower = text.toLowerCase();
+            this.showSlashMenu = false;
+
+            // Özel aksiyon komutlarını doğrudan ilgili Hub metoduna yönlendir
+            if (lower === '/xox') {
+                this.messageText = '';
+                await this.startXoxGame();
+                return;
+            }
+            if (lower === '/tkm' || lower === '/taskagitmakas') {
+                this.messageText = '';
+                await this.startRpsGame();
+                return;
+            }
+            if (lower === '/durt' || lower === '/dürt') {
+                this.messageText = '';
+                await this.sendBuzz();
+                return;
+            }
+
             this.messageText = '';
+            await this.addMessage(text);
         },
         async addMessage(messageText, type = 0, fileUrl) {
             if (this.connection && messageText) {
@@ -744,6 +916,7 @@ createApp({
                         "status": msg.Status,
                         "type": msg.Type,
                         "fileUrl": msg.FileUrl,
+                        "metadataJson": null,
                         "replyToMessageId": replyId,
                         "replyToMessage": replySummary,
                         "reactions": {},
@@ -756,24 +929,39 @@ createApp({
                         "showReactionPicker": false,
                         "isHovered": false
                     };
+                    let reactiveItem = null;
                     if (this.messages && this.messages.length && this.messages[this.messages.length - 1].senderId == msg.SenderId) {
-                        this.messages[this.messages.length - 1].messages.push(item);
+                        const groupMsgs = this.messages[this.messages.length - 1].messages;
+                        groupMsgs.push(item);
+                        reactiveItem = groupMsgs[groupMsgs.length - 1];
                     } else {
                         this.messages.push({
                             senderId: msg.SenderId,
                             messages: [item]
                         });
+                        const lastGrp = this.messages[this.messages.length - 1];
+                        reactiveItem = lastGrp.messages[lastGrp.messages.length - 1];
                     }
                     this.setLastMessage(this.selectedUserId, msg.Content);
+                    this.scrollToBottom(true);
+
                     const savedMsg = await this.connection.invoke('SendMessage', msg);
-                    if (savedMsg && (savedMsg.id || savedMsg.Id)) {
-                        item.id = savedMsg.id || savedMsg.Id;
-                    }
-                    setTimeout(() => {
-                        if (this.$refs.msgDiv) {
-                            this.$refs.msgDiv.scrollTop = this.$refs.msgDiv.scrollHeight; 
+                    if (savedMsg && reactiveItem) {
+                        if (savedMsg.id || savedMsg.Id) {
+                            reactiveItem.id = savedMsg.id || savedMsg.Id;
                         }
-                    }, 50);
+                        if (savedMsg.content || savedMsg.Content) {
+                            reactiveItem.content = savedMsg.content || savedMsg.Content;
+                            this.setLastMessage(this.selectedUserId, reactiveItem.content);
+                        }
+                        if (savedMsg.type !== undefined || savedMsg.Type !== undefined) {
+                            reactiveItem.type = savedMsg.type !== undefined ? savedMsg.type : savedMsg.Type;
+                        }
+                        if (savedMsg.metadataJson || savedMsg.MetadataJson) {
+                            reactiveItem.metadataJson = savedMsg.metadataJson || savedMsg.MetadataJson;
+                        }
+                    }
+                    this.scrollToBottom(true);
                 } catch (err) {
                     console.error('SendMessage error: ', err);
                 }
@@ -1069,6 +1257,7 @@ createApp({
             this.searchActiveTab = 'search';
             this.searchQuery = '';
             this.searchResults = [];
+            this.loadFriendRequests();
             this.$nextTick(() => {
                 if (this.$refs.searchInput) {
                     this.$refs.searchInput.focus();
@@ -1078,6 +1267,13 @@ createApp({
         openSearchModalWithTab(tab) {
             this.openSearchModal();
             this.searchActiveTab = tab;
+            if (tab === 'requests') {
+                this.loadFriendRequests();
+            }
+        },
+        switchToRequestsTab() {
+            this.searchActiveTab = 'requests';
+            this.loadFriendRequests();
         },
         closeSearchModal() {
             this.showSearchModal = false;
@@ -1132,6 +1328,7 @@ createApp({
                         found.hasPendingOutgoing = true;
                         found.pendingRequestId = data.id || data.Id;
                     }
+                    this.loadFriendRequests();
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
@@ -1307,7 +1504,7 @@ createApp({
             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         },
         scrollToBottom(smooth = true) {
-            this.$nextTick(() => {
+            const doScroll = () => {
                 if (this.$refs.msgDiv) {
                     this.$refs.msgDiv.scrollTo({
                         top: this.$refs.msgDiv.scrollHeight,
@@ -1315,6 +1512,11 @@ createApp({
                     });
                     this.showScrollBottomBtn = false;
                 }
+            };
+            this.$nextTick(() => {
+                doScroll();
+                setTimeout(doScroll, 80);
+                setTimeout(doScroll, 220);
             });
         },
         installPWA() {
@@ -1448,22 +1650,33 @@ createApp({
                 await this.connection.invoke('SendSeen', userId.toString(), messageStatus);
             }
         },
-        async  loadFriendRequests() {
-            const response = await fetch('/api/FriendRequest/GetFriendRequestByReceiverId/' + this.myuser.sub, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                    'Content-Type': 'application/json'
+        async loadFriendRequests() {
+            const myId = this.myuser && (this.myuser.sub || this.myuser.id) ? (this.myuser.sub || this.myuser.id) : 0;
+            const headers = {
+                'Authorization': `Bearer ${this.token}`,
+                'Content-Type': 'application/json'
+            };
+            try {
+                const [incomingRes, outgoingRes] = await Promise.all([
+                    fetch('/api/FriendRequest/GetFriendRequestByReceiverId/' + myId, { method: 'GET', headers }),
+                    fetch('/api/FriendRequest/GetFriendRequestBySenderId/' + myId, { method: 'GET', headers })
+                ]);
+
+                if (incomingRes.status === 401 || outgoingRes.status === 401) {
+                    this.logout();
+                    return;
                 }
-            });
-            if (response.ok) {
-                this.friendRequests = await response.json();    
-            } else {
-                if(response.status == 401) {
-                    logout();
+
+                if (incomingRes.ok) {
+                    const incData = await incomingRes.json();
+                    this.friendRequests = Array.isArray(incData) ? incData : [];
                 }
-                const error = await response.json();
-                alert('Failed to load users: ' + (error.message || 'Unknown error'));
+                if (outgoingRes.ok) {
+                    const outData = await outgoingRes.json();
+                    this.sentFriendRequests = Array.isArray(outData) ? outData : [];
+                }
+            } catch (err) {
+                console.error('Arkadaşlık istekleri yüklenemedi:', err);
             }
         },
         timeAgo(isoDateString) {
@@ -1542,7 +1755,12 @@ createApp({
             }
         },
         onImageLoad() {
-            // this.$refs.msgDiv.scrollTop = this.$refs.msgDiv.scrollHeight; 
+            const targetDiv = this.$refs.msgDiv;
+            if (!targetDiv) return;
+            const distFromBottom = targetDiv.scrollHeight - targetDiv.scrollTop - targetDiv.clientHeight;
+            if (page <= 2 || distFromBottom < 450) {
+                targetDiv.scrollTop = targetDiv.scrollHeight;
+            }
         },
         downloadFile(fileUrl) {
             const link = document.createElement('a');
@@ -1667,8 +1885,30 @@ createApp({
             }
         },
 
-        // 3. Reactions
+        // 3. Reactions & Hover Bridge
+        onMessageMouseEnter(msg) {
+            if (!msg) return;
+            if (msg._hoverTimer) {
+                clearTimeout(msg._hoverTimer);
+                msg._hoverTimer = null;
+            }
+            msg.isHovered = true;
+        },
+        onMessageMouseLeave(msg) {
+            if (!msg) return;
+            if (msg._hoverTimer) clearTimeout(msg._hoverTimer);
+            msg._hoverTimer = setTimeout(() => {
+                msg.isHovered = false;
+                msg.showReactionPicker = false;
+                msg._hoverTimer = null;
+            }, 180);
+        },
         toggleQuickReactPicker(msg) {
+            if (msg._hoverTimer) {
+                clearTimeout(msg._hoverTimer);
+                msg._hoverTimer = null;
+            }
+            msg.isHovered = true;
             msg.showReactionPicker = !msg.showReactionPicker;
         },
         async toggleReaction(msg, emoji) {
@@ -2085,7 +2325,17 @@ createApp({
             }
         },
 
-        // 2. XOX Mini Oyunu
+        // 2. XOX ve Taş-Kağıt-Makas Mini Oyunları
+        getGameType(msg) {
+            if (!msg || !msg.metadataJson) return 'xox';
+            try {
+                const state = typeof msg.metadataJson === 'object' ? msg.metadataJson : JSON.parse(msg.metadataJson);
+                return (state && (state.gameType || state.GameType)) || 'xox';
+            } catch {
+                return 'xox';
+            }
+        },
+
         async startXoxGame() {
             if (!this.selectedUserId || !this.connection) return;
             try {
@@ -2151,6 +2401,100 @@ createApp({
                 await this.connection.invoke('MakeXoxMove', msg.id, cellIndex);
             } catch (err) {
                 const errMsg = err && err.message ? err.message : 'Hamle yapılamadı.';
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'info',
+                    title: errMsg,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+        },
+
+        // 2b. Taş - Kağıt - Makas (Best of 3) Mini Oyunu
+        async startRpsGame() {
+            if (!this.selectedUserId || !this.connection) return;
+            try {
+                await this.connection.invoke('StartRpsGame', this.selectedUserId.toString());
+            } catch (err) {
+                console.error('StartRpsGame error:', err);
+                Swal.fire('Hata', 'Taş-Kağıt-Makas başlatılamadı.', 'error');
+            }
+        },
+
+        getRpsState(msg) {
+            const s = this.getXoxState(msg);
+            if (!s) {
+                return {
+                    player1Id: 0,
+                    player2Id: 0,
+                    player1Name: 'Oyuncu 1',
+                    player2Name: 'Oyuncu 2',
+                    player1Score: 0,
+                    player2Score: 0,
+                    round: 1,
+                    targetScore: 3,
+                    status: 'playing'
+                };
+            }
+            return {
+                player1Id: s.player1Id ?? s.Player1Id,
+                player2Id: s.player2Id ?? s.Player2Id,
+                player1Name: s.player1Name || s.Player1Name || 'Oyuncu 1',
+                player2Name: s.player2Name || s.Player2Name || 'Oyuncu 2',
+                player1Choice: s.player1Choice ?? s.Player1Choice ?? null,
+                player2Choice: s.player2Choice ?? s.Player2Choice ?? null,
+                player1Score: s.player1Score ?? s.Player1Score ?? 0,
+                player2Score: s.player2Score ?? s.Player2Score ?? 0,
+                round: s.round ?? s.Round ?? 1,
+                targetScore: s.targetScore ?? s.TargetScore ?? 3,
+                lastRoundSummary: s.lastRoundSummary ?? s.LastRoundSummary ?? null,
+                winner: s.winner ?? s.Winner ?? null,
+                status: s.status || s.Status || 'playing'
+            };
+        },
+
+        getMyRpsChoice(msg) {
+            const state = this.getRpsState(msg);
+            if (!state) return null;
+            const myId = parseInt(this.myuser.sub);
+            if (state.player1Id === myId) return state.player1Choice;
+            if (state.player2Id === myId) return state.player2Choice;
+            return null;
+        },
+
+        getRpsStatusText(msg) {
+            const state = this.getRpsState(msg);
+            if (!state) return '';
+            if (state.status === 'finished') {
+                return `🏆 Kazanan: ${state.winner}! (${state.player1Score} - ${state.player2Score})`;
+            }
+            const myId = parseInt(this.myuser.sub);
+            const isP1 = state.player1Id === myId;
+            const myChoice = isP1 ? state.player1Choice : state.player2Choice;
+            const peerChoice = isP1 ? state.player2Choice : state.player1Choice;
+            const peerName = isP1 ? state.player2Name : state.player1Name;
+
+            if (myChoice && !peerChoice) {
+                return `✅ Seçiminiz kaydedildi! ${peerName} bekleniyor...`;
+            }
+            if (!myChoice && peerChoice) {
+                return `🔥 ${peerName} hamlesini seçti! Sıra sizde!`;
+            }
+            return `Tur ${state.round} • 3 olan kazanır! Hamlenizi seçin:`;
+        },
+
+        async makeRpsMove(msg, choice) {
+            if (!this.connection || !msg.id) return;
+            const state = this.getRpsState(msg);
+            if (!state || state.status !== 'playing') return;
+            if (this.getMyRpsChoice(msg)) return;
+
+            try {
+                await this.connection.invoke('MakeRpsMove', msg.id, choice);
+            } catch (err) {
+                const errMsg = err && err.message ? err.message : 'Hamle gönderilemedi.';
                 Swal.fire({
                     toast: true,
                     position: 'top-end',

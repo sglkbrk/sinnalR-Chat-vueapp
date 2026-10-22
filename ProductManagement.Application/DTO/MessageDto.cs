@@ -60,4 +60,24 @@ namespace ProductManagement.Application.DTO
         public string Status { get; set; } = "playing";
         public int[]? WinningLine { get; set; }
     }
+
+    public class RpsGameState
+    {
+        public string GameType { get; set; } = "rps";
+        public int Player1Id { get; set; }
+        public int Player2Id { get; set; }
+        public string Player1Name { get; set; } = string.Empty;
+        public string Player2Name { get; set; } = string.Empty;
+        public string? Player1Choice { get; set; }
+        public string? Player2Choice { get; set; }
+        public int Player1Score { get; set; } = 0;
+        public int Player2Score { get; set; } = 0;
+        public int Round { get; set; } = 1;
+        public int TargetScore { get; set; } = 3;
+        public string? LastRoundPlayer1Choice { get; set; }
+        public string? LastRoundPlayer2Choice { get; set; }
+        public string? LastRoundSummary { get; set; }
+        public string? Winner { get; set; }
+        public string Status { get; set; } = "playing";
+    }
 }

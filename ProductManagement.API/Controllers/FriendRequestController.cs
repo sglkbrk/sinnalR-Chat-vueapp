@@ -38,13 +38,15 @@ namespace ProductManagement.API.Controllers
         [HttpGet("GetFriendRequestByReceiverId/{id}")]
         public IActionResult GetFriendRequestByReceiverId(int id)
         {
-            return Ok(_friendRequestService.GetFriendRequestByReceiverId(id));
+            int targetId = id > 0 ? id : GetCurrentUserId();
+            return Ok(_friendRequestService.GetFriendRequestByReceiverId(targetId));
         }
 
         [HttpGet("GetFriendRequestBySenderId/{id}")]
         public IActionResult GetFriendRequestBySenderId(int id)
         {
-            return Ok(_friendRequestService.GetFriendRequestBySenderId(id));
+            int targetId = id > 0 ? id : GetCurrentUserId();
+            return Ok(_friendRequestService.GetFriendRequestBySenderId(targetId));
         }
 
         public class SendFriendRequestInput
@@ -70,7 +72,14 @@ namespace ProductManagement.API.Controllers
         public IActionResult CancelFriendRequest(int id)
         {
             int currentUserId = GetCurrentUserId();
+            var req = _friendRequestService.GetFriendRequestById(id);
             _friendRequestService.CancelFriendRequest(id, currentUserId);
+            if (req != null)
+            {
+                _chatHub.Clients.User(req.ReceiverId.ToString()).SendAsync("ReceiveNotification", new Dictionary<string, string> {
+                    { "type", "refreshFriendRequests" }
+                });
+            }
             return Ok(ApiResponse.Ok());
         }
 
@@ -105,6 +114,9 @@ namespace ProductManagement.API.Controllers
                     { "id", friendRequest.ReceiverId.ToString() }
                 });
             }
+            _chatHub.Clients.User(friendRequest.SenderId.ToString()).SendAsync("ReceiveNotification", new Dictionary<string, string> {
+                { "type", "refreshFriendRequests" }
+            });
 
             return Ok(ApiResponse.Ok());
         }

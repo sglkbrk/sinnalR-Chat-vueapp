@@ -296,17 +296,6 @@ html {
   background: var(--active-conversation-bg);
   border-left: 4px solid var(--theme-color);
 }
-.msg.online:before {
-  content: "";
-  position: absolute;
-  background-color: #23be7e;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  border: 2px solid var(--theme-bg-color);
-  left: 50px;
-  bottom: 19px;
-}
 
 .msg-username {
   margin-bottom: 4px;
@@ -446,14 +435,15 @@ html {
 }
 .chat-msg-text {
   background-color: var(--chat-text-bg);
-  padding: 8px;
+  padding: 8px 12px;
   border-radius: 20px 20px 20px 0;
   line-height: 1.5;
   font-size: 14px;
   font-weight: 500;
   display: flex;
-  align-items: end;
-  
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
 }
 .chat-msg-text + .chat-msg-text {
   margin-top: 10px;
@@ -1770,9 +1760,14 @@ html {
 /* Modern Message Bubbles & Meta */
 .chat-msg-bubble-wrapper {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   position: relative;
   margin-bottom: 4px;
+}
+
+.owner .chat-msg-bubble-wrapper {
+  align-items: flex-end;
 }
 
 .chat-msg-text {
@@ -1780,19 +1775,30 @@ html {
   border-radius: 14px 14px 14px 2px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
   word-break: break-word;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  min-width: 90px;
 }
 
 .owner .chat-msg-text {
   border-radius: 14px 14px 2px 14px;
 }
 
+.chat-msg-body-row {
+  display: block;
+  width: 100%;
+  line-height: 1.45;
+}
+
 .chat-msg-meta {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 4px;
-  margin-left: 10px;
-  float: right;
-  margin-top: 4px;
+  margin-top: 2px;
+  align-self: flex-end;
 }
 
 .chat-msg-time {
@@ -2164,11 +2170,13 @@ html {
 /* Quoted (Replied) Message Box inside Bubble */
 .quoted-message-box {
   display: flex;
-  align-items: stretch;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
   background: rgba(0, 0, 0, 0.06);
   border-radius: 8px;
-  padding: 6px 10px;
-  margin-bottom: 6px;
+  padding: 5px 10px;
+  margin-bottom: 4px;
   cursor: pointer;
   border-left: 3px solid var(--theme-color);
   transition: background 0.15s;
@@ -2179,7 +2187,7 @@ html {
 }
 
 .owner .quoted-message-box {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.16);
   border-left-color: #ffffff;
 }
 
@@ -2191,13 +2199,15 @@ html {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  width: 100%;
 }
 
 .quoted-sender {
   font-size: 11px;
   font-weight: 700;
   color: var(--theme-color);
-  margin-bottom: 2px;
+  margin-bottom: 1px;
+  line-height: 1.2;
 }
 
 .owner .quoted-sender {
@@ -2210,13 +2220,15 @@ html {
   overflow: hidden;
   text-overflow: ellipsis;
   opacity: 0.9;
+  line-height: 1.3;
+  max-width: 260px;
 }
 
-/* Floating Action Icons on Message Hover */
+/* Floating Action Icons on Message Hover (with Invisible Hover Bridge) */
 .msg-actions-toolbar {
   position: absolute;
-  top: -18px;
-  right: 12px;
+  top: -15px;
+  right: 8px;
   display: none;
   align-items: center;
   gap: 4px;
@@ -2224,13 +2236,23 @@ html {
   border: 1px solid var(--border-color);
   border-radius: 20px;
   padding: 2px 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  z-index: 15;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+  z-index: 20;
+}
+
+/* Invisible hover bridge so moving the cursor from bubble to toolbar/popover never drops hover */
+.msg-actions-toolbar::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: -8px;
+  right: -8px;
+  height: 18px;
 }
 
 .owner .msg-actions-toolbar {
   right: auto;
-  left: 12px;
+  left: 8px;
 }
 
 .chat-msg-bubble-wrapper:hover .msg-actions-toolbar,
@@ -2262,17 +2284,32 @@ html {
 /* Quick Reactions Popover */
 .quick-reaction-popover {
   position: absolute;
-  top: -46px;
+  top: -48px;
+  left: 0;
   display: flex;
   align-items: center;
   gap: 6px;
   background: var(--theme-bg-color);
   border: 1px solid var(--border-color);
   border-radius: 24px;
-  padding: 4px 10px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
-  z-index: 25;
+  padding: 5px 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  z-index: 30;
   animation: popIn 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.owner .quick-reaction-popover {
+  left: auto;
+  right: 0;
+}
+
+.quick-reaction-popover::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 24px;
 }
 
 @keyframes popIn {
@@ -2695,3 +2732,227 @@ html {
   pointer-events: none;
   z-index: 9999;
 }
+
+/* ========================================================================== */
+/* Slash (/) Command Autocomplete Menu, RPS Mini-Game & Friend Request Titles */
+/* ========================================================================== */
+
+.requests-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--theme-color);
+  margin: 4px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Slash (/) Command Popup Menu */
+.slash-command-menu {
+  position: absolute;
+  bottom: 70px;
+  left: 16px;
+  right: 16px;
+  max-width: 420px;
+  background: var(--theme-bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+  z-index: 60;
+  overflow: hidden;
+  animation: slideUp 0.15s ease-out;
+}
+
+.slash-menu-header {
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--msg-message);
+  background: var(--input-bg);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.slash-command-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.slash-command-item:hover,
+.slash-command-item.active {
+  background: var(--button-bg-color);
+}
+
+.slash-cmd-icon {
+  font-size: 20px;
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.slash-cmd-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.slash-cmd-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--theme-color);
+  font-family: monospace;
+}
+
+.slash-cmd-desc {
+  font-size: 11.5px;
+  color: var(--msg-message);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Taş - Kağıt - Makas (RPS) Real-Time Mini Game */
+.rps-game-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--input-bg);
+  border-radius: 12px;
+  margin-top: 4px;
+  min-width: 235px;
+  user-select: none;
+  color: var(--body-color);
+}
+
+.rps-header {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--body-color);
+  text-align: center;
+}
+
+.rps-scoreboard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: var(--theme-bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 6px 10px;
+  box-sizing: border-box;
+  gap: 8px;
+}
+
+.rps-score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.rps-player-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--msg-message);
+  max-width: 85px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rps-player-pts {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--theme-color);
+}
+
+.rps-vs {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 8px;
+  background: var(--button-bg-color);
+  color: var(--theme-color);
+  white-space: nowrap;
+}
+
+.rps-round-summary {
+  font-size: 11.5px;
+  font-weight: 600;
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--body-color);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.rps-choices {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+.rps-choice-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 6px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--theme-bg-color);
+  color: var(--body-color);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.rps-choice-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--theme-color);
+  background: var(--button-bg-color);
+}
+
+.rps-choice-btn.selected {
+  border-color: var(--theme-color);
+  background: var(--button-bg-color);
+  box-shadow: 0 0 0 2px var(--theme-color);
+}
+
+.rps-choice-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.rps-emoji {
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.rps-label {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.rps-status-bar {
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--theme-color);
+}
+

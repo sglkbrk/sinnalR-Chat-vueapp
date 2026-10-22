@@ -93,8 +93,11 @@ public class ChatHub : Hub
             }
             else if (cmd == "/xox")
             {
-                await StartXoxGame(message.ReceiverId.ToString());
-                return message;
+                return await StartXoxGame(message.ReceiverId.ToString());
+            }
+            else if (cmd == "/tkm")
+            {
+                return await StartRpsGame(message.ReceiverId.ToString());
             }
             else if (cmd == "/durt")
             {
@@ -104,7 +107,12 @@ public class ChatHub : Hub
             else if (cmd == "/yardim")
             {
                 message.Type = messageType.CommandResult;
-                message.Content = "ℹ️ Kullanılabilir Komutlar:\n• /zar - 1-6 arası zar atar\n• /yazitura - Yazı/Tura atar\n• /rastgele 1-100 - Belirtilen aralıkta sayı üretir\n• /xox - XOX mini oyunu başlatır\n• /durt - Karşı tarafı dürter";
+                message.Content = "ℹ️ Kullanılabilir Komutlar:\n• /zar - 1-6 arası zar atar\n• /yazitura - Yazı/Tura atar\n• /rastgele 1-100 - Belirtilen aralıkta sayı üretir\n• /xox - XOX mini oyunu başlatır\n• /tkm - Taş-Kağıt-Makas düellosu başlatır\n• /durt - Karşı tarafı dürter\n• /spoiler metin - Gizli mesaj gönderir";
+            }
+            else if (cmd == "/spoiler" && parts.Length > 1)
+            {
+                var spoilerText = message.Content.Trim().Substring(8).Trim();
+                message.Content = $"||{spoilerText}||";
             }
         }
 
@@ -301,11 +309,11 @@ public class ChatHub : Hub
     }
 
     // Phase 5: XOX Mini Oyun Başlat
-    public async Task StartXoxGame(string ReceiverId)
+    public async Task<Message> StartXoxGame(string ReceiverId)
     {
         var senderIdStr = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
         var senderName = Context.User?.FindFirstValue(ClaimTypes.Name) ?? "Oyuncu 1";
-        if (string.IsNullOrEmpty(senderIdStr)) return;
+        if (string.IsNullOrEmpty(senderIdStr)) throw new HubException("Yetkisiz işlem.");
 
         var senderId = int.Parse(senderIdStr);
         var receiverId = int.Parse(ReceiverId);
@@ -318,14 +326,16 @@ public class ChatHub : Hub
             Name = senderName,
             SenderId = senderId,
             ReceiverId = receiverId,
-            Content = gameMessage,
+            Content = gameMessage.Content,
             MetadataJson = gameMessage.MetadataJson,
             Timestamp = gameMessage.Timestamp,
             Type = gameMessage.Type
         };
 
-        await Clients.User(ReceiverId).SendAsync("ReceiveMessage", payload);
-        await Clients.Caller.SendAsync("MessageSentAck", payload);
+        await Clients.User(ReceiverId).SendAsync("ReceiveGameStarted", payload);
+        await Clients.Caller.SendAsync("ReceiveGameStarted", payload);
+        await sendNotification(gameMessage);
+        return gameMessage;
     }
 
     // Phase 5: XOX Hamlesi Yap
@@ -338,6 +348,64 @@ public class ChatHub : Hub
         try
         {
             var (message, state) = await _messageService.MakeXoxMoveAsync(messageId, userId, cellIndex);
+
+            var updatePayload = new
+            {
+                MessageId = messageId,
+                Content = message.Content,
+                MetadataJson = message.MetadataJson,
+                State = state
+            };
+
+            await Clients.User(message.ReceiverId.ToString()).SendAsync("ReceiveGameUpdate", updatePayload);
+            await Clients.User(message.SenderId.ToString()).SendAsync("ReceiveGameUpdate", updatePayload);
+        }
+        catch (Exception ex)
+        {
+            throw new HubException(ex.Message);
+        }
+    }
+
+    // Phase 5: Taş-Kağıt-Makas (RPS) Mini Oyun Başlat
+    public async Task<Message> StartRpsGame(string ReceiverId)
+    {
+        var senderIdStr = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        var senderName = Context.User?.FindFirstValue(ClaimTypes.Name) ?? "Oyuncu 1";
+        if (string.IsNullOrEmpty(senderIdStr)) throw new HubException("Yetkisiz işlem.");
+
+        var senderId = int.Parse(senderIdStr);
+        var receiverId = int.Parse(ReceiverId);
+
+        var gameMessage = await _messageService.StartRpsGameAsync(senderId, receiverId, senderName, "Arkadaşınız");
+
+        var payload = new
+        {
+            Id = gameMessage.Id,
+            Name = senderName,
+            SenderId = senderId,
+            ReceiverId = receiverId,
+            Content = gameMessage.Content,
+            MetadataJson = gameMessage.MetadataJson,
+            Timestamp = gameMessage.Timestamp,
+            Type = gameMessage.Type
+        };
+
+        await Clients.User(ReceiverId).SendAsync("ReceiveGameStarted", payload);
+        await Clients.Caller.SendAsync("ReceiveGameStarted", payload);
+        await sendNotification(gameMessage);
+        return gameMessage;
+    }
+
+    // Phase 5: Taş-Kağıt-Makas Hamlesi Yap
+    public async Task MakeRpsMove(int messageId, string choice)
+    {
+        var userIdStr = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdStr)) return;
+
+        var userId = int.Parse(userIdStr);
+        try
+        {
+            var (message, state) = await _messageService.MakeRpsMoveAsync(messageId, userId, choice);
 
             var updatePayload = new
             {

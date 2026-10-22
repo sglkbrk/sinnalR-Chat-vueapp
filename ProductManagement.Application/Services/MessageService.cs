@@ -243,6 +243,15 @@ namespace ProductManagement.Application.Services
         // Phase 5: XOX Oyunu Başlat
         public async Task<Message> StartXoxGameAsync(int senderId, int receiverId, string senderName, string receiverName)
         {
+            if (string.IsNullOrWhiteSpace(receiverName) || receiverName == "Arkadaşınız")
+            {
+                var rUser = await _context.Users.FirstOrDefaultAsync(u => u.id == receiverId);
+                if (rUser != null && !string.IsNullOrWhiteSpace(rUser.Username))
+                {
+                    receiverName = rUser.Username;
+                }
+            }
+
             var gameState = new XoxGameState
             {
                 GameType = "xox",
@@ -268,6 +277,137 @@ namespace ProductManagement.Application.Services
             _context.Message.Add(message);
             await _context.SaveChangesAsync();
             return message;
+        }
+
+        // Phase 5: Taş-Kağıt-Makas (RPS) Oyunu Başlat
+        public async Task<Message> StartRpsGameAsync(int senderId, int receiverId, string senderName, string receiverName)
+        {
+            if (string.IsNullOrWhiteSpace(receiverName) || receiverName == "Arkadaşınız")
+            {
+                var rUser = await _context.Users.FirstOrDefaultAsync(u => u.id == receiverId);
+                if (rUser != null && !string.IsNullOrWhiteSpace(rUser.Username))
+                {
+                    receiverName = rUser.Username;
+                }
+            }
+
+            var gameState = new RpsGameState
+            {
+                GameType = "rps",
+                Player1Id = senderId,
+                Player2Id = receiverId,
+                Player1Name = senderName,
+                Player2Name = receiverName,
+                Round = 1,
+                TargetScore = 3,
+                Status = "playing"
+            };
+
+            var message = new Message
+            {
+                SenderId = senderId,
+                ReceiverId = receiverId,
+                Content = $"🪨📄✂️ Taş-Kağıt-Makas: {senderName} vs {receiverName}",
+                Type = messageType.Game,
+                Timestamp = DateTime.UtcNow,
+                MetadataJson = JsonSerializer.Serialize(gameState)
+            };
+
+            _context.Message.Add(message);
+            await _context.SaveChangesAsync();
+            return message;
+        }
+
+        // Phase 5: Taş-Kağıt-Makas Hamlesi Yap
+        public async Task<(Message message, RpsGameState state)> MakeRpsMoveAsync(int messageId, int userId, string choice)
+        {
+            var message = await _context.Message.FirstOrDefaultAsync(m => m.Id == messageId);
+            if (message == null) throw new KeyNotFoundException("Oyun mesajı bulunamadı.");
+            if (message.Type != messageType.Game) throw new InvalidOperationException("Bu mesaj bir oyun mesajı değil.");
+
+            var normalized = (choice ?? "").Trim().ToLowerInvariant();
+            if (normalized != "rock" && normalized != "paper" && normalized != "scissors")
+            {
+                throw new ArgumentException("Geçersiz seçim. Sadece taş, kağıt veya makas seçilebilir.");
+            }
+
+            var state = JsonSerializer.Deserialize<RpsGameState>(message.MetadataJson ?? "{}") ?? new RpsGameState();
+            if (state.Status != "playing") throw new InvalidOperationException("Bu oyun zaten sonuçlanmış.");
+
+            if (userId == state.Player1Id)
+            {
+                if (!string.IsNullOrEmpty(state.Player1Choice))
+                    throw new InvalidOperationException("Bu tur için zaten seçim yaptınız.");
+                state.Player1Choice = normalized;
+            }
+            else if (userId == state.Player2Id)
+            {
+                if (!string.IsNullOrEmpty(state.Player2Choice))
+                    throw new InvalidOperationException("Bu tur için zaten seçim yaptınız.");
+                state.Player2Choice = normalized;
+            }
+            else
+            {
+                throw new UnauthorizedAccessException("Bu oyunun oyuncusu değilsiniz.");
+            }
+
+            // İki oyuncu da seçimini yaptıysa turu hesapla
+            if (!string.IsNullOrEmpty(state.Player1Choice) && !string.IsNullOrEmpty(state.Player2Choice))
+            {
+                var c1 = state.Player1Choice;
+                var c2 = state.Player2Choice;
+                state.LastRoundPlayer1Choice = c1;
+                state.LastRoundPlayer2Choice = c2;
+
+                string EmojiOf(string c) => c switch
+                {
+                    "rock" => "🪨 Taş",
+                    "paper" => "📄 Kağıt",
+                    "scissors" => "✂️ Makas",
+                    _ => c
+                };
+
+                if (c1 == c2)
+                {
+                    state.LastRoundSummary = $"🤝 {state.Round}. Tur Berabere! ({EmojiOf(c1)} vs {EmojiOf(c2)})";
+                }
+                else if ((c1 == "rock" && c2 == "scissors") ||
+                         (c1 == "paper" && c2 == "rock") ||
+                         (c1 == "scissors" && c2 == "paper"))
+                {
+                    state.Player1Score++;
+                    state.LastRoundSummary = $"🔥 {state.Round}. Turu {state.Player1Name} kazandı! ({EmojiOf(c1)} vs {EmojiOf(c2)})";
+                }
+                else
+                {
+                    state.Player2Score++;
+                    state.LastRoundSummary = $"🔥 {state.Round}. Turu {state.Player2Name} kazandı! ({EmojiOf(c1)} vs {EmojiOf(c2)})";
+                }
+
+                // Oyun bitiş kontrolü
+                if (state.Player1Score >= state.TargetScore)
+                {
+                    state.Status = "finished";
+                    state.Winner = state.Player1Name;
+                    message.Content = $"🏆 TKM: {state.Player1Name} ({state.Player1Score}-{state.Player2Score}) kazandı!";
+                }
+                else if (state.Player2Score >= state.TargetScore)
+                {
+                    state.Status = "finished";
+                    state.Winner = state.Player2Name;
+                    message.Content = $"🏆 TKM: {state.Player2Name} ({state.Player2Score}-{state.Player1Score}) kazandı!";
+                }
+                else
+                {
+                    state.Round++;
+                    state.Player1Choice = null;
+                    state.Player2Choice = null;
+                }
+            }
+
+            message.MetadataJson = JsonSerializer.Serialize(state);
+            await _context.SaveChangesAsync();
+            return (message, state);
         }
 
         // Phase 5: XOX Hamlesi Yap
