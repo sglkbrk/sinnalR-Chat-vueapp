@@ -22,7 +22,7 @@
 
   <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
-  <link rel="stylesheet" href="./style.css?v=2.0.3">
+  <link rel="stylesheet" href="./style.css?v=2.0.5">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
@@ -301,13 +301,13 @@
             <span>{{ getDateBadge(msgGroup.messages[0].timestamp) }}</span>
           </div>
 
-          <div :class="['chat-msg', msgGroup.senderId == myuser.sub ? 'owner' : '']"> 
+          <div :class="['chat-msg', msgGroup.senderId == myuser.sub ? 'owner' : '', msgGroup.messages.some(m => m.type == 6) ? 'is-game-row' : '']"> 
             <div class="chat-msg-profile" v-if="msgGroup.senderId != myuser.sub">
               <img class="chat-msg-img" :src="getSenderAvatar(msgGroup.senderId)" alt="" />
             </div>
             <div class="chat-msg-content">
               <div :id="'msg-bubble-' + msg.id" 
-                   :class="['chat-msg-bubble-wrapper', (msg.isHovered || msg.showReactionPicker) ? 'has-active-popover' : '']" 
+                   :class="['chat-msg-bubble-wrapper', (msg.isHovered || msg.showReactionPicker) ? 'has-active-popover' : '', msg.type == 6 ? 'chat-msg-game-wrapper' : '']" 
                    v-for="msg in msgGroup.messages" :key="msg.id"
                    @mouseenter="onMessageMouseEnter(msg)"
                    @mouseleave="onMessageMouseLeave(msg)">
@@ -340,7 +340,7 @@
                 </div>
 
                 <!-- Message Body Bubble -->
-                <div :class="['chat-msg-text', msg.isDeleted ? 'delete-msg' : '']">
+                <div :class="['chat-msg-text', msg.isDeleted ? 'delete-msg' : '', msg.type == 6 ? 'game-card-bubble' : '']">
                   <!-- Quoted Message Box (Reply) -->
                   <div v-if="msg.replyToMessage && !msg.isDeleted" class="quoted-message-box" @click.stop="scrollToMessage(msg.replyToMessage.id)">
                     <div class="quoted-content">
@@ -402,46 +402,158 @@
 
                     <!-- Type 6: Mini Oyunlar (Taş-Kağıt-Makas & XOX) -->
                     <div v-if="msg.type == 6 && getGameType(msg) === 'rps'" class="rps-game-box">
-                      <div class="rps-header">
-                        <span>🪨📄✂️ Taş-Kağıt-Makas</span>
-                        <span class="rps-round-badge" v-if="getRpsState(msg) && getRpsState(msg).status === 'playing'">{{ getRpsState(msg).round }}. Tur</span>
-                        <span class="rps-round-badge finished" v-else>Bitti</span>
-                      </div>
-                      <div class="rps-scoreboard" v-if="getRpsState(msg)">
-                        <div class="rps-player-score">
-                          <span class="rps-p-name">{{ getRpsState(msg).player1Name }}</span>
-                          <span class="rps-p-pts">{{ getRpsState(msg).player1Score }}</span>
-                          <span class="rps-p-status" v-if="getRpsState(msg).status === 'playing'">
-                            {{ getRpsState(msg).player1Choice ? '✅ Seçti' : '⏳ Bekliyor' }}
-                          </span>
+                      <!-- 1. Header Bar: Game Name & Current Round Badge -->
+                      <div class="rps-card-topbar">
+                        <div class="rps-badge-title">
+                          <span class="rps-icon-pulse">🎮</span>
+                          <span class="rps-title-text">TAŞ • KAĞIT • MAKAS</span>
                         </div>
-                        <div class="rps-vs">VS</div>
-                        <div class="rps-player-score">
-                          <span class="rps-p-name">{{ getRpsState(msg).player2Name }}</span>
-                          <span class="rps-p-pts">{{ getRpsState(msg).player2Score }}</span>
-                          <span class="rps-p-status" v-if="getRpsState(msg).status === 'playing'">
-                            {{ getRpsState(msg).player2Choice ? '✅ Seçti' : '⏳ Bekliyor' }}
-                          </span>
+                        <div class="rps-round-pill" :class="{ 'finished': getRpsState(msg).status === 'finished' }">
+                          <template v-if="getRpsState(msg).status === 'playing'">
+                            <i class="fas fa-fire"></i> {{ getRpsState(msg).round }}. TUR (Hedef: 3)
+                          </template>
+                          <template v-else>
+                            <i class="fas fa-trophy"></i> MAÇ BİTTİ
+                          </template>
                         </div>
                       </div>
-                      <div v-if="getRpsState(msg) && getRpsState(msg).lastRoundSummary" class="rps-last-round">
-                        {{ getRpsState(msg).lastRoundSummary }}
+
+                      <!-- 2. Dual Player Scoreboard Arena -->
+                      <div class="rps-scoreboard-arena">
+                        <!-- Player 1 Box -->
+                        <div class="rps-player-card" :class="{ 'is-me': getRpsState(msg).player1Id == myuser.sub, 'winner-card': getRpsState(msg).winner === getRpsState(msg).player1Name }">
+                          <div class="rps-avatar-wrap">
+                            <img :src="getSenderAvatar(getRpsState(msg).player1Id)" class="rps-avatar-img" />
+                            <span v-if="getRpsState(msg).player1Id == myuser.sub" class="rps-me-tag">SEN</span>
+                          </div>
+                          <div class="rps-p-name-label" :title="getRpsState(msg).player1Name">
+                            {{ getRpsPlayer1Name(msg) }}
+                          </div>
+                          <div class="rps-score-display">
+                            <span class="rps-score-num">{{ getRpsState(msg).player1Score }}</span>
+                            <span class="rps-score-total">/ 3</span>
+                          </div>
+                          <div class="rps-score-pips">
+                            <span class="rps-pip" :class="{ 'active': getRpsState(msg).player1Score >= 1 }"></span>
+                            <span class="rps-pip" :class="{ 'active': getRpsState(msg).player1Score >= 2 }"></span>
+                            <span class="rps-pip" :class="{ 'active': getRpsState(msg).player1Score >= 3 }"></span>
+                          </div>
+                          <div class="rps-player-turn-state">
+                            <span v-if="getRpsState(msg).status === 'finished'" class="rps-choice-reveal">
+                              {{ getRpsChoiceName(getRpsState(msg).lastRoundPlayer1Choice) || '—' }}
+                            </span>
+                            <span v-else-if="getRpsState(msg).player1Id == myuser.sub" class="rps-turn-badge" :class="getMyRpsChoice(msg) ? 'ready' : 'waiting'">
+                              {{ getMyRpsChoice(msg) ? ('✅ ' + getRpsChoiceName(getMyRpsChoice(msg))) : '⏳ Seçim yap' }}
+                            </span>
+                            <span v-else class="rps-turn-badge" :class="getRpsState(msg).player1Choice ? 'ready' : 'waiting'">
+                              {{ getRpsState(msg).player1Choice ? '✅ Hamle Hazır' : '⏳ Bekleniyor' }}
+                            </span>
+                          </div>
+                        </div>
+
+                        <!-- Center VS Badge -->
+                        <div class="rps-vs-arena-center">
+                          <div class="rps-vs-circle">VS</div>
+                          <div class="rps-target-subtext">3 Puan Alan</div>
+                        </div>
+
+                        <!-- Player 2 Box -->
+                        <div class="rps-player-card" :class="{ 'is-me': getRpsState(msg).player2Id == myuser.sub, 'winner-card': getRpsState(msg).winner === getRpsState(msg).player2Name }">
+                          <div class="rps-avatar-wrap">
+                            <img :src="getSenderAvatar(getRpsState(msg).player2Id)" class="rps-avatar-img" />
+                            <span v-if="getRpsState(msg).player2Id == myuser.sub" class="rps-me-tag">SEN</span>
+                          </div>
+                          <div class="rps-p-name-label" :title="getRpsState(msg).player2Name">
+                            {{ getRpsPlayer2Name(msg) }}
+                          </div>
+                          <div class="rps-score-display">
+                            <span class="rps-score-num">{{ getRpsState(msg).player2Score }}</span>
+                            <span class="rps-score-total">/ 3</span>
+                          </div>
+                          <div class="rps-score-pips">
+                            <span class="rps-pip" :class="{ 'active': getRpsState(msg).player2Score >= 1 }"></span>
+                            <span class="rps-pip" :class="{ 'active': getRpsState(msg).player2Score >= 2 }"></span>
+                            <span class="rps-pip" :class="{ 'active': getRpsState(msg).player2Score >= 3 }"></span>
+                          </div>
+                          <div class="rps-player-turn-state">
+                            <span v-if="getRpsState(msg).status === 'finished'" class="rps-choice-reveal">
+                              {{ getRpsChoiceName(getRpsState(msg).lastRoundPlayer2Choice) || '—' }}
+                            </span>
+                            <span v-else-if="getRpsState(msg).player2Id == myuser.sub" class="rps-turn-badge" :class="getMyRpsChoice(msg) ? 'ready' : 'waiting'">
+                              {{ getMyRpsChoice(msg) ? ('✅ ' + getRpsChoiceName(getMyRpsChoice(msg))) : '⏳ Seçim yap' }}
+                            </span>
+                            <span v-else class="rps-turn-badge" :class="getRpsState(msg).player2Choice ? 'ready' : 'waiting'">
+                              {{ getRpsState(msg).player2Choice ? '✅ Hamle Hazır' : '⏳ Bekleniyor' }}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div v-if="getRpsState(msg) && getRpsState(msg).status === 'playing'" class="rps-choices-row">
-                        <button class="rps-choice-btn" :class="{ 'selected': getMyRpsChoice(msg) === 'rock' }" :disabled="!!getMyRpsChoice(msg)" @click.stop="makeRpsMove(msg, 'rock')">
-                          <span class="rps-emoji">🪨</span>
-                          <span>Taş</span>
-                        </button>
-                        <button class="rps-choice-btn" :class="{ 'selected': getMyRpsChoice(msg) === 'paper' }" :disabled="!!getMyRpsChoice(msg)" @click.stop="makeRpsMove(msg, 'paper')">
-                          <span class="rps-emoji">📄</span>
-                          <span>Kağıt</span>
-                        </button>
-                        <button class="rps-choice-btn" :class="{ 'selected': getMyRpsChoice(msg) === 'scissors' }" :disabled="!!getMyRpsChoice(msg)" @click.stop="makeRpsMove(msg, 'scissors')">
-                          <span class="rps-emoji">✂️</span>
-                          <span>Makas</span>
+
+                      <!-- 3. Last Round Result Alert Banner -->
+                      <div v-if="getRpsState(msg).lastRoundSummary" class="rps-round-alert">
+                        <i class="fas fa-bolt"></i>
+                        <span>{{ getRpsState(msg).lastRoundSummary }}</span>
+                      </div>
+
+                      <!-- 4. Interactive Action Section (Buttons or Game Finished) -->
+                      <div v-if="getRpsState(msg).status === 'playing'" class="rps-action-container">
+                        <div class="rps-action-prompt">
+                          <template v-if="!getMyRpsChoice(msg)">
+                            <span>👉 Hamlenizi Seçin:</span>
+                          </template>
+                          <template v-else>
+                            <span>✅ Hamlenizi Seçtiniz! Rakip bekleniyor...</span>
+                          </template>
+                        </div>
+
+                        <div class="rps-buttons-grid">
+                          <button class="rps-big-choice-btn" 
+                                  :class="{ 'chosen': getMyRpsChoice(msg) === 'rock', 'disabled': !!getMyRpsChoice(msg) && getMyRpsChoice(msg) !== 'rock' }" 
+                                  :disabled="!!getMyRpsChoice(msg)" 
+                                  @click.stop="makeRpsMove(msg, 'rock')">
+                            <span class="rps-btn-emoji">🪨</span>
+                            <span class="rps-btn-name">Taş</span>
+                            <span class="rps-btn-desc">Makası yener</span>
+                          </button>
+
+                          <button class="rps-big-choice-btn" 
+                                  :class="{ 'chosen': getMyRpsChoice(msg) === 'paper', 'disabled': !!getMyRpsChoice(msg) && getMyRpsChoice(msg) !== 'paper' }" 
+                                  :disabled="!!getMyRpsChoice(msg)" 
+                                  @click.stop="makeRpsMove(msg, 'paper')">
+                            <span class="rps-btn-emoji">📄</span>
+                            <span class="rps-btn-name">Kağıt</span>
+                            <span class="rps-btn-desc">Taşı sarar</span>
+                          </button>
+
+                          <button class="rps-big-choice-btn" 
+                                  :class="{ 'chosen': getMyRpsChoice(msg) === 'scissors', 'disabled': !!getMyRpsChoice(msg) && getMyRpsChoice(msg) !== 'scissors' }" 
+                                  :disabled="!!getMyRpsChoice(msg)" 
+                                  @click.stop="makeRpsMove(msg, 'scissors')">
+                            <span class="rps-btn-emoji">✂️</span>
+                            <span class="rps-btn-name">Makas</span>
+                            <span class="rps-btn-desc">Kağıdı keser</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- 5. Game Finished Banner & Rematch -->
+                      <div v-else class="rps-finished-container">
+                        <div class="rps-winner-announcement" :class="{ 'i-won': isRpsWinnerMe(msg) }">
+                          <div class="rps-trophy-icon">🏆</div>
+                          <div class="rps-winner-text">
+                            <div class="rps-winner-title">ŞAMPİYON: {{ getRpsState(msg).winner }}</div>
+                            <div class="rps-winner-sub">
+                              {{ isRpsWinnerMe(msg) ? '🎉 Tebrikler, düelloyu kazandınız!' : '👏 Tebrikler! Harika bir maçtı.' }}
+                            </div>
+                          </div>
+                        </div>
+                        <button class="rps-rematch-btn" @click.stop="startRpsGame()">
+                          <i class="fas fa-redo-alt"></i> Rövanş Başlat
                         </button>
                       </div>
-                      <div class="rps-status-bar">
+
+                      <!-- Bottom Helper Guide -->
+                      <div class="rps-footer-guide">
                         {{ getRpsStatusText(msg) }}
                       </div>
                     </div>
@@ -467,7 +579,7 @@
                   </div>
 
                   <!-- Metadata: Time, Edited Tag, Self-Destruct & Delivery Status -->
-                  <div class="chat-msg-meta">
+                  <div class="chat-msg-meta" v-if="msg.type != 6">
                     <span v-if="msg.expiresAt && !msg.isDeleted" class="self-destruct-badge" :title="'İmha süresi: ' + formatTime(msg.expiresAt)">
                       🔥 {{ getExpireRemaining(msg) }}
                     </span>
@@ -859,7 +971,7 @@
  </div>
 </div>
 <canvas id="confetti-canvas"></canvas>
-<script src="app.js?v=2.0.4"></script>
-<script src="./script.js?v=2.0.4"></script>
+<script src="app.js?v=2.0.5"></script>
+<script src="./script.js?v=2.0.5"></script>
 </body>
 </html>

@@ -2435,16 +2435,22 @@ createApp({
                     player2Id: 0,
                     player1Name: 'Oyuncu 1',
                     player2Name: 'Oyuncu 2',
+                    player1Choice: null,
+                    player2Choice: null,
                     player1Score: 0,
                     player2Score: 0,
                     round: 1,
                     targetScore: 3,
+                    lastRoundPlayer1Choice: null,
+                    lastRoundPlayer2Choice: null,
+                    lastRoundSummary: null,
+                    winner: null,
                     status: 'playing'
                 };
             }
             return {
-                player1Id: s.player1Id ?? s.Player1Id,
-                player2Id: s.player2Id ?? s.Player2Id,
+                player1Id: s.player1Id ?? s.Player1Id ?? 0,
+                player2Id: s.player2Id ?? s.Player2Id ?? 0,
                 player1Name: s.player1Name || s.Player1Name || 'Oyuncu 1',
                 player2Name: s.player2Name || s.Player2Name || 'Oyuncu 2',
                 player1Choice: s.player1Choice ?? s.Player1Choice ?? null,
@@ -2453,10 +2459,45 @@ createApp({
                 player2Score: s.player2Score ?? s.Player2Score ?? 0,
                 round: s.round ?? s.Round ?? 1,
                 targetScore: s.targetScore ?? s.TargetScore ?? 3,
+                lastRoundPlayer1Choice: s.lastRoundPlayer1Choice ?? s.LastRoundPlayer1Choice ?? null,
+                lastRoundPlayer2Choice: s.lastRoundPlayer2Choice ?? s.LastRoundPlayer2Choice ?? null,
                 lastRoundSummary: s.lastRoundSummary ?? s.LastRoundSummary ?? null,
                 winner: s.winner ?? s.Winner ?? null,
                 status: s.status || s.Status || 'playing'
             };
+        },
+
+        getRpsPlayer1Name(msg) {
+            const state = this.getRpsState(msg);
+            if (!state) return 'Oyuncu 1';
+            const myId = parseInt(this.myuser.sub);
+            return state.player1Id === myId ? 'Siz' : state.player1Name;
+        },
+
+        getRpsPlayer2Name(msg) {
+            const state = this.getRpsState(msg);
+            if (!state) return 'Oyuncu 2';
+            const myId = parseInt(this.myuser.sub);
+            return state.player2Id === myId ? 'Siz' : state.player2Name;
+        },
+
+        getRpsChoiceName(choice) {
+            if (!choice) return '';
+            const c = choice.toLowerCase();
+            if (c === 'rock') return '🪨 Taş';
+            if (c === 'paper') return '📄 Kağıt';
+            if (c === 'scissors') return '✂️ Makas';
+            return choice;
+        },
+
+        isRpsWinnerMe(msg) {
+            const state = this.getRpsState(msg);
+            if (!state || state.status !== 'finished') return false;
+            const myId = parseInt(this.myuser.sub);
+            if (state.winner === 'Draw') return false;
+            if (state.player1Score > state.player2Score) return state.player1Id === myId;
+            if (state.player2Score > state.player1Score) return state.player2Id === myId;
+            return false;
         },
 
         getMyRpsChoice(msg) {
@@ -2486,7 +2527,7 @@ createApp({
             if (!myChoice && peerChoice) {
                 return `🔥 ${peerName} hamlesini seçti! Sıra sizde!`;
             }
-            return `Tur ${state.round} • 3 olan kazanır! Hamlenizi seçin:`;
+            return `3 olan kazanır! Hamlenizi seçin:`;
         },
 
         async makeRpsMove(msg, choice) {
