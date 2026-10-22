@@ -22,7 +22,7 @@
 
   <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
-  <link rel="stylesheet" href="./style.css?v=2.0.8">
+  <link rel="stylesheet" href="./style.css?v=2.1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
@@ -568,16 +568,22 @@
                       </div>
                     </div>
 
-                    <div v-else-if="msg.type == 6" class="xox-game-box">
-                      <div class="xox-header">{{ msg.content }}</div>
-                      <div class="xox-grid">
+                    <div v-else-if="msg.type == 6" class="xox-game-box" :class="{ 'my-turn': isMyXoxTurn(msg), 'waiting-turn': !isMyXoxTurn(msg) }">
+                      <div class="xox-header">
+                        <span>{{ msg.content }}</span>
+                        <span v-if="getXoxState(msg) && (getXoxState(msg).status || getXoxState(msg).Status) === 'playing'" 
+                              :class="['xox-turn-badge', isMyXoxTurn(msg) ? 'turn-active' : 'turn-wait']">
+                          {{ isMyXoxTurn(msg) ? '🎯 Sıra Sizde' : '⏳ Rakipte' }}
+                        </span>
+                      </div>
+                      <div class="xox-grid" :class="{ 'grid-my-turn': isMyXoxTurn(msg), 'grid-waiting': !isMyXoxTurn(msg) }">
                         <div v-for="(cell, cIdx) in getXoxBoard(msg)" :key="cIdx" 
-                             :class="['xox-cell', cell === 'X' ? 'cell-x' : '', cell === 'O' ? 'cell-o' : '', isWinningCell(msg, cIdx) ? 'win-cell' : '', cell ? 'occupied' : '']"
+                             :class="['xox-cell', cell === 'X' ? 'cell-x' : '', cell === 'O' ? 'cell-o' : '', isWinningCell(msg, cIdx) ? 'win-cell' : '', cell ? 'occupied' : '', (!isMyXoxTurn(msg) && !cell) ? 'not-my-turn' : '']"
                              @click.stop="makeXoxMove(msg, cIdx)">
                           {{ cell }}
                         </div>
                       </div>
-                      <div class="xox-status-bar">
+                      <div class="xox-status-bar" :class="{ 'status-my-turn': isMyXoxTurn(msg) }">
                         {{ getXoxStatusText(msg) }}
                       </div>
                     </div>
@@ -677,14 +683,17 @@
           <span><i class="fas fa-terminal"></i> Hızlı Komutlar</span>
           <span class="slash-menu-hint">↑↓ Seç • Enter Onayla • Esc Kapat</span>
         </div>
-        <div v-for="(cmd, idx) in filteredSlashCommands" :key="cmd.command"
-             :class="['slash-command-item', idx === slashSelectedIndex ? 'active' : '']"
-             @mouseenter="slashSelectedIndex = idx"
-             @click.stop="selectSlashCommand(cmd, true)">
-          <span class="slash-cmd-icon">{{ cmd.icon }}</span>
-          <div class="slash-cmd-info">
-            <span class="slash-cmd-name">{{ cmd.command }}</span>
-            <span class="slash-cmd-desc">{{ cmd.description }}</span>
+        <div class="slash-menu-list">
+          <div v-for="(cmd, idx) in filteredSlashCommands" :key="cmd.command"
+               :id="'slash-item-' + idx"
+               :class="['slash-command-item', idx === slashSelectedIndex ? 'active' : '']"
+               @mouseenter="slashSelectedIndex = idx"
+               @click.stop="selectSlashCommand(cmd, cmd.immediate !== false)">
+            <span class="slash-cmd-icon">{{ cmd.icon }}</span>
+            <div class="slash-cmd-info">
+              <span class="slash-cmd-name">{{ cmd.command }}</span>
+              <span class="slash-cmd-desc">{{ cmd.description }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -981,7 +990,7 @@
  </div>
 </div>
 <canvas id="confetti-canvas"></canvas>
-<script src="app.js?v=2.0.8"></script>
-<script src="./script.js?v=2.0.8"></script>
+<script src="app.js?v=2.1.0"></script>
+<script src="./script.js?v=2.1.0"></script>
 </body>
 </html>

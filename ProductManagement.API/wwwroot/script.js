@@ -624,6 +624,42 @@ createApp({
                 this.scrollToBottom(true);
             });
 
+            // Oyun Sıra Bildirimi (XOX ve Taş-Kağıt-Makas)
+            this.connection.on('ReceiveGameTurnNotification', (data) => {
+                const title = (data && (data.title || data.Title)) || '🎮 Sıra Sizde!';
+                const text = (data && (data.text || data.Text)) || 'Hamle yapma sırası sizde!';
+
+                // 1. Sesli melodi çal
+                this.playGameTurnSound();
+
+                // 2. Mobil titreşim desteği
+                if (navigator.vibrate) {
+                    try { navigator.vibrate([80, 40, 80]); } catch (e) {}
+                }
+
+                // 3. SweetAlert bildirim toast'ı
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'info',
+                    title: title,
+                    text: text,
+                    showConfirmButton: false,
+                    timer: 3500,
+                    timerProgressBar: true
+                });
+
+                // 4. Sekme arka planda ise Web Notification gönder
+                if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+                    try {
+                        new Notification(title, {
+                            body: text,
+                            icon: '/favicon.ico'
+                        });
+                    } catch (e) {}
+                }
+            });
+
             // Phase 5: Süresi Dolan Mesaj Bildirimi
             this.connection.on('ReceiveMessageExpired', (data) => {
                 const msgId = data.messageId || data.MessageId;
@@ -815,28 +851,30 @@ createApp({
                 if (event.key === 'ArrowDown') {
                     event.preventDefault();
                     this.slashSelectedIndex = (this.slashSelectedIndex + 1) % this.filteredSlashCommands.length;
+                    this.scrollSelectedSlashIntoView();
                     return;
                 }
                 if (event.key === 'ArrowUp') {
                     event.preventDefault();
                     this.slashSelectedIndex = (this.slashSelectedIndex - 1 + this.filteredSlashCommands.length) % this.filteredSlashCommands.length;
+                    this.scrollSelectedSlashIntoView();
                     return;
                 }
                 if (event.key === 'Tab') {
                     event.preventDefault();
                     const selected = this.filteredSlashCommands[this.slashSelectedIndex];
-                    if (selected) this.selectSlashCommand(selected, false);
+                    if (selected) {
+                        this.selectSlashCommand(selected, false);
+                    }
                     return;
                 }
                 if (event.key === 'Enter') {
-                    const selected = this.filteredSlashCommands[this.slashSelectedIndex];
-                    const trimmed = (this.messageText || '').trim();
-                    // Eğer kullanıcı tam komutu yazmadıysa (ör. "/z" veya sadece "/") listedeki seçili komutu uygula
-                    if (selected && trimmed.toLowerCase() !== selected.cmd.toLowerCase() && !trimmed.includes(' ')) {
-                        event.preventDefault();
-                        this.selectSlashCommand(selected, !selected.needsArg);
-                        return;
+                    event.preventDefault();
+                    const selected = this.filteredSlashCommands[this.slashSelectedIndex] || this.filteredSlashCommands[0];
+                    if (selected) {
+                        this.selectSlashCommand(selected, selected.immediate !== false);
                     }
+                    return;
                 }
                 if (event.key === 'Escape') {
                     event.preventDefault();
@@ -849,17 +887,36 @@ createApp({
                 this.handleFooterSend();
             }
         },
+        scrollSelectedSlashIntoView() {
+            this.$nextTick(() => {
+                const el = document.getElementById('slash-item-' + this.slashSelectedIndex);
+                if (el && typeof el.scrollIntoView === 'function') {
+                    el.scrollIntoView({ block: 'nearest' });
+                }
+            });
+        },
         selectSlashCommand(cmdObj, executeNow = false) {
             if (!cmdObj) return;
+            const cmdName = cmdObj.command || cmdObj.cmd || '';
+            const isImmediate = cmdObj.immediate !== undefined ? cmdObj.immediate : !cmdObj.needsArg;
             this.showSlashMenu = false;
-            if (cmdObj.needsArg && !executeNow) {
-                this.messageText = cmdObj.cmd + ' ';
+
+            // Eğer anında çalışmayacaksa VEYA parametre gerektiriyorsa (örn: /spoiler, /rastgele)
+            if (!executeNow || !isImmediate) {
+                this.messageText = cmdObj.template || (cmdName + ' ');
                 this.$nextTick(() => {
                     const input = document.getElementById('message');
-                    if (input) input.focus();
+                    if (input) {
+                        input.focus();
+                        const len = this.messageText.length;
+                        if (typeof input.setSelectionRange === 'function') {
+                            input.setSelectionRange(len, len);
+                        }
+                    }
                 });
             } else {
-                this.messageText = cmdObj.cmd;
+                // Anında çalışan komutlar (örn: /zar, /yazitura, /xox, /tkm, /durt, /yardim)
+                this.messageText = cmdName;
                 this.sendMessage();
             }
         },
@@ -2408,6 +2465,55 @@ createApp({
             }
         },
 
+        playGameTurnSound() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const now = ctx.currentTime;
+
+                const playChimeNote = (freq, start, duration) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, start);
+
+                    gain.gain.setValueAtTime(0.001, start);
+                    gain.gain.exponentialRampToValueAtTime(0.18, start + 0.03);
+                    gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(start);
+                    osc.stop(start + duration);
+                };
+
+                playChimeNote(523.25, now, 0.22);
+                playChimeNote(783.99, now + 0.12, 0.35);
+            } catch (e) {
+                console.warn('Oyun sıra sesi çalınamadı:', e);
+            }
+        },
+
+        cleanErrorMessage(err, fallback = 'İşlem gerçekleştirilemedi.') {
+            if (!err) return fallback;
+            let msg = typeof err === 'string' ? err : (err.message || '');
+            if (!msg) return fallback;
+
+            if (msg.includes('HubException:')) {
+                const parts = msg.split('HubException:');
+                msg = parts[parts.length - 1].trim();
+            } else if (msg.includes('Error:')) {
+                const parts = msg.split('Error:');
+                msg = parts[parts.length - 1].trim();
+            }
+
+            msg = msg.replace(/^An unexpected error occurred invoking\s+'[^']+'\s+on the server\.\s*/i, '').trim();
+            return msg || fallback;
+        },
+
         // 2. XOX ve Taş-Kağıt-Makas Mini Oyunları
         getGameType(msg) {
             if (!msg || !msg.metadataJson) return 'xox';
@@ -2425,7 +2531,7 @@ createApp({
                 await this.connection.invoke('StartXoxGame', this.selectedUserId.toString());
             } catch (err) {
                 console.error('StartXoxGame error:', err);
-                Swal.fire('Hata', 'Oyun başlatılamadı.', 'error');
+                Swal.fire('Hata', this.cleanErrorMessage(err, 'Oyun başlatılamadı.'), 'error');
             }
         },
 
@@ -2441,6 +2547,15 @@ createApp({
         getXoxBoard(msg) {
             const state = this.getXoxState(msg);
             return (state && state.board) || (state && state.Board) || ["", "", "", "", "", "", "", "", ""];
+        },
+
+        isMyXoxTurn(msg) {
+            const state = this.getXoxState(msg);
+            if (!state || (state.status || state.Status) !== 'playing') return false;
+            if (!this.myuser || !this.myuser.sub) return false;
+            const turn = state.turn || state.Turn || 'X';
+            return (turn === 'X' && (state.playerX || state.PlayerX) == this.myuser.sub) ||
+                   (turn === 'O' && (state.playerO || state.PlayerO) == this.myuser.sub);
         },
 
         getXoxStatusText(msg) {
@@ -2459,10 +2574,7 @@ createApp({
             }
 
             const currentTurnPlayer = turn === 'X' ? playerXName : playerOName;
-            const isMyTurn = (turn === 'X' && (state.playerX || state.PlayerX) == this.myuser.sub) ||
-                             (turn === 'O' && (state.playerO || state.PlayerO) == this.myuser.sub);
-
-            return isMyTurn ? `🎮 Sıra Sende! (${turn})` : `⏳ Sıra: ${currentTurnPlayer} (${turn})`;
+            return this.isMyXoxTurn(msg) ? `🎮 Sıra Sende! (${turn})` : `⏳ Sıra: ${currentTurnPlayer} (${turn})`;
         },
 
         isWinningCell(msg, cIdx) {
@@ -2480,17 +2592,29 @@ createApp({
             const board = this.getXoxBoard(msg);
             if (board[cellIndex]) return; // Zaten dolu
 
-            try {
-                await this.connection.invoke('MakeXoxMove', msg.id, cellIndex);
-            } catch (err) {
-                const errMsg = err && err.message ? err.message : 'Hamle yapılamadı.';
+            if (!this.isMyXoxTurn(msg)) {
                 Swal.fire({
                     toast: true,
                     position: 'top-end',
-                    icon: 'info',
-                    title: errMsg,
+                    icon: 'warning',
+                    title: '⏳ Hamle sırası rakibinizde, lütfen bekleyin.',
                     showConfirmButton: false,
                     timer: 2000
+                });
+                return;
+            }
+
+            try {
+                await this.connection.invoke('MakeXoxMove', msg.id, cellIndex);
+            } catch (err) {
+                const errMsg = this.cleanErrorMessage(err, 'Hamle yapılamadı.');
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: errMsg,
+                    showConfirmButton: false,
+                    timer: 2500
                 });
             }
         },
@@ -2502,7 +2626,7 @@ createApp({
                 await this.connection.invoke('StartRpsGame', this.selectedUserId.toString());
             } catch (err) {
                 console.error('StartRpsGame error:', err);
-                Swal.fire('Hata', 'Taş-Kağıt-Makas başlatılamadı.', 'error');
+                Swal.fire('Hata', this.cleanErrorMessage(err, 'Taş-Kağıt-Makas başlatılamadı.'), 'error');
             }
         },
 
@@ -2613,19 +2737,29 @@ createApp({
             if (!this.connection || !msg.id) return;
             const state = this.getRpsState(msg);
             if (!state || state.status !== 'playing') return;
-            if (this.getMyRpsChoice(msg)) return;
-
-            try {
-                await this.connection.invoke('MakeRpsMove', msg.id, choice);
-            } catch (err) {
-                const errMsg = err && err.message ? err.message : 'Hamle gönderilemedi.';
+            if (this.getMyRpsChoice(msg)) {
                 Swal.fire({
                     toast: true,
                     position: 'top-end',
                     icon: 'info',
-                    title: errMsg,
+                    title: 'Seçiminizi zaten yaptınız. Rakip bekleniyor.',
                     showConfirmButton: false,
                     timer: 2000
+                });
+                return;
+            }
+
+            try {
+                await this.connection.invoke('MakeRpsMove', msg.id, choice);
+            } catch (err) {
+                const errMsg = this.cleanErrorMessage(err, 'Hamle gönderilemedi.');
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: errMsg,
+                    showConfirmButton: false,
+                    timer: 2500
                 });
             }
         },

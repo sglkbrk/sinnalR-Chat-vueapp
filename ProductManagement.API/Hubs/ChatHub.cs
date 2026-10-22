@@ -359,6 +359,29 @@ public class ChatHub : Hub
 
             await Clients.User(message.ReceiverId.ToString()).SendAsync("ReceiveGameUpdate", updatePayload);
             await Clients.User(message.SenderId.ToString()).SendAsync("ReceiveGameUpdate", updatePayload);
+
+            // Sıra Bildirimi: XOX devam ediyorsa sıradaki oyuncuya anlık bildirim gönder
+            if (state.Status == "playing")
+            {
+                var nextPlayerId = state.Turn == "X" ? state.PlayerX : state.PlayerO;
+                var turnNotifierPayload = new
+                {
+                    GameType = "xox",
+                    MessageId = messageId,
+                    SenderId = userId,
+                    Title = "🎮 XOX: Sıra Sizde!",
+                    Text = "Arkadaşınız hamlesini yaptı. Sıra sizde, hamlenizi yapın!"
+                };
+                await Clients.User(nextPlayerId.ToString()).SendAsync("ReceiveGameTurnNotification", turnNotifierPayload);
+
+                var dummyMsg = new Message
+                {
+                    SenderId = userId,
+                    ReceiverId = nextPlayerId,
+                    Content = "🎮 XOX: Sıra sizde! Hamlenizi yapın."
+                };
+                await sendNotification(dummyMsg);
+            }
         }
         catch (Exception ex)
         {
@@ -417,6 +440,41 @@ public class ChatHub : Hub
 
             await Clients.User(message.ReceiverId.ToString()).SendAsync("ReceiveGameUpdate", updatePayload);
             await Clients.User(message.SenderId.ToString()).SendAsync("ReceiveGameUpdate", updatePayload);
+
+            // Sıra Bildirimi: Eğer bir oyuncu hamlesini seçtiyse ve rakip henüz seçmediyse rakibe bildirim gönder
+            if (state.Status == "playing")
+            {
+                int? waitingPlayerId = null;
+                if (!string.IsNullOrEmpty(state.Player1Choice) && string.IsNullOrEmpty(state.Player2Choice))
+                {
+                    waitingPlayerId = state.Player2Id;
+                }
+                else if (string.IsNullOrEmpty(state.Player1Choice) && !string.IsNullOrEmpty(state.Player2Choice))
+                {
+                    waitingPlayerId = state.Player1Id;
+                }
+
+                if (waitingPlayerId.HasValue && waitingPlayerId.Value != userId)
+                {
+                    var turnNotifierPayload = new
+                    {
+                        GameType = "rps",
+                        MessageId = messageId,
+                        SenderId = userId,
+                        Title = "🎮 Taş-Kağıt-Makas: Sıra Sizde!",
+                        Text = "Rakibiniz hamlesini seçti! Sıra sizde, hamlenizi seçin."
+                    };
+                    await Clients.User(waitingPlayerId.Value.ToString()).SendAsync("ReceiveGameTurnNotification", turnNotifierPayload);
+
+                    var dummyMsg = new Message
+                    {
+                        SenderId = userId,
+                        ReceiverId = waitingPlayerId.Value,
+                        Content = "🎮 Taş-Kağıt-Makas: Rakibiniz hamlesini yaptı, sıra sizde!"
+                    };
+                    await sendNotification(dummyMsg);
+                }
+            }
         }
         catch (Exception ex)
         {

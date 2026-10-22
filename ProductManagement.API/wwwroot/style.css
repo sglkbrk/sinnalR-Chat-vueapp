@@ -2844,6 +2844,38 @@ html {
   font-weight: 700;
   color: var(--body-color);
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.xox-turn-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 12px;
+  letter-spacing: 0.3px;
+}
+
+.xox-turn-badge.turn-active {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  animation: pulseTurnBadge 1.5s infinite;
+}
+
+.xox-turn-badge.turn-wait {
+  background: rgba(148, 163, 184, 0.2);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+@keyframes pulseTurnBadge {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.85; }
 }
 
 .xox-grid {
@@ -2854,6 +2886,11 @@ html {
   background: var(--border-color);
   padding: 5px;
   border-radius: 10px;
+  transition: box-shadow 0.2s ease;
+}
+
+.xox-grid.grid-my-turn {
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
 }
 
 .xox-cell {
@@ -2869,9 +2906,19 @@ html {
   color: var(--body-color);
 }
 
-.xox-cell:hover:not(.occupied):not(.disabled) {
+.xox-cell:hover:not(.occupied):not(.disabled):not(.not-my-turn) {
   background: var(--button-bg-color);
   transform: scale(1.05);
+}
+
+.xox-cell.not-my-turn {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.xox-cell.not-my-turn:hover {
+  background: var(--theme-bg-color) !important;
+  transform: none !important;
 }
 
 .xox-cell.cell-x {
@@ -2898,6 +2945,11 @@ html {
   font-weight: 600;
   text-align: center;
   color: var(--theme-color);
+}
+
+.xox-status-bar.status-my-turn {
+  color: #10b981;
+  font-weight: 700;
 }
 
 /* Self-Destructing / Burning Messages */
@@ -3029,7 +3081,14 @@ html {
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 6px;
+}
+
+.slash-menu-list {
+  max-height: 250px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .slash-command-item {
